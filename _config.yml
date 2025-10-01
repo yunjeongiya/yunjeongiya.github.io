@@ -1,0 +1,46 @@
+# Site settings
+title: YJ's Dev Blog
+email: your-email@example.com
+description: >-
+  기술 블로그 | Tech Blog
+baseurl: ""
+url: "https://yunjeongiya.github.io"
+
+# Build settings
+markdown: kramdown
+theme: minima
+
+# Plugin settings
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+
+# Multi-language support
+languages: ["ko", "en"]
+default_lang: "ko"
+
+# Collections
+collections:
+  posts:
+    output: true
+    permalink: /:categories/:year/:month/:day/:title:output_ext
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+      lang: "ko"
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  - README.md
