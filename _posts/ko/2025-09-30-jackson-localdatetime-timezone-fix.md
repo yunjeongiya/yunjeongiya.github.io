@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Spring Boot에서 LocalDateTime을 UTC로 직렬화할 때 타임존 표시(Z) 추가하기"
-date: 2025-10-01 17:30:00 +0900
+date: 2025-09-30 17:30:00 +0900
 categories: [Spring Boot, Jackson]
 tags: [spring-boot, jackson, localdatetime, timezone, serialization]
 lang: ko
