@@ -1,0 +1,327 @@
+/* VSCode Dark+ Theme for Jekyll Blog */
+
+/* Import D2Coding font for Korean */
+@import url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_three@1.0/D2Coding.woff');
+
+/* VSCode Color Palette */
+:root {
+  /* Background colors */
+  --vscode-bg: #1e1e1e;
+  --vscode-sidebar-bg: #252526;
+  --vscode-editor-bg: #1e1e1e;
+  --vscode-titlebar-bg: #323233;
+
+  /* Text colors */
+  --vscode-fg: #d4d4d4;
+  --vscode-comment: #6a9955;
+  --vscode-keyword: #569cd6;
+  --vscode-string: #ce9178;
+  --vscode-function: #dcdcaa;
+  --vscode-variable: #9cdcfe;
+
+  /* Accent colors */
+  --vscode-blue: #007acc;
+  --vscode-orange: #ce9178;
+  --vscode-green: #4ec9b0;
+  --vscode-purple: #c586c0;
+
+  /* UI colors */
+  --vscode-border: #3e3e42;
+  --vscode-selection: #264f78;
+  --vscode-hover: #2a2d2e;
+}
+
+/* Base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'D2Coding', 'Consolas', 'Monaco', 'Courier New', monospace;
+  background-color: var(--vscode-bg);
+  color: var(--vscode-fg);
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+/* Container layout (VSCode style) */
+.page-content {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar (like VSCode activity bar + sidebar) */
+.sidebar {
+  width: 250px;
+  background-color: var(--vscode-sidebar-bg);
+  border-right: 1px solid var(--vscode-border);
+  padding: 20px;
+  position: fixed;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar h2 {
+  color: var(--vscode-keyword);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 15px;
+  font-weight: normal;
+}
+
+.sidebar ul {
+  list-style: none;
+}
+
+.sidebar li {
+  margin: 8px 0;
+}
+
+.sidebar a {
+  color: var(--vscode-fg);
+  text-decoration: none;
+  transition: color 0.2s;
+  font-size: 13px;
+}
+
+.sidebar a:hover {
+  color: var(--vscode-blue);
+}
+
+/* Main content area */
+.main-content {
+  margin-left: 250px;
+  flex: 1;
+  padding: 0;
+}
+
+/* Title bar (like VSCode) */
+.titlebar {
+  background-color: var(--vscode-titlebar-bg);
+  height: 35px;
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
+  border-bottom: 1px solid var(--vscode-border);
+}
+
+.titlebar .site-title {
+  color: var(--vscode-fg);
+  font-size: 13px;
+  text-decoration: none;
+  font-weight: normal;
+}
+
+/* Editor area (content) */
+.editor {
+  padding: 30px 50px;
+  max-width: 900px;
+}
+
+/* Tab-like post title */
+.post-header {
+  background-color: var(--vscode-titlebar-bg);
+  padding: 8px 15px;
+  border-bottom: 2px solid var(--vscode-blue);
+  margin: -30px -50px 30px -50px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.post-title {
+  color: var(--vscode-fg);
+  font-size: 16px;
+  font-weight: normal;
+  margin: 0;
+}
+
+.post-title::before {
+  content: "📄";
+  margin-right: 8px;
+}
+
+.post-meta {
+  color: var(--vscode-comment);
+  font-size: 12px;
+  margin-left: auto;
+}
+
+/* Content typography */
+.post-content h1,
+.post-content h2,
+.post-content h3 {
+  color: var(--vscode-keyword);
+  margin-top: 30px;
+  margin-bottom: 15px;
+  font-weight: normal;
+}
+
+.post-content h1 { font-size: 24px; }
+.post-content h2 { font-size: 20px; }
+.post-content h3 { font-size: 16px; }
+
+.post-content p {
+  margin-bottom: 15px;
+  line-height: 1.8;
+}
+
+.post-content a {
+  color: var(--vscode-blue);
+  text-decoration: none;
+}
+
+.post-content a:hover {
+  text-decoration: underline;
+}
+
+/* Code blocks (VSCode style) */
+.post-content code {
+  background-color: var(--vscode-sidebar-bg);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'D2Coding', 'Consolas', monospace;
+  font-size: 13px;
+  color: var(--vscode-string);
+}
+
+.post-content pre {
+  background-color: var(--vscode-sidebar-bg);
+  border: 1px solid var(--vscode-border);
+  border-radius: 5px;
+  padding: 15px;
+  overflow-x: auto;
+  margin: 20px 0;
+}
+
+.post-content pre code {
+  background: none;
+  padding: 0;
+  color: var(--vscode-fg);
+}
+
+/* Syntax highlighting (basic) */
+.highlight .k  { color: var(--vscode-keyword); } /* keywords */
+.highlight .s  { color: var(--vscode-string); }  /* strings */
+.highlight .nf { color: var(--vscode-function); } /* functions */
+.highlight .c  { color: var(--vscode-comment); } /* comments */
+.highlight .n  { color: var(--vscode-variable); } /* names */
+
+/* Lists */
+.post-content ul,
+.post-content ol {
+  margin-left: 25px;
+  margin-bottom: 15px;
+}
+
+.post-content li {
+  margin-bottom: 8px;
+}
+
+/* Blockquotes */
+.post-content blockquote {
+  border-left: 3px solid var(--vscode-blue);
+  padding-left: 15px;
+  margin: 20px 0;
+  color: var(--vscode-comment);
+  font-style: italic;
+}
+
+/* Tables */
+.post-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+.post-content th,
+.post-content td {
+  border: 1px solid var(--vscode-border);
+  padding: 10px;
+  text-align: left;
+}
+
+.post-content th {
+  background-color: var(--vscode-sidebar-bg);
+  color: var(--vscode-keyword);
+}
+
+/* Home page post list */
+.post-list {
+  list-style: none;
+  margin-left: 0;
+}
+
+.post-list-item {
+  background-color: var(--vscode-sidebar-bg);
+  padding: 15px;
+  margin-bottom: 10px;
+  border-left: 3px solid transparent;
+  transition: all 0.2s;
+}
+
+.post-list-item:hover {
+  border-left-color: var(--vscode-blue);
+  background-color: var(--vscode-hover);
+}
+
+.post-list-heading {
+  margin: 0;
+  font-size: 16px;
+}
+
+.post-list-heading a {
+  color: var(--vscode-fg);
+  text-decoration: none;
+}
+
+.post-list-heading a:hover {
+  color: var(--vscode-blue);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
+
+  .editor {
+    padding: 20px;
+  }
+
+  .post-header {
+    margin: -20px -20px 20px -20px;
+  }
+}
+
+/* Scrollbar (VSCode style) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--vscode-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--vscode-border);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Selection */
+::selection {
+  background-color: var(--vscode-selection);
+  color: var(--vscode-fg);
+}

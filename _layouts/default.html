@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang | default: "ko" }}">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if page.title %}{{ page.title | escape }} | {% endif %}{{ site.title | escape }}</title>
+  <meta name="description" content="{{ page.excerpt | default: site.description | strip_html | normalize_whitespace | truncate: 160 | escape }}">
+  <link rel="stylesheet" href="{{ "/assets/css/vscode-style.css" | relative_url }}">
+  {% feed_meta %}
+  {% seo %}
+</head>
+<body>
+  <div class="page-content">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h2>📁 Navigation</h2>
+      <ul>
+        <li><a href="{{ "/" | relative_url }}">🏠 Home</a></li>
+        <li><a href="{{ "/about" | relative_url }}">👤 About</a></li>
+      </ul>
+
+      <h2>📚 Categories</h2>
+      <ul>
+        {% for category in site.categories %}
+        <li><a href="#">{{ category[0] }}</a></li>
+        {% endfor %}
+      </ul>
+
+      <h2>🏷️ Tags</h2>
+      <ul>
+        {% for tag in site.tags limit:10 %}
+        <li><a href="#">{{ tag[0] }}</a></li>
+        {% endfor %}
+      </ul>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main-content">
+      <!-- Title bar -->
+      <div class="titlebar">
+        <a href="{{ "/" | relative_url }}" class="site-title">{{ site.title }}</a>
+      </div>
+
+      <!-- Editor (content area) -->
+      <div class="editor">
+        {{ content }}
+      </div>
+    </main>
+  </div>
+</body>
+</html>

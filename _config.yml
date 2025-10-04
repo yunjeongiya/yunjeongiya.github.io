@@ -9,38 +9,16 @@ url: "https://yunjeongiya.github.io"
 
 # Build settings
 markdown: kramdown
-remote_theme: yous/whiteglass
+theme: minima
 
 # Plugin settings
 plugins:
   - jekyll-feed
   - jekyll-seo-tag
-  - jekyll-sitemap
-  - jekyll-archives
 
-# Whiteglass theme settings
-lang: ko
-navigation:
-  - title: Home
-    url: /
-  - title: Archives
-    url: /archives/
-  - title: About
-    url: /about/
-
-# Archives
-jekyll-archives:
-  enabled:
-    - categories
-    - tags
-  layout: category_archives
-  permalinks:
-    category: /categories/:name/
-    tag: /tags/:name/
-
-# Multi-language support
-languages: ["ko", "en"]
-default_lang: "ko"
+# Minima settings
+minima:
+  skin: dark
 
 # Defaults
 defaults:
@@ -49,7 +27,6 @@ defaults:
       type: "posts"
     values:
       layout: "post"
-      lang: "ko"
 
 # Exclude from processing
 exclude:
