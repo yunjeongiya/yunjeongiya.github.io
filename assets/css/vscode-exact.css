@@ -616,3 +616,32 @@ body {
     height: 180px;
   }
 }
+
+/* Terminal Panel Toggle */
+.vscode-terminal-panel.hidden {
+  display: none;
+}
+
+.statusbar-toggle {
+  cursor: pointer;
+  padding: 0 10px;
+  transition: background 0.2s;
+  user-select: none;
+}
+
+.statusbar-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.statusbar-toggle .codicon {
+  margin-right: 5px;
+}
+
+/* Comments section in terminal */
+.terminal-comments {
+  padding: 0;
+}
+
+.terminal-comments .utterances {
+  max-width: none;
+}

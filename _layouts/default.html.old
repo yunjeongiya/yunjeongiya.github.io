@@ -99,64 +99,58 @@
           </div>
         </div>
 
-        <!-- Right Panel -->
+        <!-- Right Panel (Outline + Minimap) - Only on post pages -->
         {% if page.layout == 'post' %}
         <div class="vscode-right-panel">
+          <!-- Outline Section -->
           <div class="right-panel-section outline">
             <div class="right-panel-header">
               <i class="codicon codicon-list-tree"></i> OUTLINE
             </div>
-            <div id="outline-container"></div>
+            <div id="outline-container">
+              <!-- Populated by JS -->
+            </div>
           </div>
 
+          <!-- Minimap Section -->
           <div class="right-panel-section minimap">
             <div class="right-panel-header">
               <i class="codicon codicon-symbol-misc"></i> MINIMAP
             </div>
-            <div class="minimap-content" id="minimap-content"></div>
+            <div class="minimap-content" id="minimap-content">
+              <!-- Populated by JS -->
+            </div>
           </div>
         </div>
         {% endif %}
       </div>
     </div>
 
-    <!-- Terminal Panel -->
+    <!-- Terminal Panel - Only on post pages -->
     {% if page.layout == 'post' %}
-    <div class="vscode-terminal-panel" id="terminal-panel">
+    <div class="vscode-terminal-panel">
       <div class="terminal-tabs">
-        <div class="terminal-tab active" data-tab="tags">
+        <div class="terminal-tab active">
           <i class="codicon codicon-tag"></i>
           <span>TAGS</span>
         </div>
-        <div class="terminal-tab" data-tab="comments">
+        <div class="terminal-tab">
           <i class="codicon codicon-comment"></i>
-          <span>COMMENTS</span>
+          <span>COMMENTS (Coming Soon)</span>
         </div>
       </div>
       <div class="terminal-content">
-        <div class="terminal-tab-content" id="tags-content">
-          {% if page.tags.size > 0 %}
-          <div class="terminal-tags">
-            {% for tag in page.tags %}
-            <span class="terminal-tag">
-              <i class="codicon codicon-tag"></i> {{ tag }}
-            </span>
-            {% endfor %}
-          </div>
-          {% else %}
-          <p style="color: var(--text-secondary); font-size: 13px;">No tags</p>
-          {% endif %}
+        {% if page.tags.size > 0 %}
+        <div class="terminal-tags">
+          {% for tag in page.tags %}
+          <span class="terminal-tag">
+            <i class="codicon codicon-tag"></i> {{ tag }}
+          </span>
+          {% endfor %}
         </div>
-
-        <div class="terminal-tab-content terminal-comments" id="comments-content" style="display: none;">
-          <script src="https://utteranc.es/client.js"
-                  repo="yunjeongiya/yunjeongiya.github.io"
-                  issue-term="pathname"
-                  theme="github-dark"
-                  crossorigin="anonymous"
-                  async>
-          </script>
-        </div>
+        {% else %}
+        <p style="color: var(--text-secondary); font-size: 13px;">No tags</p>
+        {% endif %}
       </div>
     </div>
     {% endif %}
@@ -166,11 +160,6 @@
       <div class="statusbar-left">
         <span><i class="codicon codicon-circle-filled" style="color: #4EC9B0;"></i> Jekyll</span>
         <span><i class="codicon codicon-markdown"></i> Markdown</span>
-        {% if page.layout == 'post' %}
-        <span class="statusbar-toggle" id="terminal-toggle" title="Toggle Terminal Panel">
-          <i class="codicon codicon-terminal"></i> Terminal
-        </span>
-        {% endif %}
       </div>
       <div class="statusbar-right">
         <span>UTF-8</span>
@@ -179,12 +168,13 @@
     </div>
   </div>
 
+  <!-- Outline & Minimap JS -->
   {% if page.layout == 'post' %}
   <script>
     window.updateOutline = function() {
       const container = document.getElementById('outline-container');
       if (!container || !window.postOutline) return;
-
+      
       container.innerHTML = '';
       window.postOutline.forEach(function(item) {
         const div = document.createElement('div');
@@ -201,32 +191,9 @@
       const content = document.getElementById('post-content');
       const minimap = document.getElementById('minimap-content');
       if (!content || !minimap) return;
-
+      
       minimap.textContent = content.textContent.substring(0, 5000);
     };
-
-    document.addEventListener('DOMContentLoaded', function() {
-      const terminalPanel = document.getElementById('terminal-panel');
-      const terminalToggle = document.getElementById('terminal-toggle');
-
-      if (terminalToggle && terminalPanel) {
-        terminalToggle.addEventListener('click', function() {
-          terminalPanel.classList.toggle('hidden');
-        });
-      }
-
-      const terminalTabs = document.querySelectorAll('.terminal-tab');
-      terminalTabs.forEach(function(tab) {
-        tab.addEventListener('click', function() {
-          terminalTabs.forEach(function(t) { t.classList.remove('active'); });
-          tab.classList.add('active');
-
-          const tabName = tab.getAttribute('data-tab');
-          document.getElementById('tags-content').style.display = tabName === 'tags' ? 'block' : 'none';
-          document.getElementById('comments-content').style.display = tabName === 'comments' ? 'block' : 'none';
-        });
-      });
-    });
   </script>
   {% endif %}
 </body>
