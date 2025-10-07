@@ -1,0 +1,43 @@
+---
+layout: default
+title: Categories
+permalink: /categories/
+---
+
+<div class="categories-page">
+  <h2 style="color: var(--keyword); margin-bottom: 30px; font-weight: 600;">
+    <i class="codicon codicon-folder"></i> All Categories
+  </h2>
+
+  {% for category in site.categories %}
+  <div style="margin-bottom: 40px;">
+    <h3 style="color: var(--variable); margin-bottom: 15px; font-size: 18px; display: flex; align-items: center;">
+      <i class="codicon codicon-folder-opened" style="margin-right: 8px;"></i>
+      {{ category[0] }}
+      <span style="color: var(--text-secondary); font-size: 14px; margin-left: 10px;">({{ category[1].size }})</span>
+    </h3>
+
+    <ul class="post-list">
+      {% for post in category[1] limit:5 %}
+        <li>
+          <a href="{{ post.url | relative_url }}" style="text-decoration: none;">
+            <div class="post-list-item">
+              <div class="post-list-title">{{ post.title | escape }}</div>
+              <div class="post-list-meta">
+                {{ post.date | date: "%Y-%m-%d" }}
+              </div>
+            </div>
+          </a>
+        </li>
+      {% endfor %}
+      {% if category[1].size > 5 %}
+      <li style="padding: 10px 15px;">
+        <a href="#{{ category[0] }}" style="color: var(--activity-bar-active); font-size: 13px;">
+          View all {{ category[1].size }} posts →
+        </a>
+      </li>
+      {% endif %}
+    </ul>
+  </div>
+  {% endfor %}
+</div>

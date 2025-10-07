@@ -1,0 +1,36 @@
+---
+layout: default
+---
+
+<div class="category-page">
+  <h2 style="color: var(--keyword); margin-bottom: 10px; font-weight: 600; display: flex; align-items: center;">
+    <i class="codicon codicon-folder" style="margin-right: 8px;"></i>
+    Category: {{ page.category }}
+  </h2>
+  <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 30px;">
+    {{ site.categories[page.category].size }} post(s)
+  </p>
+
+  <ul class="post-list">
+    {% for post in site.categories[page.category] %}
+      <li>
+        <a href="{{ post.url | relative_url }}" style="text-decoration: none;">
+          <div class="post-list-item">
+            <div class="post-list-title">{{ post.title | escape }}</div>
+            <div class="post-list-meta">
+              {{ post.date | date: "%Y-%m-%d" }}
+              {% if post.tags.size > 0 %}
+                • Tags: {{ post.tags | join: ", " }}
+              {% endif %}
+            </div>
+            {% if post.excerpt %}
+            <div style="color: var(--text-secondary); font-size: 13px; margin-top: 8px; line-height: 1.6;">
+              {{ post.excerpt | strip_html | truncatewords: 30 }}
+            </div>
+            {% endif %}
+          </div>
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+</div>

@@ -1,0 +1,80 @@
+---
+layout: default
+title: Search
+permalink: /search/
+---
+
+<div class="search-page">
+  <h2 style="color: var(--keyword); margin-bottom: 20px; font-weight: 600;">
+    <i class="codicon codicon-search"></i> Search Posts
+  </h2>
+
+  <div style="margin-bottom: 30px;">
+    <input type="text" id="search-input" placeholder="Type to search..."
+           style="width: 100%; padding: 10px 15px; background: var(--sidebar-bg); border: 1px solid var(--border-color); color: var(--text-primary); font-family: 'D2Coding', monospace; font-size: 14px; border-radius: 3px;">
+  </div>
+
+  <div id="search-results"></div>
+</div>
+
+<script>
+const posts = [
+  {% for post in site.posts %}
+  {
+    title: {{ post.title | jsonify }},
+    url: {{ post.url | jsonify }},
+    date: {{ post.date | date: "%Y-%m-%d" | jsonify }},
+    categories: {{ post.categories | jsonify }},
+    tags: {{ post.tags | jsonify }},
+    excerpt: {{ post.excerpt | strip_html | truncatewords: 50 | jsonify }}
+  }{% unless forloop.last %},{% endunless %}
+  {% endfor %}
+];
+
+const searchInput = document.getElementById('search-input');
+const searchResults = document.getElementById('search-results');
+
+searchInput.addEventListener('input', function(e) {
+  const query = e.target.value.toLowerCase().trim();
+
+  if (query.length === 0) {
+    searchResults.innerHTML = '<p style="color: var(--text-secondary); font-size: 13px;">Start typing to search...</p>';
+    return;
+  }
+
+  const results = posts.filter(post => {
+    return post.title.toLowerCase().includes(query) ||
+           post.excerpt.toLowerCase().includes(query) ||
+           post.categories.some(cat => cat.toLowerCase().includes(query)) ||
+           post.tags.some(tag => tag.toLowerCase().includes(query));
+  });
+
+  if (results.length === 0) {
+    searchResults.innerHTML = '<p style="color: var(--text-secondary); font-size: 13px;">No results found.</p>';
+    return;
+  }
+
+  let html = '<ul class="post-list">';
+  results.forEach(post => {
+    html += `
+      <li>
+        <a href="${post.url}" style="text-decoration: none;">
+          <div class="post-list-item">
+            <div class="post-list-title">${post.title}</div>
+            <div class="post-list-meta">${post.date}${post.categories.length > 0 ? ' • ' + post.categories.join(', ') : ''}</div>
+            <div style="color: var(--text-secondary); font-size: 13px; margin-top: 8px; line-height: 1.6;">
+              ${post.excerpt}
+            </div>
+          </div>
+        </a>
+      </li>
+    `;
+  });
+  html += '</ul>';
+
+  searchResults.innerHTML = html;
+});
+
+// Initial message
+searchResults.innerHTML = '<p style="color: var(--text-secondary); font-size: 13px;">Start typing to search...</p>';
+</script>
