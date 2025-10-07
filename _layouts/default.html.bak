@@ -7,7 +7,6 @@
   <title>{% if page.title %}{{ page.title | escape }} - {% endif %}{{ site.title | escape }}</title>
   <meta name="description" content="{{ page.excerpt | default: site.description | strip_html | normalize_whitespace | truncate: 160 | escape }}">
   <link rel="stylesheet" href="{{ "/assets/css/vscode-exact.css" | relative_url }}">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@vscode/codicons@0.0.35/dist/codicon.css">
   {% feed_meta %}
   {% seo %}
 </head>
@@ -23,16 +22,13 @@
       <!-- Activity Bar (왼쪽 아이콘 바) -->
       <div class="vscode-activitybar">
         <div class="activity-icon active" title="Explorer">
-          <i class="codicon codicon-files"></i>
+          📁
         </div>
         <div class="activity-icon" title="Search">
-          <i class="codicon codicon-search"></i>
-        </div>
-        <div class="activity-icon" title="Source Control">
-          <i class="codicon codicon-source-control"></i>
+          🔍
         </div>
         <div class="activity-icon" title="Settings">
-          <i class="codicon codicon-gear"></i>
+          ⚙️
         </div>
       </div>
 
@@ -47,13 +43,13 @@
             <div class="sidebar-section-title">NAVIGATION</div>
             <a href="{{ "/" | relative_url }}" style="text-decoration: none; color: inherit;">
               <div class="sidebar-item">
-                <i class="codicon codicon-home icon"></i>
+                <span class="icon">🏠</span>
                 <span>Home</span>
               </div>
             </a>
             <a href="{{ "/about" | relative_url }}" style="text-decoration: none; color: inherit;">
               <div class="sidebar-item">
-                <i class="codicon codicon-account icon"></i>
+                <span class="icon">👤</span>
                 <span>About</span>
               </div>
             </a>
@@ -65,7 +61,7 @@
             {% for post in site.posts limit:5 %}
             <a href="{{ post.url | relative_url }}" style="text-decoration: none; color: inherit;">
               <div class="sidebar-item">
-                <i class="codicon codicon-file icon"></i>
+                <span class="icon">📄</span>
                 <span>{{ post.title | truncate: 25 }}</span>
               </div>
             </a>
@@ -78,7 +74,7 @@
             <div class="sidebar-section-title">CATEGORIES</div>
             {% for category in site.categories %}
             <div class="sidebar-item">
-              <i class="codicon codicon-folder icon"></i>
+              <span class="icon">📂</span>
               <span>{{ category[0] }} ({{ category[1].size }})</span>
             </div>
             {% endfor %}
@@ -92,7 +88,7 @@
         <!-- Tab Bar -->
         <div class="vscode-tabs">
           <div class="vscode-tab active">
-            <i class="codicon codicon-markdown tab-icon"></i>
+            <span class="tab-icon">📄</span>
             <span class="tab-label">{% if page.title %}{{ page.title }}{% else %}Home{% endif %}</span>
           </div>
         </div>
@@ -107,8 +103,8 @@
     <!-- Status Bar -->
     <div class="vscode-statusbar">
       <div class="statusbar-left">
-        <span><i class="codicon codicon-circle-filled" style="color: #4EC9B0;"></i> Jekyll</span>
-        <span><i class="codicon codicon-markdown"></i> Markdown</span>
+        <span>⚡ Jekyll</span>
+        <span>📝 Markdown</span>
       </div>
       <div class="statusbar-right">
         <span>UTF-8</span>

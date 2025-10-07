@@ -416,3 +416,21 @@ body {
     display: none;
   }
 }
+
+/* Codicon adjustments */
+.activity-icon .codicon {
+  font-size: 24px;
+}
+
+.sidebar-item .codicon.icon {
+  font-size: 16px;
+}
+
+.tab-icon.codicon {
+  font-size: 16px;
+}
+
+.statusbar-left .codicon,
+.statusbar-right .codicon {
+  font-size: 14px;
+}
