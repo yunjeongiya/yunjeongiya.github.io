@@ -18,7 +18,44 @@ layout: default
     </div>
   </div>
 
-  <div class="post-content">
+  <div class="post-content" id="post-content">
     {{ content }}
   </div>
 </article>
+
+<!-- Right Panel Data (Outline + Minimap) -->
+<script>
+window.postOutline = [];
+document.addEventListener('DOMContentLoaded', function() {
+  const content = document.getElementById('post-content');
+  const headings = content.querySelectorAll('h2, h3');
+  
+  headings.forEach(function(heading) {
+    const level = heading.tagName.toLowerCase();
+    const text = heading.textContent;
+    const id = heading.id || text.toLowerCase().replace(/[^a-z0-9가-힣]+/g, '-');
+    heading.id = id;
+    
+    window.postOutline.push({
+      level: level,
+      text: text,
+      id: id
+    });
+  });
+  
+  if (window.updateOutline) {
+    window.updateOutline();
+  }
+  
+  if (window.updateMinimap) {
+    window.updateMinimap();
+  }
+});
+</script>
+
+<!-- Terminal Panel Data -->
+{% if page.tags.size > 0 %}
+<script>
+window.postTags = {{ page.tags | jsonify }};
+</script>
+{% endif %}
