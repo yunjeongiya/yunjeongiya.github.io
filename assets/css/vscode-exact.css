@@ -3,8 +3,8 @@
 /* D2Coding Font for Korean */
 @font-face {
   font-family: 'D2Coding';
-  src: url('https://cdn.jsdelivr.net/gh/wan2land/d2coding/d2coding-subset.woff2') format('woff2'),
-       url('https://cdn.jsdelivr.net/gh/wan2land/d2coding/d2coding-subset.woff') format('woff');
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_three@1.0/D2Coding.woff') format('woff2'),
+       url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_three@1.0/D2Coding.woff') format('woff');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -12,8 +12,8 @@
 
 @font-face {
   font-family: 'D2Coding';
-  src: url('https://cdn.jsdelivr.net/gh/wan2land/d2coding/d2coding-bold-subset.woff2') format('woff2'),
-       url('https://cdn.jsdelivr.net/gh/wan2land/d2coding/d2coding-bold-subset.woff') format('woff');
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_three@1.0/D2Coding.woff') format('woff2'),
+       url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_three@1.0/D2Coding.woff') format('woff');
   font-weight: bold;
   font-display: swap;
   font-style: normal;
