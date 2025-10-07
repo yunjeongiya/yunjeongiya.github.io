@@ -739,3 +739,73 @@ body {
   min-height: 0;
   overflow: hidden;
 }
+
+/* Terminal Style Comments */
+.terminal-comments {
+  padding: 0;
+  background: #1a1a1a;
+}
+
+.terminal-header {
+  background: #0a0a0a;
+  padding: 8px 15px;
+  border-bottom: 1px solid #333;
+  font-family: 'D2Coding', monospace;
+  font-size: 12px;
+  color: #4EC9B0;
+  display: flex;
+  align-items: center;
+}
+
+.terminal-prompt {
+  color: #4EC9B0;
+  margin-right: 10px;
+}
+
+.terminal-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 14px;
+  background: #4EC9B0;
+  margin-left: 5px;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.terminal-comments-wrapper {
+  padding: 15px;
+  background: #0a0a0a;
+  min-height: 150px;
+}
+
+/* Override utterances styles */
+.terminal-comments .utterances {
+  max-width: none !important;
+}
+
+.terminal-comments iframe.utterances-frame {
+  border-radius: 0 !important;
+  border: none !important;
+}
+
+/* Terminal intro text */
+.terminal-intro {
+  font-family: 'D2Coding', monospace;
+  font-size: 13px;
+  color: #4EC9B0;
+  margin-bottom: 15px;
+  line-height: 1.6;
+}
+
+.terminal-intro .comment-sign {
+  color: #6a9955;
+}
+
+.terminal-intro .prompt-line {
+  color: #858585;
+  margin: 5px 0;
+}

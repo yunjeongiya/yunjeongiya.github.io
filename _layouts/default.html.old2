@@ -13,34 +13,30 @@
 </head>
 <body>
   <div class="vscode-container">
+    <!-- Title Bar -->
     <div class="vscode-titlebar">
       <div class="title">{{ site.title }} - {% if page.title %}{{ page.title }}{% else %}Welcome{% endif %}</div>
     </div>
 
+    <!-- Main Layout -->
     <div class="vscode-main {% if page.layout == 'post' %}with-terminal{% endif %}">
+      <!-- Activity Bar -->
       <div class="vscode-activitybar">
-        <a href="{{ "/" | relative_url }}" style="text-decoration: none; color: inherit;">
-          <div class="activity-icon active" title="Explorer">
-            <i class="codicon codicon-files"></i>
-          </div>
-        </a>
-        <a href="{{ "/search" | relative_url }}" style="text-decoration: none; color: inherit;">
-          <div class="activity-icon" title="Search">
-            <i class="codicon codicon-search"></i>
-          </div>
-        </a>
-        <a href="https://github.com/yunjeongiya/yunjeongiya.github.io" target="_blank" style="text-decoration: none; color: inherit;">
-          <div class="activity-icon" title="Source Control">
-            <i class="codicon codicon-source-control"></i>
-          </div>
-        </a>
-        <a href="{{ "/settings" | relative_url }}" style="text-decoration: none; color: inherit;">
-          <div class="activity-icon" title="Settings">
-            <i class="codicon codicon-gear"></i>
-          </div>
-        </a>
+        <div class="activity-icon active" title="Explorer">
+          <i class="codicon codicon-files"></i>
+        </div>
+        <div class="activity-icon" title="Search">
+          <i class="codicon codicon-search"></i>
+        </div>
+        <div class="activity-icon" title="Source Control">
+          <i class="codicon codicon-source-control"></i>
+        </div>
+        <div class="activity-icon" title="Settings">
+          <i class="codicon codicon-gear"></i>
+        </div>
       </div>
 
+      <!-- Side Bar -->
       <div class="vscode-sidebar">
         <div class="sidebar-header">EXPLORER</div>
         <div class="sidebar-content">
@@ -92,8 +88,10 @@
         </div>
       </div>
 
+      <!-- Editor Group -->
       <div class="vscode-editor-group {% if page.layout == 'post' %}with-right-panel{% endif %}">
         <div class="vscode-editor-wrapper">
+          <!-- Tab Bar -->
           <div class="vscode-tabs">
             <div class="vscode-tab active">
               <i class="codicon codicon-markdown tab-icon"></i>
@@ -101,11 +99,13 @@
             </div>
           </div>
 
+          <!-- Editor Content -->
           <div class="vscode-editor">
             {{ content }}
           </div>
         </div>
 
+        <!-- Right Panel -->
         {% if page.layout == 'post' %}
         <div class="vscode-right-panel">
           <div class="right-panel-section outline">
@@ -126,6 +126,7 @@
       </div>
     </div>
 
+    <!-- Terminal Panel -->
     {% if page.layout == 'post' %}
     <div class="vscode-terminal-panel" id="terminal-panel">
       <div class="terminal-tabs">
@@ -154,29 +155,19 @@
         </div>
 
         <div class="terminal-tab-content terminal-comments" id="comments-content" style="display: none;">
-          <div class="terminal-header">
-            <span class="terminal-prompt">user@blog:~/comments$</span>
-            <span>git comment --post="{{ page.title | escape }}"</span>
-            <span class="terminal-cursor"></span>
-          </div>
-          <div class="terminal-comments-wrapper">
-            <div class="terminal-intro">
-              <span class="comment-sign"># GitHub 계정으로 댓글을 남길 수 있습니다</span><br>
-              <span class="prompt-line">$ Loading comments from GitHub Issues...</span>
-            </div>
-            <script src="https://utteranc.es/client.js"
-                    repo="yunjeongiya/yunjeongiya.github.io"
-                    issue-term="pathname"
-                    theme="github-dark"
-                    crossorigin="anonymous"
-                    async>
-            </script>
-          </div>
+          <script src="https://utteranc.es/client.js"
+                  repo="yunjeongiya/yunjeongiya.github.io"
+                  issue-term="pathname"
+                  theme="github-dark"
+                  crossorigin="anonymous"
+                  async>
+          </script>
         </div>
       </div>
     </div>
     {% endif %}
 
+    <!-- Status Bar -->
     <div class="vscode-statusbar">
       <div class="statusbar-left">
         <span><i class="codicon codicon-circle-filled" style="color: #4EC9B0;"></i> Jekyll</span>

@@ -1,0 +1,106 @@
+---
+layout: default
+title: Settings
+permalink: /settings/
+---
+
+<div class="settings-page">
+  <h2 style="color: var(--keyword); margin-bottom: 30px; font-weight: 600;">
+    <i class="codicon codicon-settings-gear"></i> Settings
+  </h2>
+
+  <!-- Blog Info -->
+  <div class="settings-section">
+    <h3 style="color: var(--variable); margin-bottom: 15px; font-size: 16px;">
+      <i class="codicon codicon-info"></i> Blog Information
+    </h3>
+    <div style="background: var(--sidebar-bg); padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+      <p style="margin-bottom: 10px;"><strong>Title:</strong> {{ site.title }}</p>
+      <p style="margin-bottom: 10px;"><strong>Description:</strong> {{ site.description }}</p>
+      <p style="margin-bottom: 10px;"><strong>Total Posts:</strong> {{ site.posts.size }}</p>
+      <p style="margin-bottom: 10px;"><strong>Categories:</strong> {{ site.categories.size }}</p>
+      <p><strong>URL:</strong> <a href="{{ site.url }}" style="color: var(--activity-bar-active);">{{ site.url }}</a></p>
+    </div>
+  </div>
+
+  <!-- Theme Settings -->
+  <div class="settings-section">
+    <h3 style="color: var(--variable); margin-bottom: 15px; font-size: 16px;">
+      <i class="codicon codicon-color-mode"></i> Theme
+    </h3>
+    <div style="background: var(--sidebar-bg); padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+      <p style="margin-bottom: 10px;"><strong>Current Theme:</strong> VSCode Dark+</p>
+      <p style="color: var(--text-secondary); font-size: 13px;">Custom VSCode-inspired theme with D2Coding font</p>
+    </div>
+  </div>
+
+  <!-- Font Settings -->
+  <div class="settings-section">
+    <h3 style="color: var(--variable); margin-bottom: 15px; font-size: 16px;">
+      <i class="codicon codicon-symbol-text"></i> Font
+    </h3>
+    <div style="background: var(--sidebar-bg); padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+      <p style="margin-bottom: 10px;"><strong>Font Family:</strong> D2Coding</p>
+      <p style="margin-bottom: 10px;"><strong>Font Size:</strong> 14px</p>
+      <div style="margin-top: 15px;">
+        <label style="display: block; margin-bottom: 10px;">Adjust Font Size:</label>
+        <input type="range" id="font-size-slider" min="12" max="18" value="14"
+               style="width: 200px; cursor: pointer;">
+        <span id="font-size-display" style="margin-left: 10px; color: var(--text-secondary);">14px</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Links -->
+  <div class="settings-section">
+    <h3 style="color: var(--variable); margin-bottom: 15px; font-size: 16px;">
+      <i class="codicon codicon-link"></i> Quick Links
+    </h3>
+    <div style="background: var(--sidebar-bg); padding: 15px; border-radius: 5px;">
+      <p style="margin-bottom: 10px;">
+        <a href="https://github.com/yunjeongiya/yunjeongiya.github.io" target="_blank"
+           style="color: var(--activity-bar-active); display: flex; align-items: center;">
+          <i class="codicon codicon-github" style="margin-right: 8px;"></i>
+          View Source on GitHub
+        </a>
+      </p>
+      <p style="margin-bottom: 10px;">
+        <a href="{{ "/about" | relative_url }}"
+           style="color: var(--activity-bar-active); display: flex; align-items: center;">
+          <i class="codicon codicon-person" style="margin-right: 8px;"></i>
+          About
+        </a>
+      </p>
+      <p>
+        <a href="{{ site.feed.path | default: "/feed.xml" | relative_url }}"
+           style="color: var(--activity-bar-active); display: flex; align-items: center;">
+          <i class="codicon codicon-rss" style="margin-right: 8px;"></i>
+          RSS Feed
+        </a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+// Font size adjustment
+const slider = document.getElementById('font-size-slider');
+const display = document.getElementById('font-size-display');
+
+if (slider && display) {
+  slider.addEventListener('input', function(e) {
+    const size = e.target.value;
+    display.textContent = size + 'px';
+    document.querySelector('.vscode-editor').style.fontSize = size + 'px';
+    localStorage.setItem('fontSize', size);
+  });
+
+  // Load saved font size
+  const savedSize = localStorage.getItem('fontSize');
+  if (savedSize) {
+    slider.value = savedSize;
+    display.textContent = savedSize + 'px';
+    document.querySelector('.vscode-editor').style.fontSize = savedSize + 'px';
+  }
+}
+</script>
