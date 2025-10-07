@@ -3,30 +3,22 @@ layout: default
 ---
 
 <article class="post">
-  <header class="post-header">
+  <div class="post-header-meta">
     <h1 class="post-title">{{ page.title | escape }}</h1>
-    <p class="post-meta">
+    <div class="post-meta">
       <time datetime="{{ page.date | date_to_xmlschema }}">
-        {{ page.date | date: "%Y-%m-%d" }}
+        {{ page.date | date: "%Y-%m-%d %H:%M" }}
       </time>
       {% if page.categories.size > 0 %}
         • {{ page.categories | join: ", " }}
       {% endif %}
-    </p>
-  </header>
+      {% if page.tags.size > 0 %}
+        • Tags: {{ page.tags | join: ", " }}
+      {% endif %}
+    </div>
+  </div>
 
   <div class="post-content">
     {{ content }}
   </div>
-
-  {% if page.tags.size > 0 %}
-  <div class="post-tags">
-    <p style="color: var(--vscode-comment); font-size: 12px;">
-      Tags:
-      {% for tag in page.tags %}
-        <span style="background: var(--vscode-sidebar-bg); padding: 3px 8px; border-radius: 3px; margin-right: 5px;">{{ tag }}</span>
-      {% endfor %}
-    </p>
-  </div>
-  {% endif %}
 </article>

@@ -3,32 +3,32 @@ layout: default
 ---
 
 <div class="home">
-  <h1 style="color: var(--vscode-keyword); margin-bottom: 30px;">📝 Recent Posts</h1>
+  <h2 style="color: var(--keyword); margin-bottom: 20px; font-weight: 600;">📝 Recent Posts</h2>
 
   {% if site.posts.size > 0 %}
     <ul class="post-list">
       {% for post in site.posts %}
-        <li class="post-list-item">
-          <h2 class="post-list-heading">
-            <a href="{{ post.url | relative_url }}">
-              {{ post.title | escape }}
-            </a>
-          </h2>
-          <p class="post-meta" style="color: var(--vscode-comment); font-size: 12px; margin-top: 5px;">
-            {{ post.date | date: "%Y-%m-%d" }}
-            {% if post.categories.size > 0 %}
-              • {{ post.categories | join: ", " }}
-            {% endif %}
-          </p>
-          {% if post.excerpt %}
-          <p style="color: var(--vscode-comment); font-size: 13px; margin-top: 10px;">
-            {{ post.excerpt | strip_html | truncatewords: 30 }}
-          </p>
-          {% endif %}
+        <li>
+          <a href="{{ post.url | relative_url }}" style="text-decoration: none;">
+            <div class="post-list-item">
+              <div class="post-list-title">{{ post.title | escape }}</div>
+              <div class="post-list-meta">
+                {{ post.date | date: "%Y-%m-%d" }}
+                {% if post.categories.size > 0 %}
+                  • {{ post.categories | join: ", " }}
+                {% endif %}
+              </div>
+              {% if post.excerpt %}
+              <div style="color: var(--text-secondary); font-size: 13px; margin-top: 8px; line-height: 1.6;">
+                {{ post.excerpt | strip_html | truncatewords: 30 }}
+              </div>
+              {% endif %}
+            </div>
+          </a>
         </li>
       {% endfor %}
     </ul>
   {% else %}
-    <p style="color: var(--vscode-comment);">No posts yet.</p>
+    <p style="color: var(--text-secondary);">No posts yet.</p>
   {% endif %}
 </div>
