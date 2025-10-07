@@ -1,0 +1,92 @@
+/* Critical Fixes */
+
+/* Fix: Body overflow and height */
+body {
+  font-family: 'D2Coding', 'Segoe UI', 'Consolas', monospace !important;
+  background: var(--editor-bg);
+  color: var(--text-primary);
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* Fix: Main layout height calculation */
+.vscode-main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Fix: Editor needs to scroll */
+.vscode-editor {
+  flex: 1;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  padding: 20px 40px;
+  max-width: 900px;
+  height: 100%;
+}
+
+/* Fix: Editor wrapper height */
+.vscode-editor-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Fix: Editor group height with right panel */
+.vscode-editor-group {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  background: var(--editor-bg);
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Fix: Right panel should be visible */
+.vscode-right-panel {
+  width: 250px;
+  background: var(--sidebar-bg);
+  border-left: 1px solid var(--border-color);
+  display: flex !important;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* Fix: Ensure post content uses D2Coding */
+.post-content,
+.post-content p,
+.post-content li,
+.post-content td,
+.post-content th {
+  font-family: 'D2Coding', 'Segoe UI', 'Consolas', monospace !important;
+}
+
+/* Fix: Terminal panel height */
+.vscode-terminal-panel {
+  height: 250px;
+  background: var(--editor-bg);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+/* Fix: Container layout with terminal */
+.vscode-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.vscode-main.with-terminal {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
