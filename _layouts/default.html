@@ -188,8 +188,11 @@
         {% endif %}
       </div>
       <div class="statusbar-right">
+        {% assign current_lang = page.lang | default: "ko" %}
+
         {% if page.layout == 'post' %}
-          {% if page.lang == 'ko' %}
+          <!-- Post pages: language switcher based on alternative post -->
+          {% if current_lang == 'ko' %}
             {% assign en_post = site.posts | where: "lang", "en" | where: "date", page.date | first %}
             {% if en_post %}
               <a href="{{ en_post.url | relative_url }}" style="text-decoration: none; color: inherit;">
@@ -198,7 +201,7 @@
             {% else %}
               <span class="statusbar-lang-disabled" title="English version not available">한국어</span>
             {% endif %}
-          {% elsif page.lang == 'en' %}
+          {% else %}
             {% assign ko_post = site.posts | where: "lang", "ko" | where: "date", page.date | first %}
             {% if ko_post %}
               <a href="{{ ko_post.url | relative_url }}" style="text-decoration: none; color: inherit;">
@@ -209,8 +212,18 @@
             {% endif %}
           {% endif %}
         {% else %}
-          <span>UTF-8</span>
+          <!-- Other pages: language switcher between / and /en/ -->
+          {% if current_lang == 'ko' %}
+            <a href="{{ page.url | replace: '/', '/en/' }}" style="text-decoration: none; color: inherit;">
+              <span class="statusbar-lang" title="Switch to English">한국어</span>
+            </a>
+          {% else %}
+            <a href="{{ page.url | replace: '/en/', '/' }}" style="text-decoration: none; color: inherit;">
+              <span class="statusbar-lang" title="Switch to 한국어">English</span>
+            </a>
+          {% endif %}
         {% endif %}
+
         <span>{{ site.posts.size }} posts</span>
       </div>
     </div>

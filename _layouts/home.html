@@ -3,12 +3,17 @@ layout: default
 ---
 
 <div class="home">
-  <h2 style="color: var(--keyword); margin-bottom: 20px; font-weight: 600;">📝 Recent Posts</h2>
+  {% if page.lang == 'en' %}
+    <h2 style="color: var(--keyword); margin-bottom: 20px; font-weight: 600;">📝 Recent Posts</h2>
+  {% else %}
+    <h2 style="color: var(--keyword); margin-bottom: 20px; font-weight: 600;">📝 최근 게시글</h2>
+  {% endif %}
 
   {% if site.posts.size > 0 %}
     <ul class="post-list">
-      {% assign ko_posts = site.posts | where: "lang", "ko" %}
-      {% for post in ko_posts %}
+      {% assign page_lang = page.lang | default: "ko" %}
+      {% assign filtered_posts = site.posts | where: "lang", page_lang %}
+      {% for post in filtered_posts %}
         <li>
           <a href="{{ post.url | relative_url }}" style="text-decoration: none;">
             <div class="post-list-item">
@@ -18,9 +23,16 @@ layout: default
                 {% if post.categories.size > 0 %}
                   • {{ post.categories | join: ", " }}
                 {% endif %}
-                {% assign en_post = site.posts | where: "lang", "en" | where: "date", post.date | first %}
-                {% if en_post %}
-                  • <span style="color: var(--string);">🌐 English available</span>
+                {% if page_lang == 'ko' %}
+                  {% assign alt_post = site.posts | where: "lang", "en" | where: "date", post.date | first %}
+                  {% if alt_post %}
+                    • <span style="color: var(--string);">🌐 English available</span>
+                  {% endif %}
+                {% else %}
+                  {% assign alt_post = site.posts | where: "lang", "ko" | where: "date", post.date | first %}
+                  {% if alt_post %}
+                    • <span style="color: var(--string);">🌐 한국어 available</span>
+                  {% endif %}
                 {% endif %}
               </div>
               {% if post.excerpt %}
@@ -34,6 +46,10 @@ layout: default
       {% endfor %}
     </ul>
   {% else %}
-    <p style="color: var(--text-secondary);">No posts yet.</p>
+    {% if page.lang == 'en' %}
+      <p style="color: var(--text-secondary);">No posts yet.</p>
+    {% else %}
+      <p style="color: var(--text-secondary);">아직 게시글이 없습니다.</p>
+    {% endif %}
   {% endif %}
 </div>
