@@ -11,11 +11,9 @@ If you've suddenly started hitting the **File has been unexpectedly modified** e
 
 This appears to be a fickle bug with behavior that changes depending on the situation, the user, and even the time of day. This post isn't a declaration of a single "correct" solution. Instead, it's a guide to share the collective knowledge from the community and my own evolving experience with this bug.
 
----
+![Claude Code Error](/assets/images/posts/2025-09-28-claude-bug/1_BPfY5nXCsBge-KoLsdbNkA.png)
 
-## When this bug hit
-
-When this bug hit, it felt like someone just cut off my hands — I couldn't do anything. One Claude crash and suddenly I'm useless, so this is what a **Single Point of Failure** feels like.
+When this bug hit, it felt like someone just cut off my hands - I couldn't do anything. One Claude crash and suddenly I'm useless, so this is what a **Single Point of Failure** feels like.
 
 Claude even came up with its own "fix" by having me manually patch files in bash, which felt both ridiculous and like a total token drain. At one point I started copy-pasting Claude's suggestions myself, basically becoming a human Ctrl+C/Ctrl+V pipeline… and that's when the existential crisis hit. So this is what a Single Point of Failure feels like. Guess I need a backup personality next time.
 
@@ -104,12 +102,10 @@ The most reliable source of truth is the [official GitHub issue](https://github.
 
 ---
 
-## 마치며
-
 I hope one of the methods outlined in this post helps you solve your problem. Good luck to all of us in the battle against this ever-changing bug!
 
 ---
 
-**원문**: [Medium - The Elusive Claude "File has been unexpectedly modified" Bug](https://medium.com/@yunjeongiya/the-elusive-claude-file-has-been-unexpectedly-modified-bug-a-workaround-solution-831182038d1d)
-**작성일**: 2025-09-27
-**관련 이슈**: [GitHub Issue #7443](https://github.com/anthropics/claude-code/issues/7443)
+**Also available on**: [Medium](https://medium.com/@yunjeongiya/the-elusive-claude-file-has-been-unexpectedly-modified-bug-a-workaround-solution-831182038d1d)
+
+**Related**: [GitHub Issue #7443](https://github.com/anthropics/claude-code/issues/7443)
