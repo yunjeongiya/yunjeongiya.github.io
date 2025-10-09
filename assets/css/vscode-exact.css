@@ -652,6 +652,13 @@ body {
   text-decoration: underline;
 }
 
+.statusbar-lang-disabled {
+  padding: 0 5px;
+  opacity: 0.6;
+  cursor: default;
+  user-select: none;
+}
+
 /* Comments section in terminal */
 .terminal-comments {
   padding: 0;

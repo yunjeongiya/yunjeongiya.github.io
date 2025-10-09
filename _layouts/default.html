@@ -193,19 +193,19 @@
             {% assign en_post = site.posts | where: "lang", "en" | where: "date", page.date | first %}
             {% if en_post %}
               <a href="{{ en_post.url | relative_url }}" style="text-decoration: none; color: inherit;">
-                <span class="statusbar-lang">한국어 → English</span>
+                <span class="statusbar-lang" title="Click to view in English">한국어</span>
               </a>
             {% else %}
-              <span>한국어</span>
+              <span class="statusbar-lang-disabled" title="English version not available">한국어</span>
             {% endif %}
           {% elsif page.lang == 'en' %}
             {% assign ko_post = site.posts | where: "lang", "ko" | where: "date", page.date | first %}
             {% if ko_post %}
               <a href="{{ ko_post.url | relative_url }}" style="text-decoration: none; color: inherit;">
-                <span class="statusbar-lang">English → 한국어</span>
+                <span class="statusbar-lang" title="Click to view in 한국어">English</span>
               </a>
             {% else %}
-              <span>English</span>
+              <span class="statusbar-lang-disabled" title="한국어 version not available">English</span>
             {% endif %}
           {% endif %}
         {% else %}
