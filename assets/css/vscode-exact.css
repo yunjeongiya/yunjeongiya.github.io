@@ -639,6 +639,19 @@ body {
   margin-right: 5px;
 }
 
+/* Language switcher */
+.statusbar-lang {
+  cursor: pointer;
+  padding: 0 5px;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.statusbar-lang:hover {
+  background: rgba(255, 255, 255, 0.1);
+  text-decoration: underline;
+}
+
 /* Comments section in terminal */
 .terminal-comments {
   padding: 0;

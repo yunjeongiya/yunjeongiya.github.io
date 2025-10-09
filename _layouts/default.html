@@ -188,7 +188,29 @@
         {% endif %}
       </div>
       <div class="statusbar-right">
-        <span>UTF-8</span>
+        {% if page.layout == 'post' %}
+          {% if page.lang == 'ko' %}
+            {% assign en_post = site.posts | where: "lang", "en" | where: "date", page.date | first %}
+            {% if en_post %}
+              <a href="{{ en_post.url | relative_url }}" style="text-decoration: none; color: inherit;">
+                <span class="statusbar-lang">한국어 → English</span>
+              </a>
+            {% else %}
+              <span>한국어</span>
+            {% endif %}
+          {% elsif page.lang == 'en' %}
+            {% assign ko_post = site.posts | where: "lang", "ko" | where: "date", page.date | first %}
+            {% if ko_post %}
+              <a href="{{ ko_post.url | relative_url }}" style="text-decoration: none; color: inherit;">
+                <span class="statusbar-lang">English → 한국어</span>
+              </a>
+            {% else %}
+              <span>English</span>
+            {% endif %}
+          {% endif %}
+        {% else %}
+          <span>UTF-8</span>
+        {% endif %}
         <span>{{ site.posts.size }} posts</span>
       </div>
     </div>
