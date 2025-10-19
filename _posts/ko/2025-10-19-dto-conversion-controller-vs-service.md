@@ -40,6 +40,8 @@ public ResponseEntity<Response> create(@RequestBody CreateRequest request) {
 
 ## 1. 먼저 Martin Fowler 공식 문서부터 찾아봤다
 
+> **💡 참고:** Martin Fowler는 소프트웨어 아키텍처 분야의 세계적 권위자로, Agile Manifesto 서명자이자 "Refactoring", "Patterns of Enterprise Application Architecture" 등의 저자입니다. DTO 패턴을 2002년에 정의한 창시자이기도 합니다.
+
 ###DTO가 원래 뭐였지?
 
 Martin Fowler의 [Patterns of Enterprise Application Architecture](https://martinfowler.com/eaaCatalog/dataTransferObject.html)를 읽어보니:
