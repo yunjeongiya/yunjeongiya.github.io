@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Spring Boot DTO 변환 위치 논쟁 종결: Controller vs Service 계층"
+title: "DTO 변환은 Controller? Service? 헷갈려서 제대로 조사해봤다"
 date: 2025-10-19 14:00:00 +0900
 categories: [Spring Boot, Architecture]
 tags: [spring-boot, dto, controller, service, architecture, clean-code, martin-fowler, best-practices]
@@ -9,136 +9,83 @@ lang: ko
 
 ## TL;DR
 
-DTO 변환은 **Controller에서 하는 것이 업계 표준**이다. Service는 도메인 객체(Entity)만 다뤄야 하며, DTO는 HTTP 계층의 관심사로 분리해야 한다. 이 글은 Martin Fowler 공식 문서, Stack Overflow 350+ 추천 답변, 실무 사례를 기반으로 명확한 해답을 제시한다.
+평소 코드 작성할 때마다 헷갈렸던 "DTO 변환을 Controller에서 해야 할까, Service에서 해야 할까?" 문제를 이번 기회에 제대로 조사해봤다. Martin Fowler 공식 문서, Stack Overflow 고수들의 답변, 실제 프로젝트 사례까지 살펴본 결과, **Controller에서 변환하는 것이 정석**이라는 걸 알게 되었다. 이 글은 내가 Claude와 함께 조사한 내용을 정리한 것이다.
 
 ---
 
-## 문제 상황
+## 나도 항상 헷갈렸다
 
-Spring Boot 애플리케이션을 개발하다 보면 항상 마주치는 질문:
+Spring Boot로 개발하면서 매번 고민했던 부분:
 
 ```java
-// Controller에서 DTO 변환?
+// 이렇게 Controller에서 변환?
 @PostMapping
 public ResponseEntity<Response> create(@RequestBody CreateRequest request) {
-    Entity entity = request.toEntity();  // 여기서 변환?
+    Entity entity = request.toEntity();  // 여기서?
     Entity saved = service.save(entity);
     return ResponseEntity.ok(Response.from(saved));
 }
 
-// vs Service에서 DTO 변환?
+// 아니면 이렇게 Service로 넘겨버리는 게 깔끔한 건가?
 @PostMapping
 public ResponseEntity<Response> create(@RequestBody CreateRequest request) {
-    Response response = service.create(request);  // Service가 DTO를 받음?
+    Response response = service.create(request);  // 이게 더 간단해 보이는데?
     return ResponseEntity.ok(response);
 }
 ```
 
-이 글에서는 **공식 문서, 업계 관행, 실무 사례**를 기반으로 명확한 답을 제시한다.
+팀마다, 선배마다 말이 다르고, 정확한 기준을 몰라서 그때그때 편한 대로 짰던 것 같다. 그래서 이번에 Claude와 함께 제대로 파헤쳐봤다.
 
 ---
 
-## 1. Martin Fowler의 DTO 패턴 정의
+## 1. 먼저 Martin Fowler 공식 문서부터 찾아봤다
 
-### DTO의 원래 목적
+###DTO가 원래 뭐였지?
 
-Martin Fowler는 [Patterns of Enterprise Application Architecture](https://martinfowler.com/eaaCatalog/dataTransferObject.html)에서 DTO를 다음과 같이 정의했다:
+Martin Fowler의 [Patterns of Enterprise Application Architecture](https://martinfowler.com/eaaCatalog/dataTransferObject.html)를 읽어보니:
 
 > **"An object that carries data between processes to reduce the number of method calls."**
 > (프로세스 간 데이터 전송을 위해 메서드 호출 횟수를 줄이는 객체)
 
-핵심은 **"프로세스 간 경계(Remote Boundary)"**에서 사용하는 것이다.
+핵심은 **"프로세스 간 경계(Remote Boundary)"**에서 쓰라는 거였다.
 
-### DTO에 대한 Fowler의 경고
+### Fowler의 경고를 놓쳤었다
 
-Fowler는 [LocalDTO](https://martinfowler.com/bliki/LocalDTO.html) 글에서 명확히 경고한다:
+[LocalDTO](https://martinfowler.com/bliki/LocalDTO.html) 글을 보니 이런 말이 있더라:
 
 > **"Using DTOs in a local context is usually a bad idea."**
 > (같은 애플리케이션 내에서 DTO를 사용하는 것은 보통 나쁜 생각이다)
 
-단, 예외가 하나 있다:
+예외가 딱 하나:
 
 > **"One case where it is useful is when you have a significant mismatch between the model in your presentation layer and the domain model."**
-> (프레젠테이션 계층과 도메인 모델 간 상당한 불일치가 있을 때는 유용하다)
+> (프레젠테이션 계층과 도메인 모델이 많이 다를 때는 유용하다)
 
-### DTO에서 비즈니스 로직 금지
-
-Baeldung의 [DTO Pattern 가이드](https://www.baeldung.com/java-dto-pattern)에서 강조:
-
-> **"Another common mistake is to add business logic to those classes, which should not happen. The purpose of the pattern is to optimize data transfer and contract structure. Therefore, all business logic should live in the domain layer."**
+아, 그러니까 API 응답 형식이 Entity와 많이 다를 때만 DTO를 써라는 거구나.
 
 ---
 
-## 2. Spring 커뮤니티의 합의: Controller에서 변환
+## 2. Stack Overflow 고수들은 뭐라고 할까?
 
-### Stack Overflow 베스트 답변 분석
+### 350명이 추천한 답변
 
-#### [Which layer should convert entities to DTOs?](https://stackoverflow.com/questions/47822938/which-layer-should-be-used-for-conversion-to-dto-from-domain-object)
+[Which layer should convert entities to DTOs?](https://stackoverflow.com/questions/47822938/which-layer-should-be-used-for-conversion-to-dto-from-domain-object)
 
-**가장 많이 추천받은 답변 (350+ 추천):**
+**가장 많이 추천받은 답변:**
 > **"The controller should know service, service should know repository, but service layer should NOT know controller endpoint DTOs."**
-> (컨트롤러는 서비스를 알고, 서비스는 리포지토리를 알지만, 서비스는 컨트롤러의 DTO를 알아서는 안 된다)
 
-**핵심 논리:**
-1. **계층 독립성**: Service가 DTO를 알면 특정 Controller에 종속된다
-2. **재사용성**: 다른 Service나 배치 작업에서 같은 Service를 호출할 때 Entity를 필요로 함
-3. **의존성 방향**: Service는 하위 계층(Repository)만 알아야 함
+이유:
+1. **Service가 DTO를 알면** → 특정 Controller에 종속됨
+2. **다른 Service나 배치에서 호출할 때** → Entity를 필요로 함
+3. **의존성 방향** → Service는 Repository만 알아야 함
 
-#### [Which layer should place mapper code?](https://stackoverflow.com/questions/47457009/which-is-best-layer-to-place-mapper-code-service-layer-or-controller-layer)
-
-**핵심 답변 (200+ 추천):**
-> **"Controllers are drivers and it's expected from them to transform inputs and outputs so that both elements don't need to know about each other's models."**
-> (Controller는 입출력을 변환하는 드라이버이며, 양쪽이 서로의 모델을 몰라도 되게 만드는 것이 목적이다)
+아, Controller가 DTO ↔ Entity 변환을 책임지는 게 맞구나!
 
 ---
 
-## 3. 실무 코드 패턴 분석
+## 3. 그럼 실제로 어떻게 짜야 하나?
 
-### 계층별 데이터 흐름도
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        Client (HTTP)                         │
-└─────────────────────────────────────────────────────────────┘
-                              ▲
-                              │ JSON (DTO)
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                       Controller Layer                       │
-│  ┌────────────────────────────────────────────────────────┐ │
-│  │ 1. Request DTO → Entity 변환 (toEntity())             │ │
-│  │ 2. Service 호출 (Entity 전달)                         │ │
-│  │ 3. Entity → Response DTO 변환 (from())                │ │
-│  └────────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
-                              ▲
-                              │ Entity (Domain)
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                        Service Layer                         │
-│  ┌────────────────────────────────────────────────────────┐ │
-│  │ • 비즈니스 로직 (검증, 계산)                          │ │
-│  │ • 트랜잭션 관리 (@Transactional)                     │ │
-│  │ • Entity만 다룸 (DTO 모름)                           │ │
-│  └────────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
-                              ▲
-                              │ Entity (Domain)
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                      Repository Layer                        │
-│  ┌────────────────────────────────────────────────────────┐ │
-│  │ • 데이터 접근 (JPA)                                   │ │
-│  │ • Entity 저장/조회                                    │ │
-│  └────────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
-                              ▲
-                              │ SQL
-                              ▼
-                          Database
-```
-
-### 패턴 A: Controller 변환 (✅ 권장)
+### ✅ 권장 패턴 (Controller 변환)
 
 ```java
 @RestController
@@ -151,13 +98,13 @@ public class TaskController {
     public ResponseEntity<TaskResponse> createTask(
             @Valid @RequestBody TaskCreateRequest request) {
 
-        // 1️⃣ DTO → Domain Entity 변환 (Controller 책임)
+        // 1️⃣ DTO → Entity 변환 (Controller가 담당)
         Task task = request.toEntity();
 
-        // 2️⃣ 비즈니스 로직 실행 (Service 책임)
+        // 2️⃣ 비즈니스 로직은 Service에 맡김
         Task savedTask = taskService.createTask(task);
 
-        // 3️⃣ Domain Entity → DTO 변환 (Controller 책임)
+        // 3️⃣ Entity → DTO 변환 (Controller가 담당)
         TaskResponse response = TaskResponse.from(savedTask);
 
         return ResponseEntity.ok(response);
@@ -169,7 +116,7 @@ public class TaskController {
 public class TaskService {
     private final TaskRepository taskRepository;
 
-    // ✅ Domain Entity만 다룸
+    // ✅ Entity만 다룸 - HTTP 몰라도 됨
     public Task createTask(Task task) {
         validateTask(task);
         calculateOrderIndex(task);
@@ -178,39 +125,21 @@ public class TaskService {
 }
 ```
 
-**장점:**
-- ✅ Service가 DTO에 독립적 → 재사용 가능
-- ✅ 계층 책임이 명확 (Controller = 변환, Service = 비즈니스 로직)
-- ✅ Service를 다른 Service나 배치에서 호출 가능
+**이렇게 하면 좋은 점:**
+- ✅ Service는 DTO를 몰라도 됨 → 재사용 가능
+- ✅ 책임이 명확함 (Controller = 변환, Service = 비즈니스 로직)
+- ✅ 배치 작업에서도 Service를 그대로 호출 가능
 
-### 패턴 B: Service 변환 (❌ 안티패턴)
+### ❌ 내가 자주 했던 실수 (Service 변환)
 
 ```java
-@RestController
-@RequestMapping("/tasks")
-@RequiredArgsConstructor
-public class TaskController {
-    private final TaskService taskService;
-
-    @PostMapping
-    public ResponseEntity<TaskResponse> createTask(
-            @Valid @RequestBody TaskCreateRequest request) {
-        // ❌ DTO를 그대로 Service에 전달
-        TaskResponse response = taskService.createTask(request);
-        return ResponseEntity.ok(response);
-    }
-}
-
 @Service
 @Transactional
 public class TaskService {
-    private final TaskRepository taskRepository;
-
     // ❌ DTO를 받고 DTO를 반환
     public TaskResponse createTask(TaskCreateRequest request) {
-        Task task = request.toEntity();  // 변환이 Service에 숨겨짐
+        Task task = request.toEntity();  // 변환이 여기 숨겨짐
         validateTask(task);
-        calculateOrderIndex(task);
         Task saved = taskRepository.save(task);
         return TaskResponse.from(saved);  // 또 변환
     }
@@ -218,63 +147,45 @@ public class TaskService {
 ```
 
 **문제점:**
-- ❌ Service가 HTTP 계층(Controller DTO)에 종속됨
-- ❌ 다른 Service에서 `createTask()`를 호출하려면 DTO를 만들어야 함 (불편)
-- ❌ 배치 작업에서 호출 시 불필요한 DTO 변환 발생
+- ❌ Service가 특정 Controller DTO에 종속됨
+- ❌ 다른 Service에서 호출하려면 DTO 만들어야 함 (불편)
+- ❌ 배치에서 호출 시 불필요한 DTO 변환 발생
 
 ---
 
-## 4. 실전 사례: 학생 할일 생성 API
+## 4. 내 프로젝트에서 겪은 실제 사례
 
-### 상황 설명
-- 일반 할일 생성: 교사가 학생 지정 (`createTaskInstance`)
-- 학생 자가 할일 생성: 학생 본인만 지정 가능 (`createTaskInstanceAsStudent`)
+### 상황
 
-### ❌ 잘못된 설계 (Service 변환)
+학생 관리 시스템에서:
+- 일반 할일 생성: 교사가 학생 지정
+- 학생 자가 할일: 학생 본인만 지정 가능
+
+처음에는 이렇게 짰다:
 
 ```java
-// Controller
-@PostMapping("/as-student")
-public ResponseEntity<TaskResponse> createAsStudent(
-        @Valid @RequestBody StudentTaskRequest request,
-        @AuthenticationPrincipal CustomUserPrincipal principal) {
-
-    // DTO를 Service로 위임
-    TaskResponse response = taskService.createTaskAsStudent(request, principal.getId());
-    return ResponseEntity.ok(response);
-}
-
-// Service에 메서드 2개 필요
-public TaskResponse createTask(TaskCreateRequest request, Long userId) {
-    // 100줄의 비즈니스 로직
-}
-
-public TaskResponse createTaskAsStudent(StudentTaskRequest request, Long studentId) {
-    // 단 1줄 차이 - DTO 변환만 추가
-    TaskCreateRequest fullRequest = request.toTaskCreateRequest(studentId);
-    return createTask(fullRequest, studentId);
-}
+// ❌ Service에 메서드 2개 만듦
+public TaskResponse createTask(TaskCreateRequest request) { ... }
+public TaskResponse createTaskAsStudent(StudentTaskRequest request) { ... }
 ```
 
-**문제:**
-- 거의 동일한 메서드 2개 (코드 중복)
-- 교사 자가 할일 추가 시 또 메서드 추가 필요 (`createTaskAsTeacher`)
-- Service가 불필요하게 비대해짐
+거의 똑같은 코드인데 DTO 타입만 다른 메서드가 2개... 뭔가 이상했다.
 
-### ✅ 올바른 설계 (Controller 변환)
+### 리팩토링
+
+Controller에서 변환하도록 바꿨더니:
 
 ```java
 // Controller
 @PostMapping("/as-student")
-@PreAuthorize("hasRole('STUDENT')")
 public ResponseEntity<TaskResponse> createAsStudent(
         @Valid @RequestBody StudentTaskRequest request,
         @AuthenticationPrincipal CustomUserPrincipal principal) {
 
-    // 1️⃣ DTO 변환 (Controller 책임)
+    // 1️⃣ DTO 변환만 여기서
     TaskCreateRequest fullRequest = request.toTaskCreateRequest(principal.getId());
 
-    // 2️⃣ 비즈니스 로직 실행 (기존 Service 메서드 재사용)
+    // 2️⃣ 기존 Service 메서드 재사용
     TaskResponse response = taskService.createTask(fullRequest, principal.getId());
 
     return ResponseEntity.ok(response);
@@ -286,281 +197,186 @@ public TaskResponse createTask(TaskCreateRequest request, Long userId) {
 }
 ```
 
-**장점:**
-- ✅ Service 메서드 1개로 모든 시나리오 처리
-- ✅ 새로운 역할(교사) 추가 시 Controller만 확장
-- ✅ 비즈니스 로직 중복 없음
+**결과:**
+- Service 메서드 중복 제거
+- 교사용 추가해도 Controller만 수정하면 됨
+- Service는 깔끔하게 유지
 
 ---
 
-## 5. DTO 변환, 정확히 무엇이 "비즈니스 로직"이 아닌가?
+## 5. DTO 변환 vs 비즈니스 로직, 뭐가 다른 거야?
 
-### DTO 변환 = 데이터 매핑 (비즈니스 로직 ❌)
+### DTO 변환 = 단순 복사 (비즈니스 로직 X)
 
 ```java
-// 이건 단순 매핑 (비즈니스 로직 X)
-public TaskCreateRequest toTaskCreateRequest(Long studentId) {
-    return TaskCreateRequest.builder()
+// 이건 그냥 필드 옮기기
+public Task toEntity() {
+    return Task.builder()
         .title(this.title)
-        .studentId(studentId)  // 인증 정보 주입
         .dueDate(this.dueDate)
         .build();
 }
 ```
 
-이건 그냥 **"A 형식 데이터를 B 형식으로 복사"**일 뿐이다.
-
-### 비즈니스 로직 = 도메인 규칙 (Service 책임 ✅)
+### 비즈니스 로직 = 도메인 규칙 (Service O)
 
 ```java
-// 이건 비즈니스 로직 (Service에 있어야 함)
+// 이건 비즈니스 로직
 public Task createTask(Task task) {
-    // 1️⃣ 도메인 규칙 검증
+    // 1️⃣ 검증
     if (task.getDueDate().isBefore(LocalDate.now())) {
         throw new BusinessException("마감일은 과거일 수 없습니다");
     }
 
-    // 2️⃣ 다른 Entity와의 관계 검증
+    // 2️⃣ 다른 Entity 확인
     Student student = studentRepository.findById(task.getStudentId())
-        .orElseThrow(() -> new NotFoundException("학생을 찾을 수 없습니다"));
+        .orElseThrow();
 
-    // 3️⃣ 자동 계산 로직
+    // 3️⃣ 자동 계산
     int orderIndex = calculateNextOrderIndex(task.getStudentId());
     task.setOrderIndex(orderIndex);
 
-    // 4️⃣ 트랜잭션 처리
+    // 4️⃣ 저장
     return taskRepository.save(task);
 }
 ```
 
 ---
 
-## 6. 실무에서 자주 만나는 문제: 트랜잭션과 LazyInitializationException
+## 6. 실무에서 자주 만나는 문제: LazyInitializationException
 
-### 문제 상황: Service에서 Entity 반환 시
+### 이런 에러 본 적 있나?
 
 ```java
 // Controller
 @GetMapping("/{id}")
 public ResponseEntity<TaskResponse> getTask(@PathVariable Long id) {
-    Task task = taskService.getTask(id);  // Entity 반환
+    Task task = taskService.getTask(id);  // Entity 받음
 
-    // ❌ LazyInitializationException 발생!
-    TaskResponse response = TaskResponse.from(task);  // task.getStudent() 호출 시 에러
+    // ❌ 에러 발생!
+    TaskResponse response = TaskResponse.from(task);
     return ResponseEntity.ok(response);
 }
 
 // Service
 @Transactional(readOnly = true)
 public Task getTask(Long id) {
-    return taskRepository.findById(id)
-        .orElseThrow(() -> new NotFoundException("할일을 찾을 수 없습니다"));
-    // 메서드 종료 = 트랜잭션 종료 = 세션 종료
+    return taskRepository.findById(id).orElseThrow();
+    // 메서드 끝 = 트랜잭션 종료 = JPA 세션 종료
 }
 ```
 
-**왜 에러가 날까?**
-1. Service 메서드가 끝나면 `@Transactional` 범위 종료
-2. JPA 세션 종료 → Lazy Loading 불가능
-3. Controller에서 `task.getStudent()` 호출 시 세션 없음 → **LazyInitializationException**
+**왜 에러나나?**
+1. Service 메서드 끝 = 트랜잭션 종료
+2. JPA 세션 종료 = Lazy Loading 불가
+3. Controller에서 `task.getStudent()` 호출 = 세션 없음 = 💥
 
-### 해결 방법 2가지
-
-#### 방법 1: Service에서 DTO로 변환 (✅ 권장)
+### 해결 방법 1: Service에서 DTO 변환
 
 ```java
-// Service
 @Transactional(readOnly = true)
 public TaskResponse getTask(Long id) {
-    Task task = taskRepository.findById(id)
-        .orElseThrow(() -> new NotFoundException("할일을 찾을 수 없습니다"));
-
-    // 트랜잭션 내에서 DTO 변환 (Lazy Loading 가능)
-    return TaskResponse.from(task);
-}
-
-// Controller
-@GetMapping("/{id}")
-public ResponseEntity<TaskResponse> getTask(@PathVariable Long id) {
-    TaskResponse response = taskService.getTask(id);  // DTO 받음
-    return ResponseEntity.ok(response);
+    Task task = taskRepository.findById(id).orElseThrow();
+    return TaskResponse.from(task);  // 트랜잭션 내에서 변환
 }
 ```
 
-**장점:**
-- ✅ LazyInitializationException 방지
-- ✅ 트랜잭션 내에서 필요한 데이터 모두 로드
+**장점:** 에러 안 남
+**단점:** Service가 DTO에 종속됨
 
-**단점:**
-- ❌ Service가 특정 DTO에 종속됨
-- ❌ 조회 메서드마다 다른 DTO가 필요하면 메서드 중복
-
-#### 방법 2: Fetch Join 사용 (✅ 권장)
+### 해결 방법 2: Fetch Join (내가 선호하는 방법)
 
 ```java
 // Repository
 @Query("SELECT t FROM Task t " +
        "JOIN FETCH t.student " +
-       "JOIN FETCH t.template " +
        "WHERE t.id = :id")
 Optional<Task> findByIdWithDetails(@Param("id") Long id);
 
 // Service
 @Transactional(readOnly = true)
 public Task getTask(Long id) {
-    return taskRepository.findByIdWithDetails(id)
-        .orElseThrow(() -> new NotFoundException("할일을 찾을 수 없습니다"));
-    // Entity 반환하지만 필요한 연관 Entity는 모두 로드됨
+    return taskRepository.findByIdWithDetails(id).orElseThrow();
+    // Entity 반환하지만 연관 Entity 미리 로드됨
 }
 
 // Controller
 @GetMapping("/{id}")
 public ResponseEntity<TaskResponse> getTask(@PathVariable Long id) {
-    Task task = taskService.getTask(id);  // Entity 받음 (연관 Entity 로드됨)
-    TaskResponse response = TaskResponse.from(task);  // ✅ 에러 없음
+    Task task = taskService.getTask(id);  // 연관 Entity 로드됨
+    TaskResponse response = TaskResponse.from(task);  // ✅ 문제없음
     return ResponseEntity.ok(response);
 }
 ```
 
 **장점:**
-- ✅ Service가 DTO 독립적 (재사용 가능)
-- ✅ N+1 문제 해결
-
-**단점:**
-- ❌ Repository 메서드가 증가 (조회 시나리오마다)
-- ❌ 복잡한 연관관계에서는 쿼리가 복잡해짐
-
-### 실무 권장 패턴
-
-| 시나리오 | 권장 방법 |
-|---------|---------|
-| 단순 조회 (연관 Entity 적음) | Fetch Join + Controller 변환 |
-| 복잡한 집계 (여러 Service 조합) | Service에서 DTO 변환 (Facade 패턴) |
-| 단순 CRUD (연관 Entity 없음) | Controller 변환 |
+- Service는 여전히 Entity 반환 (재사용 가능)
+- N+1 문제도 해결
 
 ---
 
-## 7. 예외 케이스: Facade 패턴
+## 7. 정리: 어디에 뭘 넣어야 하나
 
-### 언제 Service에서 DTO를 다뤄야 하나?
-
-**시나리오:** 복잡한 집계 데이터를 여러 Service에서 조합
-
-```java
-// ❌ Controller에서 직접 조합 (너무 복잡)
-@GetMapping("/dashboard")
-public DashboardResponse getDashboard() {
-    List<Task> tasks = taskService.getAllTasks();
-    List<StudyTime> studyTimes = studyTimeService.getStudyTimes();
-    Statistics stats = statisticsService.calculate(tasks, studyTimes);
-
-    // Controller가 비즈니스 로직을 포함하게 됨
-    return DashboardResponse.builder()
-        .tasks(tasks.stream().map(TaskDto::from).toList())
-        .studyTimes(studyTimes.stream().map(StudyTimeDto::from).toList())
-        .statistics(StatsDto.from(stats))
-        .build();
-}
-
-// ✅ Facade 패턴 사용
-@Service
-public class DashboardFacadeService {
-    private final TaskService taskService;
-    private final StudyTimeService studyTimeService;
-    private final StatisticsService statisticsService;
-
-    public DashboardResponse getDashboard(Long studentId) {
-        List<Task> tasks = taskService.getTasksByStudent(studentId);
-        List<StudyTime> studyTimes = studyTimeService.getStudyTimesByStudent(studentId);
-        Statistics stats = statisticsService.calculate(tasks, studyTimes);
-
-        // 복잡한 조합 로직이 Facade에 캡슐화됨
-        return DashboardResponse.builder()
-            .tasks(tasks.stream().map(TaskDto::from).toList())
-            .studyTimes(studyTimes.stream().map(StudyTimeDto::from).toList())
-            .statistics(StatsDto.from(stats))
-            .build();
-    }
-}
-```
-
-**주의:** Facade는 **여러 Service를 조합하는 복잡한 시나리오**에만 사용해야 한다. 단순 CRUD에는 불필요하다.
-
----
-
-## 8. 정리: 계층 책임 체크리스트
-
-### ✅ Controller에 있어야 하는 것
-- DTO ↔ Domain Entity 변환
+### ✅ Controller 책임
+- DTO ↔ Entity 변환
 - 인증 정보 추출 (`@AuthenticationPrincipal`)
 - HTTP 응답 구성 (`ResponseEntity`)
 - 간단한 입력 검증 (`@Valid`)
 
-### ✅ Service에 있어야 하는 것
-- 비즈니스 로직 (도메인 규칙, 계산, 검증)
+### ✅ Service 책임
+- 비즈니스 로직 (검증, 계산)
 - 트랜잭션 관리 (`@Transactional`)
 - 여러 Repository 조합
-- 도메인 이벤트 발행
+- Entity만 다룸
 
-### ❌ Service에 없어야 하는 것
+### ❌ Service에서 하면 안 되는 것
 - HTTP 관련 DTO (Request/Response)
 - 단순 DTO 변환 래핑 메서드
 - Controller에 종속된 코드
 
 ---
 
-## 9. 실무 팁: DTO 변환 패턴 모음
+## 8. 실무 팁
 
-### 💡 팁 1: DTO에 변환 메서드 추가하기
+### 팁 1: DTO에 변환 메서드 넣기
 
 ```java
-// ✅ DTO에 변환 메서드 캡슐화
 public class TaskCreateRequest {
     private String title;
-    private String description;
     private LocalDate dueDate;
-    private String priority;
 
-    // DTO가 자신을 Entity로 변환하는 책임
+    // DTO가 자기 자신을 Entity로 변환
     public Task toEntity() {
         return Task.builder()
             .title(this.title)
-            .description(this.description)
             .dueDate(this.dueDate)
-            .priority(Priority.valueOf(this.priority))
             .build();
     }
 }
 
-// Controller는 깔끔하게
+// Controller는 깔끔
 @PostMapping
 public ResponseEntity<TaskResponse> createTask(@RequestBody TaskCreateRequest request) {
-    Task task = request.toEntity();  // 한 줄로 해결
+    Task task = request.toEntity();  // 한 줄
     Task saved = taskService.createTask(task);
     return ResponseEntity.ok(TaskResponse.from(saved));
 }
 ```
 
-### 💡 팁 2: 정적 팩토리 메서드로 Entity → DTO 변환
+### 팁 2: 정적 팩토리 메서드
 
 ```java
 public class TaskResponse {
-    private Long id;
-    private String title;
-    private String studentName;
-    private String status;
-
-    // 정적 팩토리 메서드
+    // 정적 메서드로 변환
     public static TaskResponse from(Task task) {
         return TaskResponse.builder()
             .id(task.getId())
             .title(task.getTitle())
-            .studentName(task.getStudent().getName())  // 연관 Entity 접근
-            .status(task.getStatus().name())
+            .studentName(task.getStudent().getName())
             .build();
     }
 
-    // 리스트 변환도 편리
+    // 리스트도 편하게
     public static List<TaskResponse> fromList(List<Task> tasks) {
         return tasks.stream()
             .map(TaskResponse::from)
@@ -571,15 +387,13 @@ public class TaskResponse {
 
 ---
 
-## 10. FAQ: 자주 묻는 질문
+## 9. 자주 묻는 질문
 
-### Q1. "LazyInitializationException이 자꾸 나는데요?"
-
-**원인:** Service에서 Entity를 반환하는데, Controller에서 연관 Entity에 접근하려고 함
+### Q1. "LazyInitializationException 자꾸 나는데요?"
 
 **해결:**
 ```java
-// 방법 A: Fetch Join (Service는 Entity 반환 유지)
+// 방법 A: Fetch Join
 @Query("SELECT t FROM Task t JOIN FETCH t.student WHERE t.id = :id")
 Optional<Task> findByIdWithStudent(@Param("id") Long id);
 
@@ -591,26 +405,23 @@ public TaskResponse getTask(Long id) {
 }
 ```
 
-### Q2. "Service에서 여러 DTO를 반환해야 하면?"
-
-**상황:** 같은 데이터를 조회하는데, 화면마다 다른 DTO 필요
+### Q2. "화면마다 다른 DTO가 필요하면?"
 
 ```java
-// ✅ 좋은 예: Service는 Entity 반환, Controller에서 변환
+// ✅ Service는 Entity 반환, Controller에서 각각 변환
 // Service
 public Task getTask(Long id) {
-    return taskRepository.findByIdWithDetails(id)  // Fetch Join
-        .orElseThrow();
+    return taskRepository.findByIdWithDetails(id).orElseThrow();
 }
 
-// Controller A
+// Controller A - 요약
 @GetMapping("/summary/{id}")
 public TaskSummaryResponse getSummary(@PathVariable Long id) {
     Task task = taskService.getTask(id);
     return TaskSummaryResponse.from(task);
 }
 
-// Controller B
+// Controller B - 상세
 @GetMapping("/detail/{id}")
 public TaskDetailResponse getDetail(@PathVariable Long id) {
     Task task = taskService.getTask(id);
@@ -620,33 +431,33 @@ public TaskDetailResponse getDetail(@PathVariable Long id) {
 
 ---
 
-## 마무리: 왜 이게 중요한가?
+## 마무리
 
-### 올바른 판단 기준
+### 내가 배운 것
 
 | 판단 기준 | Controller 변환 | Service 변환 |
 |---------|----------------|--------------|
-| 재사용성 | ✅ Service가 DTO 독립적 | ❌ Service가 특정 DTO에 종속 |
+| 재사용성 | ✅ Service가 독립적 | ❌ DTO에 종속 |
 | 코드 중복 | ✅ 없음 | ❌ 래핑 메서드 증가 |
-| 책임 분리 | ✅ Controller=변환, Service=로직 | ❌ Service가 변환+로직 |
-| 유지보수성 | ✅ 새 API 추가 시 Controller만 수정 | ❌ Service도 같이 수정 |
+| 책임 분리 | ✅ 명확함 | ❌ Service가 변환+로직 |
+| 유지보수 | ✅ 쉬움 | ❌ 어려움 |
+
+**결론:** Controller에서 변환하는 게 정석이다. 예외는 복잡한 집계 로직뿐.
 
 ---
 
 ## 참고 자료
 
-### 공식 문서 및 표준 자료
+### 공식 문서
 - [Martin Fowler - Data Transfer Object](https://martinfowler.com/eaaCatalog/dataTransferObject.html)
 - [Martin Fowler - LocalDTO](https://martinfowler.com/bliki/LocalDTO.html)
-- [Baeldung - Entity To DTO Conversion for Spring REST API](https://www.baeldung.com/entity-to-and-from-dto-for-a-java-spring-application)
+- [Baeldung - Entity To DTO Conversion](https://www.baeldung.com/entity-to-and-from-dto-for-a-java-spring-application)
 - [Baeldung - The DTO Pattern](https://www.baeldung.com/java-dto-pattern)
 
-### 커뮤니티 토론 (Stack Overflow)
-- [Which layer should convert entities to DTOs?](https://stackoverflow.com/questions/47822938/which-layer-should-be-used-for-conversion-to-dto-from-domain-object)
-- [Which layer should place mapper code?](https://stackoverflow.com/questions/47457009/which-is-best-layer-to-place-mapper-code-service-layer-or-controller-layer)
-- [In a typical MVC application, which layer is responsible for Model→DTO conversion?](https://stackoverflow.com/questions/20481384/in-a-typical-mvc-application-which-layer-is-responsible-for-a-model-dto-conver)
-- [Should services always return DTOs?](https://stackoverflow.com/questions/21554977/should-services-always-return-dtos-or-can-they-also-return-domain-models)
+### Stack Overflow
+- [Which layer should convert entities to DTOs?](https://stackoverflow.com/questions/47822938/which-layer-should-be-used-for-conversion-to-dto-from-domain-object) (350+ 추천)
+- [Which layer should place mapper code?](https://stackoverflow.com/questions/47457009/which-is-best-layer-to-place-mapper-code-service-layer-or-controller-layer) (200+ 추천)
 
 ---
 
-**결론:** DTO 변환은 Controller에서 하는 것이 업계 표준이며, Service는 도메인 객체만 다뤄야 재사용성과 유지보수성이 높아진다.
+이 글이 나처럼 헷갈렸던 분들에게 도움이 되길 바란다!
