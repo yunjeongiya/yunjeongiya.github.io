@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "DTO 변환은 Controller? Service? 헷갈려서 제대로 조사해봤다"
+title: "DTO 변환은 Controller? Service? - 제대로 조사해봤다"
 date: 2025-10-19 14:00:00 +0900
 categories: [Spring Boot, Architecture]
 tags: [spring-boot, dto, controller, service, architecture, clean-code, martin-fowler, best-practices]
@@ -9,7 +9,7 @@ lang: ko
 
 ## TL;DR
 
-평소 코드 작성할 때마다 헷갈렸던 "DTO 변환을 Controller에서 해야 할까, Service에서 해야 할까?" 문제를 이번 기회에 제대로 조사해봤다. Martin Fowler 공식 문서, Stack Overflow 고수들의 답변, 실제 프로젝트 사례까지 살펴본 결과, **Controller에서 변환하는 것이 정석**이라는 걸 알게 되었다. 이 글은 내가 Claude와 함께 조사한 내용을 정리한 것이다.
+평소 코드 작성할 때마다 헷갈렸던 "DTO 변환을 Controller에서 해야 할까, Service에서 해야 할까?" 문제를 이번 기회에 제대로 조사해봤다. Martin Fowler 공식 문서, Stack Overflow 고수들의 답변, 실제 프로젝트 사례까지 살펴본 결과, **Controller에서 변환하는 것이 정석**이다.
 
 ---
 
@@ -38,20 +38,20 @@ public ResponseEntity<Response> create(@RequestBody CreateRequest request) {
 
 ---
 
-## 1. 먼저 Martin Fowler 공식 문서부터 찾아봤다
+## 1. Martin Fowler 공식 문서부터 찾아봤다
 
-> **💡 참고:** Martin Fowler는 소프트웨어 아키텍처 분야의 세계적 권위자로, Agile Manifesto 서명자이자 "Refactoring", "Patterns of Enterprise Application Architecture" 등의 저자입니다. DTO 패턴을 2002년에 정의한 창시자이기도 합니다.
+> **💡 참고:** Martin Fowler는 소프트웨어 아키텍처 분야의 세계적 권위자로, Agile Manifesto 서명자이자 "Refactoring", "Patterns of Enterprise Application Architecture" 등의 저자다. DTO 패턴을 2002년에 정의한 창시자이기도 하다.
 
-###DTO가 원래 뭐였지?
+### DTO가 원래 뭐였지?
 
-Martin Fowler의 [Patterns of Enterprise Application Architecture](https://martinfowler.com/eaaCatalog/dataTransferObject.html)를 읽어보니:
+Martin Fowler의 [Patterns of Enterprise Application Architecture](https://martinfowler.com/eaaCatalog/dataTransferObject.html)를 보니:
 
 > **"An object that carries data between processes to reduce the number of method calls."**
 > (프로세스 간 데이터 전송을 위해 메서드 호출 횟수를 줄이는 객체)
 
 핵심은 **"프로세스 간 경계(Remote Boundary)"**에서 쓰라는 거였다.
 
-### Fowler의 경고를 놓쳤었다
+### Fowler의 경고
 
 [LocalDTO](https://martinfowler.com/bliki/LocalDTO.html) 글을 보니 이런 말이 있더라:
 
@@ -63,7 +63,7 @@ Martin Fowler의 [Patterns of Enterprise Application Architecture](https://marti
 > **"One case where it is useful is when you have a significant mismatch between the model in your presentation layer and the domain model."**
 > (프레젠테이션 계층과 도메인 모델이 많이 다를 때는 유용하다)
 
-아, 그러니까 API 응답 형식이 Entity와 많이 다를 때만 DTO를 써라는 거구나.
+아, 그러니까 API 응답 형식이 Entity와 많이 다를 때만 DTO를 쓰라는 거구나.
 
 ---
 
@@ -81,11 +81,11 @@ Martin Fowler의 [Patterns of Enterprise Application Architecture](https://marti
 2. **다른 Service나 배치에서 호출할 때** → Entity를 필요로 함
 3. **의존성 방향** → Service는 Repository만 알아야 함
 
-아, Controller가 DTO ↔ Entity 변환을 책임지는 게 맞구나!
+Controller가 DTO ↔ Entity 변환을 책임지는 게 맞다.
 
 ---
 
-## 3. 그럼 실제로 어떻게 짜야 하나?
+## 3. 실제로 어떻게 짜야 하나?
 
 ### ✅ 권장 패턴 (Controller 변환)
 
@@ -206,7 +206,7 @@ public TaskResponse createTask(TaskCreateRequest request, Long userId) {
 
 ---
 
-## 5. DTO 변환 vs 비즈니스 로직, 뭐가 다른 거야?
+## 5. DTO 변환 vs 비즈니스 로직, 뭐가 다른 거지?
 
 ### DTO 변환 = 단순 복사 (비즈니스 로직 X)
 
@@ -268,7 +268,7 @@ public Task getTask(Long id) {
 }
 ```
 
-**왜 에러나나?**
+**왜 에러날까?**
 1. Service 메서드 끝 = 트랜잭션 종료
 2. JPA 세션 종료 = Lazy Loading 불가
 3. Controller에서 `task.getStudent()` 호출 = 세션 없음 = 💥
@@ -462,4 +462,4 @@ public TaskDetailResponse getDetail(@PathVariable Long id) {
 
 ---
 
-이 글이 나처럼 헷갈렸던 분들에게 도움이 되길 바란다!
+이 글이 나처럼 헷갈렸던 분들에게 도움이 되길 바란다.
