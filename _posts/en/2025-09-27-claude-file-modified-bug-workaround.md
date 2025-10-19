@@ -4,7 +4,6 @@ title: "The Elusive Claude 'File has been unexpectedly modified' Bug: A Workarou
 date: 2025-09-27 10:00:00 +0900
 categories: [Claude, DevTools]
 tags: [claude, claude-code, bug, workaround, file-editing, debugging]
-permalink: /en/:categories/:year/:month/:day/:title/
 lang: en
 ---
 

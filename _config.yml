@@ -20,13 +20,27 @@ plugins:
 minima:
   skin: dark
 
+# Permalink structure
+permalink: /:categories/:year/:month/:day/:title/
+
 # Defaults
 defaults:
+  # Korean posts (default)
   - scope:
-      path: ""
+      path: "_posts/ko"
       type: "posts"
     values:
       layout: "post"
+      lang: "ko"
+
+  # English posts (with /en/ prefix)
+  - scope:
+      path: "_posts/en"
+      type: "posts"
+    values:
+      layout: "post"
+      lang: "en"
+      permalink: "/en/:categories/:year/:month/:day/:title/"
 
 # Exclude from processing
 exclude:
@@ -38,3 +52,6 @@ exclude:
   - vendor/gems/
   - vendor/ruby/
   - README.md
+  - .claude
+  - CLAUDE.md
+  - BLOG_DEVELOPMENT.md
