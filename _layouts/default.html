@@ -206,6 +206,7 @@
               <span class="statusbar-lang-disabled" title="English version not available">한국어</span>
             {% endif %}
           {% else %}
+            {% capture post_slug %}{{ page.url | split: "/" | last | split: ".html" | first }}{% endcapture %}
             {% assign ko_post = site.posts | where: "lang", "ko" | where_exp: "p", "p.url contains post_slug" | first %}
             {% if ko_post %}
               <a href="{{ ko_post.url | relative_url }}" style="text-decoration: none; color: inherit;">
