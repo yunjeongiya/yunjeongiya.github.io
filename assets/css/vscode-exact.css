@@ -829,3 +829,94 @@ body {
   color: #858585;
   margin: 5px 0;
 }
+
+/* Mobile Responsive Fixes */
+@media (max-width: 768px) {
+  /* Hide sidebar and activitybar completely */
+  .vscode-activitybar {
+    display: none !important;
+  }
+  
+  .vscode-sidebar {
+    display: none !important;
+  }
+  
+  /* Editor takes full width */
+  .vscode-editor-group {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  /* Hide right panel (outline, minimap) on mobile */
+  .vscode-right-panel {
+    display: none !important;
+  }
+  
+  /* Full width editor */
+  .vscode-editor {
+    padding: 10px 15px;
+    max-width: 100%;
+  }
+  
+  /* Adjust title bar */
+  .vscode-titlebar {
+    padding: 0 10px;
+    font-size: 12px;
+  }
+  
+  /* Status bar adjustments */
+  .vscode-statusbar {
+    flex-wrap: wrap;
+    padding: 5px 10px;
+  }
+  
+  .statusbar-left,
+  .statusbar-right {
+    font-size: 11px;
+  }
+  
+  /* Terminal panel smaller on mobile */
+  .vscode-terminal-panel {
+    height: 200px;
+  }
+  
+  /* Post content adjustments */
+  .post-content h1 { font-size: 24px; }
+  .post-content h2 { font-size: 20px; }
+  .post-content h3 { font-size: 18px; }
+  
+  .post-content pre {
+    font-size: 12px;
+    padding: 10px;
+    overflow-x: auto;
+  }
+  
+  .post-content code {
+    font-size: 12px;
+  }
+  
+  .post-content table {
+    font-size: 12px;
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 480px) {
+  .vscode-titlebar {
+    font-size: 11px;
+  }
+  
+  .vscode-editor {
+    padding: 8px 12px;
+  }
+  
+  .post-content h1 { font-size: 20px; }
+  .post-content h2 { font-size: 18px; }
+  .post-content h3 { font-size: 16px; }
+  
+  .post-content {
+    font-size: 14px;
+  }
+}
