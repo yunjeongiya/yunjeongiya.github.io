@@ -69,7 +69,9 @@
 
           <div class="sidebar-section">
             <div class="sidebar-section-title">RECENT POSTS</div>
-            {% for post in site.posts limit:5 %}
+            {% assign current_page_lang = page.lang | default: "ko" %}
+            {% assign filtered_posts = site.posts | where: "lang", current_page_lang %}
+            {% for post in filtered_posts limit:5 %}
             <a href="{{ post.url | relative_url }}" style="text-decoration: none; color: inherit;">
               <div class="sidebar-item">
                 <i class="codicon codicon-file icon"></i>
@@ -194,7 +196,8 @@
         {% if page.layout == 'post' %}
           <!-- Post pages: language switcher based on alternative post -->
           {% if current_lang == 'ko' %}
-            {% assign en_post = site.posts | where: "lang", "en" | where: "date", page.date | first %}
+            {% capture post_slug %}{{ page.url | split: "/" | last | split: ".html" | first }}{% endcapture %}
+            {% assign en_post = site.posts | where: "lang", "en" | where_exp: "p", "p.url contains post_slug" | first %}
             {% if en_post %}
               <a href="{{ en_post.url | relative_url }}" style="text-decoration: none; color: inherit;">
                 <span class="statusbar-lang" title="Click to view in English">한국어</span>
@@ -203,7 +206,7 @@
               <span class="statusbar-lang-disabled" title="English version not available">한국어</span>
             {% endif %}
           {% else %}
-            {% assign ko_post = site.posts | where: "lang", "ko" | where: "date", page.date | first %}
+            {% assign ko_post = site.posts | where: "lang", "ko" | where_exp: "p", "p.url contains post_slug" | first %}
             {% if ko_post %}
               <a href="{{ ko_post.url | relative_url }}" style="text-decoration: none; color: inherit;">
                 <span class="statusbar-lang" title="Click to view in 한국어">English</span>
