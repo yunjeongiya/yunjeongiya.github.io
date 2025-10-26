@@ -67,7 +67,7 @@ User feedback: "I found 002, but I want to see 003 too. Do I have to search agai
 ### Pattern 2: Highlight Pattern
 
 <div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
-  <div style="flex: 1; min-width: 300px;">
+  <div style="flex: 1; min-width: 300px;" markdown="1">
 
 Second attempt: "Keep the full tree, but highlight matching results."
 
@@ -101,7 +101,7 @@ User feedback: "Items are highlighted in yellow, but I don't know how many there
 ### Pattern 3: Hybrid Pattern (Final Choice)
 
 <div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
-  <div style="flex: 1; min-width: 300px;">
+  <div style="flex: 1; min-width: 300px;" markdown="1">
 
 So I came up with a "search result list + full tree" approach - showing both simultaneously. The top section displays a list of matching templates, while the bottom section maintains the full tree structure with matched items highlighted.
 
