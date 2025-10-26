@@ -38,7 +38,7 @@ The problem was clear:
 
 Time to add search.
 
-![Before adding search feature](/assets/images/posts/2025-10-26-hybrid-tree-search/before.png)
+<img src="/assets/images/posts/2025-10-26-hybrid-tree-search/before.png" alt="Before adding search feature" width="400">
 *Before: Searching for "점과" requires scrolling through the entire tree*
 
 ---
@@ -101,7 +101,7 @@ So I thought: "What if we show both search results list + full tree?"
 
 **User feedback:** "This is much better!"
 
-![After applying hybrid pattern](/assets/images/posts/2025-10-26-hybrid-tree-search/after.png)
+<img src="/assets/images/posts/2025-10-26-hybrid-tree-search/after.png" alt="After applying hybrid pattern" width="400">
 *After: Hybrid pattern shows search results list (top) + full tree (bottom) simultaneously*
 
 ---
