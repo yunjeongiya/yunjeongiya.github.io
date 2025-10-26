@@ -38,8 +38,10 @@ lang: ko
 
 검색 기능을 추가하기로 했다.
 
-<img src="/assets/images/posts/2025-10-26-hybrid-tree-search/before.png" alt="검색 기능 추가 전" width="400">
-*검색 적용 전: "점과" 검색 시 전체 트리에서 스크롤하며 찾아야 함*
+<div style="text-align: center;">
+  <img src="/assets/images/posts/2025-10-26-hybrid-tree-search/before.png" alt="검색 기능 추가 전" width="300">
+  <p><em>검색 적용 전: "점과" 검색 시 전체 트리에서 스크롤하며 찾아야 함</em></p>
+</div>
 
 ---
 
@@ -101,8 +103,10 @@ const filteredTree = filterTreeByQuery(tree, searchQuery);
 
 **사용자 피드백:** "이게 훨씬 낫네!"
 
-<img src="/assets/images/posts/2025-10-26-hybrid-tree-search/after.png" alt="하이브리드 패턴 적용 후" width="400">
-*하이브리드 패턴 적용 후: 검색 결과 리스트(상단) + 전체 트리(하단)를 동시에 표시*
+<div style="text-align: center;">
+  <img src="/assets/images/posts/2025-10-26-hybrid-tree-search/after.png" alt="하이브리드 패턴 적용 후" width="300">
+  <p><em>하이브리드 패턴 적용 후: 검색 결과 리스트(상단) + 전체 트리(하단)를 동시에 표시</em></p>
+</div>
 
 ---
 

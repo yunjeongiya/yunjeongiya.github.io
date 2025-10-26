@@ -38,8 +38,11 @@ The problem was clear:
 
 Time to add search.
 
-<img src="/assets/images/posts/2025-10-26-hybrid-tree-search/before.png" alt="Before adding search feature" width="400">
-*Before: Searching for "점과" requires scrolling through the entire tree*
+
+<div style="text-align: center;">
+  <img src="/assets/images/posts/2025-10-26-hybrid-tree-search/before.png" alt="Before adding search feature" width="300">
+  <p><em>Before: Searching for "점과" requires scrolling through the entire tree</em></p>
+</div>
 
 ---
 
@@ -101,8 +104,10 @@ So I thought: "What if we show both search results list + full tree?"
 
 **User feedback:** "This is much better!"
 
-<img src="/assets/images/posts/2025-10-26-hybrid-tree-search/after.png" alt="After applying hybrid pattern" width="400">
-*After: Hybrid pattern shows search results list (top) + full tree (bottom) simultaneously*
+<div style="text-align: center;">
+  <img src="/assets/images/posts/2025-10-26-hybrid-tree-search/after.png" alt="After applying hybrid pattern" width="300">
+  <p><em>After: Hybrid pattern shows search results list (top) + full tree (bottom) simultaneously</em></p>
+</div>
 
 ---
 
