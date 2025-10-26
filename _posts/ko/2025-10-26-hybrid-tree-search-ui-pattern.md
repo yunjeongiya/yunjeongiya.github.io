@@ -64,10 +64,10 @@ const filteredTree = filterTreeByQuery(tree, searchQuery);
 
 ---
 
+### Pattern 2: 하이라이트 패턴
+
 <div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
   <div style="flex: 1; min-width: 300px;">
-
-### Pattern 2: 하이라이트 패턴
 
 두 번째로 시도한 건 "전체 트리를 유지하되, 검색 결과를 하이라이트"하는 방식이다.
 
@@ -98,10 +98,10 @@ const highlightMatchingNodes = (node: TreeNode, query: string) => {
 
 ---
 
+### Pattern 3: 하이브리드 패턴 (최종 선택)
+
 <div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
   <div style="flex: 1; min-width: 300px;">
-
-### Pattern 3: 하이브리드 패턴 (최종 선택)
 
 그래서 생각한 게 "검색 결과 리스트 + 전체 트리"를 동시에 보여주는 방식이다. 상단에는 검색된 템플릿 목록을 표시하고, 하단에는 전체 트리 구조를 유지하면서 검색된 항목을 하이라이트하는 방식이다.
 
