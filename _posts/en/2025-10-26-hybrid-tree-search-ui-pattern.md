@@ -38,15 +38,9 @@ The problem was clear:
 
 Time to add search.
 
-
-<div style="text-align: center;">
-  <img src="/assets/images/posts/2025-10-26-hybrid-tree-search/before.png" alt="Before adding search feature" width="300">
-  <p><em>Before: Searching for "점과" requires scrolling through the entire tree</em></p>
-</div>
-
 ---
 
-## The Dilemma: Two Patterns, Which One?
+## The Dilemma: Three Patterns, Which One?
 
 ### Pattern 1: Filtered Tree
 
@@ -68,20 +62,62 @@ const filteredTree = filterTreeByQuery(tree, searchQuery);
 
 User feedback: "I found 002, but I want to see 003 too. Do I have to search again?"
 
-### Pattern 2: Hybrid Pattern (Final Choice)
+---
+
+<div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
+  <div style="flex: 1; min-width: 300px;">
+
+### Pattern 2: Highlight Pattern
+
+Second attempt: "Keep the full tree, but highlight matching results."
+
+```typescript
+// Keep full tree + highlight matching nodes
+const highlightMatchingNodes = (node: TreeNode, query: string) => {
+  return node.title.includes(query);
+};
+```
+
+**Pros:**
+- Full tree context preserved
+- Can see surrounding items
+
+**Cons:**
+- **Hard to find when there are many results**
+- Have to scroll through and check each highlighted item
+- Can't tell at a glance how many results there are
+
+User feedback: "Items are highlighted in yellow, but I don't know how many there are and it's hard to find them"
+
+  </div>
+  <div style="flex: 0 0 300px;">
+    <img src="/assets/images/posts/2025-10-26-hybrid-tree-search/before.png" alt="Highlight pattern" style="width: 100%; max-width: 300px;">
+    <p style="text-align: center; margin-top: 10px;"><em>Pattern 2: Highlighting search results in full tree</em></p>
+  </div>
+</div>
+
+---
+
+<div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
+  <div style="flex: 1; min-width: 300px;">
+
+### Pattern 3: Hybrid Pattern (Final Choice)
 
 So I came up with a "search result list + full tree" approach - showing both simultaneously. The top section displays a list of matching templates, while the bottom section maintains the full tree structure with matched items highlighted.
 
 **Pros:**
-- Quick scan of search results
-- Full tree context preserved
+- Quick scan of search results (top list)
+- Full tree context preserved (bottom tree)
 - "Show in tree" button jumps to exact location
+- Clear display of result count
 
-**User feedback:** "This is much better!"
+**User feedback:** "This is much better! I can quickly browse the list and immediately check the location"
 
-<div style="text-align: center;">
-  <img src="/assets/images/posts/2025-10-26-hybrid-tree-search/after.png" alt="After applying hybrid pattern" width="300">
-  <p><em>After: Hybrid pattern shows search results list (top) + full tree (bottom) simultaneously</em></p>
+  </div>
+  <div style="flex: 0 0 300px;">
+    <img src="/assets/images/posts/2025-10-26-hybrid-tree-search/after.png" alt="Hybrid pattern" style="width: 100%; max-width: 300px;">
+    <p style="text-align: center; margin-top: 10px;"><em>Pattern 3 (Hybrid): Search results list (top) + full tree (bottom)</em></p>
+  </div>
 </div>
 
 ---

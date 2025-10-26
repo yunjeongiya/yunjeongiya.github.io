@@ -38,14 +38,9 @@ lang: ko
 
 검색 기능을 추가하기로 했다.
 
-<div style="text-align: center;">
-  <img src="/assets/images/posts/2025-10-26-hybrid-tree-search/before.png" alt="검색 기능 추가 전" width="300">
-  <p><em>검색 적용 전: "점과" 검색 시 전체 트리에서 스크롤하며 찾아야 함</em></p>
-</div>
-
 ---
 
-## 고민: 두 가지 패턴, 어떤 걸 선택할까?
+## 고민: 세 가지 패턴, 어떤 걸 선택할까?
 
 ### Pattern 1: 필터링된 트리
 
@@ -67,20 +62,62 @@ const filteredTree = filterTreeByQuery(tree, searchQuery);
 
 사용자 피드백: "002강을 찾긴 했는데, 003강도 같이 보고 싶은데 다시 검색해야 하네?"
 
-### Pattern 2: 하이브리드 패턴 (최종 선택)
+---
+
+<div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
+  <div style="flex: 1; min-width: 300px;">
+
+### Pattern 2: 하이라이트 패턴
+
+두 번째로 시도한 건 "전체 트리를 유지하되, 검색 결과를 하이라이트"하는 방식이다.
+
+```typescript
+// 전체 트리 유지 + 매칭 노드 하이라이트
+const highlightMatchingNodes = (node: TreeNode, query: string) => {
+  return node.title.includes(query);
+};
+```
+
+**장점:**
+- 트리 전체 맥락 유지
+- 주변 항목들도 함께 볼 수 있음
+
+**단점:**
+- **검색 결과가 많으면 찾기 어려움**
+- 스크롤하며 하이라이트된 항목을 일일이 확인해야 함
+- 검색 결과가 몇 개인지 한눈에 파악 불가
+
+사용자 피드백: "노란색으로 표시는 되는데, 이게 전체 몇 개인지 모르겠고 찾기 힘들어"
+
+  </div>
+  <div style="flex: 0 0 300px;">
+    <img src="/assets/images/posts/2025-10-26-hybrid-tree-search/before.png" alt="하이라이트 패턴" style="width: 100%; max-width: 300px;">
+    <p style="text-align: center; margin-top: 10px;"><em>Pattern 2: 전체 트리에서 검색 결과를 하이라이트</em></p>
+  </div>
+</div>
+
+---
+
+<div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
+  <div style="flex: 1; min-width: 300px;">
+
+### Pattern 3: 하이브리드 패턴 (최종 선택)
 
 그래서 생각한 게 "검색 결과 리스트 + 전체 트리"를 동시에 보여주는 방식이다. 상단에는 검색된 템플릿 목록을 표시하고, 하단에는 전체 트리 구조를 유지하면서 검색된 항목을 하이라이트하는 방식이다.
 
 **장점:**
-- 검색 결과를 빠르게 스캔할 수 있음
-- 트리 전체 맥락도 유지됨
+- 검색 결과를 빠르게 스캔할 수 있음 (상단 리스트)
+- 트리 전체 맥락도 유지됨 (하단 트리)
 - "트리에서 보기" 버튼으로 원하는 위치로 바로 점프
+- 검색 결과 개수를 명확히 표시
 
-**사용자 피드백:** "이게 훨씬 낫네!"
+**사용자 피드백:** "이게 훨씬 낫네! 리스트에서 빠르게 보고, 위치도 바로 확인할 수 있어"
 
-<div style="text-align: center;">
-  <img src="/assets/images/posts/2025-10-26-hybrid-tree-search/after.png" alt="하이브리드 패턴 적용 후" width="300">
-  <p><em>하이브리드 패턴 적용 후: 검색 결과 리스트(상단) + 전체 트리(하단)를 동시에 표시</em></p>
+  </div>
+  <div style="flex: 0 0 300px;">
+    <img src="/assets/images/posts/2025-10-26-hybrid-tree-search/after.png" alt="하이브리드 패턴" style="width: 100%; max-width: 300px;">
+    <p style="text-align: center; margin-top: 10px;"><em>Pattern 3 (Hybrid): 검색 결과 리스트(상단) + 전체 트리(하단)</em></p>
+  </div>
 </div>
 
 ---
