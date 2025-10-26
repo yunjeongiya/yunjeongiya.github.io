@@ -70,32 +70,7 @@ User feedback: "I found 002, but I want to see 003 too. Do I have to search agai
 
 ### Pattern 2: Hybrid Pattern (Final Choice)
 
-So I thought: "What if we show both search results list + full tree?"
-
-```
-┌─────────────────────────────┐
-│ 🔍 Search: "002"            │
-├─────────────────────────────┤
-│ 📋 Results (3)              │
-│ ┌─────────────────────────┐ │
-│ │ Lesson 002. Remainder   │ │
-│ │ High > Common Math 1 > 1│ │
-│ │      [Show in tree →]   │ │
-│ ├─────────────────────────┤ │
-│ │ Lesson 002. Exponential │ │
-│ │ High > Common Math 2 > 1│ │
-│ │      [Show in tree →]   │ │
-│ └─────────────────────────┘ │
-├─────────────────────────────┤
-│ 🌲 Full Tree                │
-│ ▼ High School               │
-│   ▼ Common Math 1           │
-│     ▼ LV1                   │
-│       □ Lesson 001          │
-│       ■ Lesson 002          │  ← Yellow highlight
-│       □ Lesson 003          │
-└─────────────────────────────┘
-```
+So I came up with a "search result list + full tree" approach - showing both simultaneously. The top section displays a list of matching templates, while the bottom section maintains the full tree structure with matched items highlighted.
 
 **Pros:**
 - Quick scan of search results
