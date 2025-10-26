@@ -131,6 +131,7 @@
 
     {% if page.layout == 'post' %}
     <div class="vscode-terminal-panel" id="terminal-panel">
+      <div class="terminal-resize-handle" id="terminal-resize-handle"></div>
       <div class="terminal-tabs">
         <div class="terminal-tab active" data-tab="tags">
           <i class="codicon codicon-tag"></i>
@@ -281,6 +282,38 @@
           document.getElementById('comments-content').style.display = tabName === 'comments' ? 'block' : 'none';
         });
       });
+
+      // Terminal resize functionality
+      const resizeHandle = document.getElementById('terminal-resize-handle');
+      if (resizeHandle && terminalPanel) {
+        let isResizing = false;
+        let startY = 0;
+        let startHeight = 0;
+
+        resizeHandle.addEventListener('mousedown', function(e) {
+          isResizing = true;
+          startY = e.clientY;
+          startHeight = terminalPanel.offsetHeight;
+          document.body.style.cursor = 'ns-resize';
+          document.body.style.userSelect = 'none';
+          e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', function(e) {
+          if (!isResizing) return;
+          const deltaY = startY - e.clientY;
+          const newHeight = Math.max(150, Math.min(600, startHeight + deltaY));
+          terminalPanel.style.height = newHeight + 'px';
+        });
+
+        document.addEventListener('mouseup', function() {
+          if (isResizing) {
+            isResizing = false;
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+          }
+        });
+      }
     });
   </script>
   {% endif %}

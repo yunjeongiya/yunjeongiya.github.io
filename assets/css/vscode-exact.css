@@ -744,6 +744,28 @@ body {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+  position: relative;
+}
+
+/* Terminal resize handle */
+.terminal-resize-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  cursor: ns-resize;
+  background: transparent;
+  z-index: 10;
+  transition: background 0.2s;
+}
+
+.terminal-resize-handle:hover {
+  background: rgba(14, 99, 156, 0.5);
+}
+
+.terminal-resize-handle:active {
+  background: rgba(14, 99, 156, 0.8);
 }
 
 /* Fix: Container layout with terminal */
