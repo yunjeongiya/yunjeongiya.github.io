@@ -692,8 +692,8 @@ body {
   overflow-y: auto !important;
   overflow-x: hidden;
   padding: 20px 40px;
-  max-width: 900px;
   height: 100%;
+  width: 100%;
 }
 
 /* Fix: Editor wrapper height */
