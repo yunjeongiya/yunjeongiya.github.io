@@ -5,3 +5,13 @@ _site
 vendor
 Gemfile.lock
 .DS_Store
+
+# Claude Code
+.claude/settings.local.json
+conversation.txt
+
+# Backup files
+*.backup
+
+# Temp files
+temp.md
