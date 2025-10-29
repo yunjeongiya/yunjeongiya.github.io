@@ -1,7 +1,11 @@
 import { Redis } from '@upstash/redis';
 import { Comment } from '../types';
-// Initialize Upstash Redis
-const redis = Redis.fromEnv();
+
+// Initialize Upstash Redis with Vercel KV environment variables
+const redis = new Redis({
+  url: process.env.KV_REST_API_URL!,
+  token: process.env.KV_REST_API_TOKEN!,
+});
 
 
 // Redis Key 생성
