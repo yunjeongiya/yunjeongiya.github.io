@@ -59,3 +59,15 @@ document.addEventListener('DOMContentLoaded', function() {
 window.postTags = {{ page.tags | jsonify }};
 </script>
 {% endif %}
+
+<!-- Git Comments System -->
+<div id="git-comments" style="margin-top: 40px;"></div>
+
+<script type="module">
+  import { GitTerminal } from '/assets/js/git-terminal.js';
+
+  const postId = '{{ page.id | replace: "/", "-" }}';
+  const apiUrl = 'https://blog-comments-jnlald3nf-checkus.vercel.app';
+
+  new GitTerminal('git-comments', postId, apiUrl);
+</script>

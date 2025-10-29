@@ -1,5 +1,8 @@
-import { kv } from '@vercel/kv';
+import { Redis } from '@upstash/redis';
 import { Comment } from '../types';
+// Initialize Upstash Redis
+const redis = Redis.fromEnv();
+
 
 // Redis Key 생성
 export function getCommentsKey(postId: string): string {
@@ -18,7 +21,7 @@ export function generateCommitHash(): string {
 // 댓글 목록 조회
 export async function getComments(postId: string): Promise<Comment[]> {
   const key = getCommentsKey(postId);
-  const commentHashes = await kv.lrange<string>(key, 0, -1);
+  const commentHashes = await redis.lrange<string>(key, 0, -1);
 
   if (!commentHashes || commentHashes.length === 0) {
     return [];
@@ -27,7 +30,7 @@ export async function getComments(postId: string): Promise<Comment[]> {
   // 각 해시로 댓글 데이터 조회
   const comments: Comment[] = [];
   for (const hash of commentHashes) {
-    const comment = await kv.get<Comment>(getCommentKey(hash));
+    const comment = await redis.get<Comment>(getCommentKey(hash));
     if (comment) {
       comments.push(comment);
     }
@@ -51,19 +54,19 @@ export async function createComment(
     post_id: postId,
     author,
     message,
-    parent_hash: parentHash,
+    parent_hash: parentHash || undefined,
     created_at: new Date().toISOString(),
   };
 
   // 댓글 데이터 저장
-  await kv.set(getCommentKey(commitHash), comment);
+  await redis.set(getCommentKey(commitHash), comment);
 
   // 댓글 목록에 추가
-  await kv.lpush(getCommentsKey(postId), commitHash);
+  await redis.lpush(getCommentsKey(postId), commitHash);
 
   // 비밀번호가 있으면 별도 저장 (보안을 위해 분리)
   if (passwordHash) {
-    await kv.set(`password:${commitHash}`, passwordHash);
+    await redis.set(`password:${commitHash}`, passwordHash);
   }
 
   return comment;
@@ -71,7 +74,7 @@ export async function createComment(
 
 // 댓글 조회 (단일)
 export async function getComment(commitHash: string): Promise<Comment | null> {
-  return await kv.get<Comment>(getCommentKey(commitHash));
+  return await redis.get<Comment>(getCommentKey(commitHash));
 }
 
 // 댓글 수정
@@ -85,7 +88,7 @@ export async function updateComment(
   comment.message = message;
   comment.updated_at = new Date().toISOString();
 
-  await kv.set(getCommentKey(commitHash), comment);
+  await redis.set(getCommentKey(commitHash), comment);
   return true;
 }
 
@@ -95,20 +98,20 @@ export async function deleteComment(
   commitHash: string
 ): Promise<boolean> {
   // 댓글 목록에서 제거
-  await kv.lrem(getCommentsKey(postId), 0, commitHash);
+  await redis.lrem(getCommentsKey(postId), 0, commitHash);
 
   // 댓글 데이터 삭제
-  await kv.del(getCommentKey(commitHash));
+  await redis.del(getCommentKey(commitHash));
 
   // 비밀번호 삭제
-  await kv.del(`password:${commitHash}`);
+  await redis.del(`password:${commitHash}`);
 
   return true;
 }
 
 // 비밀번호 조회
 export async function getPasswordHash(commitHash: string): Promise<string | null> {
-  return await kv.get<string>(`password:${commitHash}`);
+  return await redis.get<string>(`password:${commitHash}`);
 }
 
 // 답글 조회 (특정 댓글의 답글들)
