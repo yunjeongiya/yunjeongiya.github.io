@@ -169,18 +169,8 @@
             <span>git comment --post="{{ page.title | escape }}"</span>
             <span class="terminal-cursor"></span>
           </div>
-          <div class="terminal-comments-wrapper">
-            <div class="terminal-intro">
-              <span class="comment-sign"># GitHub 계정으로 댓글을 남길 수 있습니다</span><br>
-              <span class="prompt-line">$ Loading comments from GitHub Issues...</span>
-            </div>
-            <script src="https://utteranc.es/client.js"
-                    repo="yunjeongiya/yunjeongiya.github.io"
-                    issue-term="pathname"
-                    theme="github-dark"
-                    crossorigin="anonymous"
-                    async>
-            </script>
+          <div class="terminal-comments-wrapper" id="terminal-comments-content">
+            <!-- Git Terminal Comments will be injected here by post.html -->
           </div>
         </div>
       </div>

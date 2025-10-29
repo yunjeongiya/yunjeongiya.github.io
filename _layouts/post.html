@@ -61,13 +61,15 @@ window.postTags = {{ page.tags | jsonify }};
 {% endif %}
 
 <!-- Git Comments System -->
-<div id="git-comments" style="margin-top: 40px;"></div>
-
 <script type="module">
   import { GitTerminal } from '/assets/js/git-terminal.js';
 
   const postId = '{{ page.id | replace: "/", "-" }}';
   const apiUrl = 'https://blog-comments-jnlald3nf-checkus.vercel.app';
 
-  new GitTerminal('git-comments', postId, apiUrl);
+  // Inject into terminal panel
+  const targetContainer = document.getElementById('terminal-comments-content');
+  if (targetContainer) {
+    new GitTerminal('terminal-comments-content', postId, apiUrl);
+  }
 </script>
