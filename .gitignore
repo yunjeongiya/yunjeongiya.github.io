@@ -15,3 +15,5 @@ conversation.txt
 
 # Temp files
 temp.md
+backend/.env.development.local
+test-comments.html
