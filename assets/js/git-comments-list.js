@@ -1,10 +1,12 @@
 import { GitCommentAPI } from './git-api.js';
+import { GitStorage } from './git-parser.js';
 
 export class GitCommentsList {
   constructor(containerId, postId, apiBaseUrl) {
     this.container = document.getElementById(containerId);
     this.postId = postId;
     this.api = new GitCommentAPI(apiBaseUrl);
+    this.storage = new GitStorage();
 
     this.init();
   }
@@ -32,6 +34,9 @@ export class GitCommentsList {
 
       const commentsHtml = commits.map(comment => this.renderComment(comment)).join('');
       this.container.innerHTML = `<div class="comments-container">${commentsHtml}</div>`;
+
+      // Attach delete button event listeners
+      this.attachDeleteListeners();
     } catch (error) {
       this.container.innerHTML = `
         <div style="color: var(--error); padding: 20px;">
@@ -39,6 +44,33 @@ export class GitCommentsList {
         </div>
       `;
     }
+  }
+
+  attachDeleteListeners() {
+    const deleteButtons = this.container.querySelectorAll('.comment-delete-btn');
+    deleteButtons.forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const hash = e.target.getAttribute('data-hash');
+        const password = this.storage.getPassword(hash);
+
+        if (!password) {
+          alert('Password not found. You can only delete your own comments.');
+          return;
+        }
+
+        if (!confirm('Are you sure you want to delete this comment?')) {
+          return;
+        }
+
+        try {
+          await this.api.deleteComment(hash, password);
+          this.storage.removeFromReflog(hash);
+          await this.refresh();
+        } catch (error) {
+          alert(`Failed to delete comment: ${error.message}`);
+        }
+      });
+    });
   }
 
   renderComment(comment) {
@@ -54,12 +86,19 @@ export class GitCommentsList {
       ? comment.replies.map(reply => this.renderReply(reply)).join('')
       : '';
 
+    // Check if user has password saved for this comment
+    const hasPassword = !!this.storage.getPassword(comment.hash);
+    const deleteButton = hasPassword
+      ? `<button class="comment-delete-btn" data-hash="${comment.hash}">Delete</button>`
+      : '';
+
     return `
       <div class="comment-item" data-hash="${comment.hash}">
         <div class="comment-header">
           <span class="comment-author">${this.escapeHtml(comment.author)}</span>
           <span class="comment-hash">#${comment.hash.substring(0, 7)}</span>
           <span class="comment-date">${date}</span>
+          ${deleteButton}
         </div>
         <div class="comment-body">
           ${this.escapeHtml(comment.message)}

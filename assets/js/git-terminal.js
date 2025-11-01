@@ -359,15 +359,41 @@ export class GitTerminal {
 
   // git reset --hard - 댓글 삭제
   async cmdReset(hash) {
-    const savedPassword = this.storage.getPassword(hash);
+    // Support both full hash and 7-char short hash
+    let fullHash = hash;
+
+    // If short hash (7 chars), find the full hash
+    if (hash.length === 7) {
+      try {
+        const { commits } = await this.api.getComments(this.postId);
+        const allComments = commits.flatMap(c => [c, ...(c.replies || [])]);
+        const comment = allComments.find(c => c.hash.startsWith(hash));
+
+        if (!comment) {
+          this.print(`<span style="color: #F48771">fatal: bad object ${hash}</span>`);
+          return;
+        }
+
+        fullHash = comment.hash;
+      } catch (error) {
+        this.print(`<span style="color: #F48771">Error: ${error.message}</span>`);
+        return;
+      }
+    }
+
+    const savedPassword = this.storage.getPassword(fullHash);
 
     if (savedPassword) {
       // 비밀번호가 저장되어 있으면 바로 삭제
       try {
-        const result = await this.api.deleteComment(hash, savedPassword);
+        const result = await this.api.deleteComment(fullHash, savedPassword);
         this.print(`<span style="color: #4EC9B0">${result.message}</span>`);
-        this.storage.removeFromReflog(hash);
-        await this.cmdLog({ oneline: false });
+        this.storage.removeFromReflog(fullHash);
+
+        // 콜백 호출 (댓글 목록 갱신용)
+        if (this.onCommentCreated) {
+          this.onCommentCreated();
+        }
       } catch (error) {
         this.print(`<span style="color: #F48771">Error: ${error.message}</span>`);
       }

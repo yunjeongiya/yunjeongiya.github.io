@@ -1029,6 +1029,23 @@ body {
   margin-left: auto;
 }
 
+.comment-delete-btn {
+  background: transparent;
+  border: 1px solid #f48771;
+  color: #f48771;
+  padding: 2px 8px;
+  font-size: 11px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: 'D2Coding', 'Consolas', monospace !important;
+  transition: all 0.2s;
+}
+
+.comment-delete-btn:hover {
+  background: #f48771;
+  color: #1e1e1e;
+}
+
 .comment-body {
   color: #d4d4d4;
   line-height: 1.6;
