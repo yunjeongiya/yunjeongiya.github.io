@@ -64,6 +64,14 @@ export class GitTerminal {
 
   async handleCommand(input) {
     const trimmed = input.trim();
+
+    // 대화형 모드 처리 (빈 입력도 허용)
+    if (this.currentPromptState) {
+      await this.handlePromptInput(trimmed);
+      return;
+    }
+
+    // 일반 명령어는 빈 입력 무시
     if (!trimmed) return;
 
     // 명령어 히스토리에 추가
@@ -72,12 +80,6 @@ export class GitTerminal {
 
     // 입력된 명령어 출력
     this.print(`<span style="color: #858585">guest@post:~$</span> ${this.escapeHtml(trimmed)}`);
-
-    // 대화형 모드 처리
-    if (this.currentPromptState) {
-      await this.handlePromptInput(trimmed);
-      return;
-    }
 
     // 명령어 파싱
     const parsed = this.parser.parse(trimmed);
