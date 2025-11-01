@@ -22,17 +22,12 @@ layout: default
     {{ content }}
   </div>
 
-  <!-- Comments Section -->
+  <!-- Comments List -->
   <div class="post-comments-section">
     <h2 style="color: var(--keyword); margin-bottom: 20px; font-size: 20px; border-top: 1px solid var(--border-color); padding-top: 40px;">
       <i class="codicon codicon-comment" style="margin-right: 8px;"></i>Comments
     </h2>
-
-    <!-- 댓글 목록 -->
     <div id="comments-list"></div>
-
-    <!-- 댓글 작성 터미널 -->
-    <div class="git-terminal" id="post-comments-terminal"></div>
   </div>
 </article>
 
@@ -81,10 +76,10 @@ window.postTags = {{ page.tags | jsonify }};
   const postId = '{{ page.id | replace: "/", "-" }}';
   const apiUrl = 'https://blog-comments-jnlald3nf-checkus.vercel.app';
 
-  // 터미널 (댓글 작성)
-  const terminal = new GitTerminal('post-comments-terminal', postId, apiUrl);
+  // 터미널 패널 (댓글 작성)
+  const terminal = new GitTerminal('terminal-git-comments', postId, apiUrl);
 
-  // 댓글 목록
+  // 본문 하단 (댓글 목록)
   const commentsList = new GitCommentsList('comments-list', postId, apiUrl);
 
   // 터미널에서 댓글 작성 시 목록 갱신

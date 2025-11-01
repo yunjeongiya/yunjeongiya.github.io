@@ -154,6 +154,21 @@
       </div>
     </div>
 
+    {% if page.layout == 'post' %}
+    <div class="vscode-terminal-panel" id="terminal-panel">
+      <div class="terminal-tabs">
+        <div class="terminal-tab active" data-tab="comments">
+          <i class="codicon codicon-comment"></i>
+          <span>COMMENTS</span>
+        </div>
+      </div>
+      <div class="terminal-content">
+        <div class="terminal-tab-content terminal-comments" id="comments-content">
+          <div id="terminal-git-comments"></div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
 
     <div class="vscode-statusbar">
       <div class="statusbar-left">
@@ -231,7 +246,16 @@
     };
 
     document.addEventListener('DOMContentLoaded', function() {
-      // No terminal panel functionality needed anymore
+      const terminalTabs = document.querySelectorAll('.terminal-tab');
+      terminalTabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          terminalTabs.forEach(function(t) { t.classList.remove('active'); });
+          tab.classList.add('active');
+
+          const tabName = tab.getAttribute('data-tab');
+          document.getElementById('comments-content').style.display = tabName === 'comments' ? 'block' : 'none';
+        });
+      });
     });
   </script>
   {% endif %}
