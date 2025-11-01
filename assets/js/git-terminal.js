@@ -211,22 +211,27 @@ export class GitTerminal {
   // 대화형 입력 처리
   async handlePromptInput(input) {
     const state = this.currentPromptState;
+    const trimmed = input.trim();
 
     switch (state.step) {
       case 'author':
-        if (input.trim() === '') {
+        if (trimmed === '') {
           this.print('<span style="color: #858585">Author skipped, using Guest</span>');
+          state.data.author = this.storage.getConfig('user.name') || 'Guest';
+        } else {
+          state.data.author = trimmed;
         }
-        state.data.author = input || this.storage.getConfig('user.name') || 'Guest';
         state.step = 'password';
         this.setPrompt('Password (optional, press Enter to skip):');
         break;
 
       case 'password':
-        if (input.trim() === '') {
+        if (trimmed === '') {
           this.print('<span style="color: #858585">Password skipped</span>');
+          state.data.password = null;
+        } else {
+          state.data.password = trimmed;
         }
-        state.data.password = input || null;
         state.step = 'message';
         this.setPrompt('Message:');
         break;
