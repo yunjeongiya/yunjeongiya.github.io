@@ -66,7 +66,22 @@ docs/features/
 
 ### 1. Frontmatter로 상태 관리
 
-파일을 옮기지 않고 메타데이터만 바꾼다. **Git 히스토리가 보존된다!**
+**다른 방법들은 왜 안 썼나?**
+
+많은 프로젝트 관리 시스템들이 상태별로 폴더를 나눈다:
+
+```
+TODO/F001-user-auth.md
+IN_PROGRESS/F001-user-auth.md
+DONE/F001-user-auth.md
+```
+
+문제는 **파일을 이동하면 Git 히스토리가 끊긴다**는 점이다:
+- `git log F001-user-auth.md` → "어? 방금 만든 파일인데요?"
+- Git이 "파일 삭제 + 새 파일 생성"으로 인식
+- GitHub blame도 제대로 안 됨
+
+**해결: 파일은 그대로 두고 메타데이터만 변경**
 
 ```markdown
 ---

@@ -66,7 +66,22 @@ features/
 
 ### 1. State Management with Frontmatter
 
-Change only metadata, not file location. **Git history is preserved!**
+**Why not use other approaches?**
+
+Many project management systems organize by status folders:
+
+```
+TODO/F001-user-auth.md
+IN_PROGRESS/F001-user-auth.md
+DONE/F001-user-auth.md
+```
+
+The problem: **Moving files breaks Git history**:
+- `git log F001-user-auth.md` → "Huh? This file was just created?"
+- Git sees it as "file deletion + new file creation"
+- GitHub blame doesn't work properly
+
+**Solution: Keep files in place, change only metadata**
 
 ```markdown
 ---
