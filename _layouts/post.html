@@ -73,7 +73,8 @@ window.postTags = {{ page.tags | jsonify }};
   import { GitTerminal } from '/assets/js/git-terminal.js';
   import { GitCommentsList } from '/assets/js/git-comments-list.js';
 
-  const postId = '{{ page.id | replace: "/", "-" }}';
+  // Use slug from filename (e.g., "blog-command-ai-workflow")
+  const postId = '{{ page.url | split: "/" | last | remove: ".html" }}';
   const apiUrl = 'https://blog-comments-jnlald3nf-checkus.vercel.app';
 
   console.log('[Comments] postId:', postId);
