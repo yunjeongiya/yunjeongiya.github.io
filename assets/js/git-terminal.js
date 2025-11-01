@@ -179,15 +179,21 @@ export class GitTerminal {
       return;
     }
 
-    // 직접 입력 모드 - 비밀번호 필수
+    // 직접 입력 모드
     const author = parsed.author || this.storage.getConfig('user.name') || 'Guest';
     const password = parsed.password;
 
+    // 비밀번호 없으면 대화형 모드로 전환
     if (!password) {
-      this.print(`<span style="color: #F48771">Error: Password is required. Use --password="your_password"</span>`);
+      this.currentPromptState = {
+        step: 'password',
+        data: { author, password: null, message: parsed.message, parentHash: parsed.parentHash }
+      };
+      this.setPrompt('Password (required for edit/delete):');
       return;
     }
 
+    // 비밀번호 있으면 바로 댓글 작성
     try {
       const result = await this.api.createComment(
         this.postId,
