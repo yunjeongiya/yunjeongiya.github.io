@@ -282,14 +282,13 @@ Features 추적 시스템은 다음과 같은 폴더 구조를 가진다...
 
 ## 다른 Slash 명령어와의 통합
 
-### /finish-checkus → /blog 연계
+### /finish → /blog 연계
 
 ```bash
 # 1. 작업 완료 프로세스
-/finish-checkus
+/finish
 → Features 시스템 업데이트 (status: DONE)
-→ daily_work_summary/ 작업일지 작성
-→ requirement.md 동기화
+→ 작업일지 작성
 → Git 커밋
 
 # 2. 블로그 초안 생성
@@ -300,7 +299,7 @@ Features 추적 시스템은 다음과 같은 폴더 구조를 가진다...
 
 **시너지 효과**:
 
-- `/finish-checkus`가 **데이터 수집** 역할을 한다
+- `/finish`가 **데이터 수집** 역할을 한다
 - `/blog`가 **콘텐츠 생성** 역할을 한다
 - 중복 작업 없이 자연스럽게 연결된다
 
@@ -312,10 +311,10 @@ Features 추적 시스템은 다음과 같은 폴더 구조를 가진다...
 
 ```bash
 # 글로벌 명령어 (개인용)
-C:/Users/YJL/.claude/commands/blog.md
+~/.claude/commands/blog.md
 
 # 프로젝트 명령어 (팀 공유)
-CheckUS/.claude/commands/blog.md
+my-project/.claude/commands/blog.md
 ```
 
 **팀 공유 시 장점**:

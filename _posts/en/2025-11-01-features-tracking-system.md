@@ -196,7 +196,7 @@ Used HTML5 Drag & Drop API directly instead of react-dnd...
 
 ### 4. Full Automation with Slash Commands
 
-#### `/finish-checkus` - 8-Step Automated Process
+#### `/finish` - 8-Step Automated Process
 
 ```
 1. Check changes

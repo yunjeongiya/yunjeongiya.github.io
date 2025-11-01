@@ -268,11 +268,11 @@ Time: 30 min - 1 hour
 
 ## Integration with Other Slash Commands
 
-### /finish-checkus → /blog Pipeline
+### /finish → /blog Pipeline
 
 ```bash
 # 1. Work completion process
-/finish-checkus
+/finish
 → Update Features system (status: DONE)
 → Write work log in daily_work_summary/
 → Sync requirement.md
@@ -285,7 +285,7 @@ Time: 30 min - 1 hour
 ```
 
 **Synergy**:
-- `/finish-checkus` for **data collection**
+- `/finish` for **data collection**
 - `/blog` for **content generation**
 - Seamless connection, no duplicate work
 
@@ -297,10 +297,10 @@ Time: 30 min - 1 hour
 
 ```bash
 # Global command (personal)
-C:/Users/YJL/.claude/commands/blog.md
+~/.claude/commands/blog.md
 
 # Project command (team shared)
-CheckUS/.claude/commands/blog.md
+my-project/.claude/commands/blog.md
 ```
 
 **Team sharing benefits**:
@@ -331,7 +331,7 @@ CheckUS/.claude/commands/blog.md
 ### Command File Structure
 
 ```markdown
-# C:/Users/YJL/.claude/commands/blog.md
+# ~/.claude/commands/blog.md
 
 You are an AI that analyzes recent work to write blog drafts.
 
