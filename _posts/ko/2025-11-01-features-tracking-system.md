@@ -268,57 +268,17 @@ AI:
 2. 없으면:
 
 ┌────────────────────────────────────────┐
-│ ⚠️  Features 추적 시스템이 없습니다.  │
+│ ⚠️ Features 추적 시스템이 없습니다.       │
 │                                        │
-│ 지금 설정할까요?                       │
+│ 지금 설정할까요?                         │
 │                                        │
-│ 생성 파일:                             │
-│ - docs/features/INDEX.md              │
-│ - docs/features/F001-[현재작업]/      │
+│ 생성 파일:                              │
+│ - docs/features/INDEX.md               │
+│ - docs/features/F001-[현재작업]/        │
 │                                        │
 │ [Y/n]                                  │
 └────────────────────────────────────────┘
 ```
-
-### 7. "/blog 웹 서치로 자연스러운 글쓰기"
-
-문제: AI가 쓴 글은 말투가 어색하다
-
-```
-"본 포스팅에서는..."
-"구현하였습니다"
-"다음과 같습니다"
-```
-
-해결: **블로그를 쓰기 전에 인기 글을 검색하고 말투를 학습한다!**
-
-`/blog` 명령어에 1.5단계를 추가했다:
-
-```
-1.5단계: 기존 글 리서치 및 경쟁 분석
-
-한국어 검색:
-- "[주제] site:velog.io"
-- "[주제] site:tech.kakao.com"
-- "[주제] site:techblog.woowahan.com"
-
-영어 검색:
-- "[topic] site:dev.to"
-- "[topic] site:medium.com"
-- "[topic] site:hashnode.dev"
-
-결과 분석:
-1. 타겟 독자 결정 (한국 vs 글로벌)
-2. 인기 글의 말투 학습 (문장 패턴, 어미, 구어체)
-3. 차별화 포인트 발견
-```
-
-효과:
-
-- 한국 독자용: "~네요", "~거 같아", 구어체
-- 글로벌 독자용: 직관적 예제, 짧은 문장
-- 중복 글 방지, 차별성 확보
-
 ---
 
 ## 주의할 점
@@ -353,15 +313,15 @@ AI:
 3. 사용자에게 선택 제안:
 
 ┌─────────────────────────────────────────┐
-│ F005와 관련된 작업으로 보입니다.        │
+│ F005와 관련된 작업으로 보입니다.            │
 │                                         │
-│ A) F005에 이어서 작업                   │
-│    - status: DONE → IN_PROGRESS        │
-│    - "🐛 추가 수정사항 (2차)" 섹션 추가│
+│ A) F005에 이어서 작업                     │
+│    - status: DONE → IN_PROGRESS         │
+│    - "🐛 추가 수정사항 (2차)" 섹션 추가    │
 │                                         │
-│ B) 새 Feature 생성 (F006)              │
+│ B) 새 Feature 생성 (F006)                │
 │                                         │
-│ 선택: [A/B]                            │
+│ 선택: [A/B]                              │
 └─────────────────────────────────────────┘
 ```
 
@@ -429,40 +389,6 @@ $ git log docs/features/F001-user-auth/README.md
 
 ---
 
-## 향후 개선 방향
-
-### 1. 자동 CHANGELOG 생성
-
-```bash
-Features의 DONE 항목들 → CHANGELOG.md 자동 생성
-```
-
-### 2. LinkedIn 포스트 초안
-
-```
-/blog 완료 → LinkedIn용 짧은 버전도 자동 생성
-```
-
-### 3. Features 통계 대시보드
-
-```html
-features-stats.html
-- 월별 완료 기능 수
-- 예상 vs 실제 시간
-- 태그별 분포
-```
-
-### 4. npm package화
-
-```bash
-npx init-feature-system
-→ .claude/commands/
-→ docs/features/
-자동 설치
-```
-
----
-
 ## 정리
 
 Features 추적 시스템은:
@@ -476,4 +402,4 @@ AI 코딩 도구를 쓴다면, AI가 따라갈 수 있는 워크플로우를 먼
 
 ---
 
-**다음 글**: Features 시스템을 활용한 블로그 자동화에 관심이 있다면 [/blog 명령어 - 개발 블로그 작성 시간을 83% 줄인 방법](/개발생산성/ai워크플로우/2025/11/01/blog-command-ai-workflow.html)을 읽어보자.
+**다음 글**: Features 시스템을 활용한 블로그 자동화에 관심이 있다면 [/blog 명령어 - 개발 블로그 작성 시간을 83% 줄인 방법](https://yunjeongiya.github.io/%EA%B0%9C%EB%B0%9C%EC%83%9D%EC%82%B0%EC%84%B1/ai%EC%9B%8C%ED%81%AC%ED%94%8C%EB%A1%9C%EC%9A%B0/2025/11/01/blog-command-ai-workflow/)을 읽어보자.

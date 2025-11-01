@@ -376,58 +376,17 @@ AI:
 2. If not found:
 
 ┌────────────────────────────────────────┐
-│ ⚠️  No Features tracking system.      │
+│ ⚠️  No Features tracking system.       │
 │                                        │
 │ Set it up now?                         │
 │                                        │
 │ Will create:                           │
-│ - docs/features/INDEX.md              │
-│ - docs/features/F001-[current work]/ │
+│ - docs/features/INDEX.md               │
+│ - docs/features/F001-[current work]/   │
 │                                        │
 │ [Y/n]                                  │
 └────────────────────────────────────────┘
 ```
-
-### 7. "Natural Writing with /blog Web Search"
-
-Problem: AI-written text sounds awkward
-
-```
-"In this post we will..."
-"Was implemented"
-"As follows"
-```
-
-Solution: **Search popular posts and learn writing style before blogging!**
-
-Added step 1.5 to `/blog` command:
-
-```
-Step 1.5: Research Existing Content & Competitive Analysis
-
-Korean search:
-- "[topic] site:velog.io"
-- "[topic] site:tech.kakao.com"
-- "[topic] site:techblog.woowahan.com"
-
-English search:
-- "[topic] site:dev.to"
-- "[topic] site:medium.com"
-- "[topic] site:hashnode.dev"
-
-Analyze results:
-1. Determine target audience (Korean vs Global)
-2. Learn popular posts' style (sentence patterns, endings, colloquialisms)
-3. Find differentiation points
-```
-
-Impact:
-
-- For Korean readers: "~네요", "~거 같아", colloquial
-- For global readers: Intuitive examples, short sentences
-- Avoid duplicate content, ensure differentiation
-
----
 
 ## Considerations
 
@@ -464,12 +423,12 @@ AI:
 │ Looks related to F032.                  │
 │                                         │
 │ A) Continue F032                        │
-│    - status: DONE → IN_PROGRESS        │
-│    - Add "🐛 Additional Changes (2nd)" │
+│    - status: DONE → IN_PROGRESS         │
+│    - Add "🐛 Additional Changes (2nd)"  │
 │                                         │
-│ B) Create new Feature (F033)           │
+│ B) Create new Feature (F033)            │
 │                                         │
-│ Choice: [A/B]                          │
+│ Choice: [A/B]                           │
 └─────────────────────────────────────────┘
 ```
 
@@ -500,40 +459,6 @@ Found web search encoding bug while working on F032...
 
 ---
 
-## Future Improvements
-
-### 1. Auto CHANGELOG Generation
-
-```bash
-Features DONE items → Auto-generate CHANGELOG.md
-```
-
-### 2. LinkedIn Post Drafts
-
-```
-/blog complete → Also auto-generate short LinkedIn version
-```
-
-### 3. Features Statistics Dashboard
-
-```html
-features-stats.html
-- Monthly completed features
-- Estimated vs actual time
-- Distribution by tags
-```
-
-### 4. npm Package
-
-```bash
-npx init-feature-system
-→ .claude/commands/
-→ checkus-docs/features/
-Auto-install
-```
-
----
-
 ## Conclusion
 
 The Features tracking system:
@@ -550,4 +475,4 @@ If you use AI coding tools, build a workflow AI can follow first.
 
 ---
 
-**Next in series**: [/blog Command - How I Reduced Blog Writing Time by 83%](/2025/11/01/blog-command-ai-workflow.html)
+**Next in series**: [/blog Command - How I Reduced Blog Writing Time by 83%](https://yunjeongiya.github.io/en/productivity/ai-workflow/2025/11/01/blog-command-ai-workflow/)
