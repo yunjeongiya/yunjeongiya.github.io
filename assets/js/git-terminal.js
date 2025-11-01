@@ -57,8 +57,9 @@ export class GitTerminal {
   }
 
   showWelcome() {
-    this.print(`<span style="color: #6A9955">Git-style comment system v1.0.0</span>`);
-    this.print(`Type '<span style="color: #4FC1FF">help</span>' for available commands.\n`);
+    this.print(`<span style="color: #6A9955"># Write a comment using git commands</span>`);
+    this.print(`<span style="color: #858585"># Example: git commit --author="Your Name" -m "Your comment"</span>`);
+    this.print(`<span style="color: #858585"># Type 'help' for more commands\n</span>`);
   }
 
   async handleCommand(input) {
@@ -93,7 +94,7 @@ export class GitTerminal {
         break;
 
       case 'log':
-        await this.cmdLog(parsed.options);
+        this.print(`<span style="color: #858585">Comments are displayed above. Use 'git reflog' to see your own comments.</span>`);
         break;
 
       case 'commit':
@@ -198,8 +199,10 @@ export class GitTerminal {
         this.storage.addToReflog(result.commit_hash, password);
       }
 
-      // 댓글 목록 새로고침
-      await this.cmdLog({ oneline: false });
+      // 콜백 호출 (댓글 목록 갱신용)
+      if (this.onCommentCreated) {
+        this.onCommentCreated();
+      }
     } catch (error) {
       this.print(`<span style="color: #F48771">Error: ${error.message}</span>`);
     }
@@ -244,7 +247,10 @@ export class GitTerminal {
             this.storage.addToReflog(result.commit_hash, state.data.password);
           }
 
-          await this.cmdLog({ oneline: false });
+          // 콜백 호출 (댓글 목록 갱신용)
+          if (this.onCommentCreated) {
+            this.onCommentCreated();
+          }
         } catch (error) {
           this.print(`<span style="color: #F48771">Error: ${error.message}</span>`);
         }

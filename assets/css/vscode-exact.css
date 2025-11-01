@@ -991,6 +991,61 @@ body {
    Git Terminal Comment System
    ================================ */
 
+/* 댓글 목록 */
+.comments-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.comment-item {
+  background-color: #252526;
+  border-left: 3px solid #007acc;
+  padding: 16px;
+  border-radius: 4px;
+}
+
+.comment-header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.comment-author {
+  color: #4ec9b0;
+  font-weight: 600;
+}
+
+.comment-hash {
+  color: #dcdcaa;
+  font-family: 'D2Coding', 'Consolas', monospace !important;
+}
+
+.comment-date {
+  color: #858585;
+  margin-left: auto;
+}
+
+.comment-body {
+  color: #d4d4d4;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.comment-reply {
+  margin-left: 24px;
+  margin-top: 12px;
+  padding: 12px;
+  background-color: #1e1e1e;
+  border-left: 2px solid #3794ff;
+  border-radius: 4px;
+}
+
+/* 터미널 */
 .git-terminal {
   width: 100%;
   background-color: #1e1e1e;
@@ -1000,14 +1055,18 @@ body {
   line-height: 1.6;
   padding: 16px;
   border-radius: 4px;
+  min-height: 200px;
+  max-height: 300px;
+  display: flex;
+  flex-direction: column;
 }
 
 .terminal-output {
-  margin-bottom: 12px;
-  max-height: 500px;
+  flex: 1;
   overflow-y: auto;
   white-space: pre-wrap;
   word-wrap: break-word;
+  margin-bottom: 12px;
 }
 
 .terminal-output div {
@@ -1018,6 +1077,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .terminal-prompt {
