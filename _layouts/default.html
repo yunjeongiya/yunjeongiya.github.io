@@ -157,16 +157,17 @@
     {% if page.layout == 'post' %}
     <div class="vscode-terminal-panel" id="terminal-panel">
       <div class="terminal-tabs">
-        <div class="terminal-tab active" data-tab="comments">
-          <i class="codicon codicon-comment"></i>
-          <span>COMMENTS</span>
+        <div class="terminal-tab active" data-tab="terminal">
+          <i class="codicon codicon-terminal"></i>
+          <span>TERMINAL</span>
         </div>
       </div>
-      <div class="terminal-content">
-        <div class="terminal-tab-content terminal-comments" id="comments-content">
+      <div class="terminal-content" id="terminal-content">
+        <div class="terminal-tab-content" id="terminal-tab-content">
           <div id="terminal-git-comments"></div>
         </div>
       </div>
+      <div class="terminal-resize-handle" id="terminal-resizer"></div>
     </div>
     {% endif %}
 
@@ -246,16 +247,37 @@
     };
 
     document.addEventListener('DOMContentLoaded', function() {
-      const terminalTabs = document.querySelectorAll('.terminal-tab');
-      terminalTabs.forEach(function(tab) {
-        tab.addEventListener('click', function() {
-          terminalTabs.forEach(function(t) { t.classList.remove('active'); });
-          tab.classList.add('active');
+      // Terminal resizer
+      const terminalPanel = document.getElementById('terminal-panel');
+      const resizer = document.getElementById('terminal-resizer');
 
-          const tabName = tab.getAttribute('data-tab');
-          document.getElementById('comments-content').style.display = tabName === 'comments' ? 'block' : 'none';
+      if (resizer && terminalPanel) {
+        let isResizing = false;
+
+        resizer.addEventListener('mousedown', function(e) {
+          isResizing = true;
+          document.body.style.cursor = 'row-resize';
+          e.preventDefault();
         });
-      });
+
+        document.addEventListener('mousemove', function(e) {
+          if (!isResizing) return;
+
+          const containerHeight = document.querySelector('.vscode-container').offsetHeight;
+          const newHeight = containerHeight - e.clientY;
+
+          if (newHeight >= 100 && newHeight <= 600) {
+            terminalPanel.style.height = newHeight + 'px';
+          }
+        });
+
+        document.addEventListener('mouseup', function() {
+          if (isResizing) {
+            isResizing = false;
+            document.body.style.cursor = 'default';
+          }
+        });
+      }
     });
   </script>
   {% endif %}
