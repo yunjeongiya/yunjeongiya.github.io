@@ -118,7 +118,7 @@ WebSearch 쿼리 예시:
 
 ### 2단계: Features 문서 읽기 (최우선)
 
-> **Features 폴더란?** 모든 작업을 `docs/features/F001-xxx/` 형식으로 추적하는 시스템이다. 각 기능마다 README.md에 작업 내용, 기술적 결정사항, 해결한 문제를 기록한다. 자세한 내용은 [Features 추적 시스템 글](/개발생산성/ai워크플로우/2025/11/01/features-tracking-system.html)을 참고하라.
+> **Features 폴더란?** 모든 작업을 `docs/features/F001-xxx/` 형식으로 추적하는 시스템이다. 각 기능마다 README.md에 작업 내용, 기술적 결정사항, 해결한 문제를 기록한다. 자세한 내용은 [Features 추적 시스템 글](https://yunjeongiya.github.io/%EA%B0%9C%EB%B0%9C%EC%83%9D%EC%82%B0%EC%84%B1/ai%EC%9B%8C%ED%81%AC%ED%94%8C%EB%A1%9C%EC%9A%B0/2025/11/01/features-tracking-system/)을 참고하라.
 
 정보 소스 우선순위는 다음과 같다:
 

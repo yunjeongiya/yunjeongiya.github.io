@@ -111,7 +111,7 @@ WebSearch query examples:
 
 ### Step 2: Read Features Documentation (Top Priority)
 
-> **What is the Features folder?** A system that tracks all work in `docs/features/F001-xxx/` format. Each feature has a README.md documenting tasks, technical decisions, and problems solved. For details, see the [Features tracking system post](/productivity/ai-workflow/2025/11/01/features-tracking-system.html).
+> **What is the Features folder?** A system that tracks all work in `docs/features/F001-xxx/` format. Each feature has a README.md documenting tasks, technical decisions, and problems solved. For details, see the [Features tracking system post](https://yunjeongiya.github.io/en/productivity/ai-workflow/2025/11/01/features-tracking-system/l).
 
 Information source priority:
 1. **Features/README.md** (highest)
