@@ -32,10 +32,15 @@ Initially, I only kept daily work logs in `daily_work_summary/2025-10-15.md` for
    - "How did I fix that search bug?" → digging through multiple date files
    - "Where are caching-related commits?" → searching entire Git log
 
-2. **Claude Conversation Thread Management Failed**
-   - Working on 3 features in parallel → 3 conversation threads
-   - After a few days, forgot thread titles, old threads disappeared from list
-   - Starting new conversation → had to re-explain "what I was working on"
+2. **Claude Conversation Thread Management Failed + Parallel Work Chaos**
+
+   With Claude Code, you need to run multiple features in parallel for efficiency.
+   Can't just sit and wait for one task to finish.
+
+   But this means I end up stopping work on F001, F003, F006 simultaneously at quitting time,
+   and trying to remember multiple contexts overloads even me, a human.
+
+   Every morning, I wasted 30 minutes just figuring out "where did I leave off?"
 
 3. **AI Token Waste**
    - Explaining "what I did last week" → need to read 5 daily_log files
@@ -64,14 +69,16 @@ AI: "Saved F006 progress"
 
 **Scenario 2: When Resuming Work** (Monday morning)
 
+Friday quitting time, I was juggling F001, F003, F006 simultaneously.
+
 ```
 Me: /resume
-AI: "Paused work: F006 Search Performance Optimization (30% progress)"
-    → Read INDEX.md to check paused work
-    → Read F006/README.md to understand "where I left off"
+AI: "3 paused tasks:
+    - F001 User Auth (90%, only tests remaining)
+    - F003 Logging System (50%, configuring AOP)
+    - F006 Search Optimization (30%, designing index)"
 
-→ Claude conversation thread reset? No problem ✅
-→ Forgot over the weekend? No problem ✅
+→ 30 minutes of confusion → 0 seconds ✅
 ```
 
 **Scenario 3: When Completing Work**
