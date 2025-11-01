@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Features Tracking System for AI Coding Agents - Managing 29 Features"
-date: 2025-11-01 14:00:00 +0900
+date: 2025-11-01 09:00:00 +0900
 categories: [Productivity, AI-Workflow]
 tags: [claude-code, ai, project-management, workflow, documentation, productivity]
 lang: en

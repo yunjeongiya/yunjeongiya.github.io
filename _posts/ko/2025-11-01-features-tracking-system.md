@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "AI 코딩 에이전트를 위한 Features 추적 시스템"
-date: 2025-11-01 14:00:00 +0900
+date: 2025-11-01 09:00:00 +0900
 categories: [개발생산성, AI워크플로우]
 tags: [claude-code, ai, 프로젝트관리, 워크플로우, 문서화, 생산성]
 lang: ko
