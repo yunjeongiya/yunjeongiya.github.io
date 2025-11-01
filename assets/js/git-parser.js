@@ -89,11 +89,20 @@ export class GitCommandParser {
         result.message = parts[i + 1];
         i++;
       } else if (part.startsWith('--author=')) {
-        result.author = part.substring(9);
+        result.author = part.substring(9).replace(/^["']|["']$/g, '');
+      } else if (part === '--author' && i + 1 < parts.length) {
+        result.author = parts[i + 1];
+        i++;
       } else if (part.startsWith('--password=')) {
-        result.password = part.substring(11);
+        result.password = part.substring(11).replace(/^["']|["']$/g, '');
+      } else if (part === '--password' && i + 1 < parts.length) {
+        result.password = parts[i + 1];
+        i++;
       } else if (part.startsWith('--fixup=')) {
         result.parentHash = part.substring(8);
+      } else if (part === '--fixup' && i + 1 < parts.length) {
+        result.parentHash = parts[i + 1];
+        i++;
       }
     }
 
