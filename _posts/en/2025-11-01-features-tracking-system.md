@@ -47,6 +47,48 @@ Initially, I only kept daily work logs in `daily_work_summary/2025-10-15.md` for
 
 ## Solution: Features System
 
+### Real-World Usage Flow
+
+**Scenario 1: When Pausing Work** (Need to shut down computer)
+
+```
+(Working on F006 search feature...)
+
+Me: /pause
+AI: "Saved F006 progress"
+    → Record current state in frontmatter
+    → Update INDEX.md
+
+(Computer shutdown, weekend passes...)
+```
+
+**Scenario 2: When Resuming Work** (Monday morning)
+
+```
+Me: /resume
+AI: "Paused work: F006 Search Performance Optimization (30% progress)"
+    → Read INDEX.md to check paused work
+    → Read F006/README.md to understand "where I left off"
+
+→ Claude conversation thread reset? No problem ✅
+→ Forgot over the weekend? No problem ✅
+```
+
+**Scenario 3: When Completing Work**
+
+```
+Me: /finish
+AI: Automatically handles:
+    1. Update Features documentation (status: DONE)
+    2. Write work log
+    3. Git commit
+    4. "Is this worth blogging about?" assessment
+```
+
+**Result**: AI remembers and manages my work context.
+
+---
+
 ### Core Idea
 
 **"Every feature = One document"**
