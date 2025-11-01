@@ -214,12 +214,18 @@ export class GitTerminal {
 
     switch (state.step) {
       case 'author':
+        if (input.trim() === '') {
+          this.print('<span style="color: #858585">Author skipped, using Guest</span>');
+        }
         state.data.author = input || this.storage.getConfig('user.name') || 'Guest';
         state.step = 'password';
-        this.setPrompt('Password (optional, for edit/delete):');
+        this.setPrompt('Password (optional, press Enter to skip):');
         break;
 
       case 'password':
+        if (input.trim() === '') {
+          this.print('<span style="color: #858585">Password skipped</span>');
+        }
         state.data.password = input || null;
         state.step = 'message';
         this.setPrompt('Message:');
