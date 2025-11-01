@@ -179,9 +179,14 @@ export class GitTerminal {
       return;
     }
 
-    // 직접 입력 모드
+    // 직접 입력 모드 - 비밀번호 필수
     const author = parsed.author || this.storage.getConfig('user.name') || 'Guest';
-    const password = parsed.password || null;
+    const password = parsed.password;
+
+    if (!password) {
+      this.print(`<span style="color: #F48771">Error: Password is required. Use --password="your_password"</span>`);
+      return;
+    }
 
     try {
       const result = await this.api.createComment(
@@ -196,10 +201,8 @@ export class GitTerminal {
       this.print(` Author: ${author}`);
       this.print(` 1 comment created\n`);
 
-      // reflog에 추가 (비밀번호가 있는 경우)
-      if (password) {
-        this.storage.addToReflog(result.commit_hash, password);
-      }
+      // reflog에 추가
+      this.storage.addToReflog(result.commit_hash, password);
 
       // 콜백 호출 (댓글 목록 갱신용)
       if (this.onCommentCreated) {
@@ -224,16 +227,16 @@ export class GitTerminal {
           state.data.author = trimmed;
         }
         state.step = 'password';
-        this.setPrompt('Password (optional, press Enter to skip):');
+        this.setPrompt('Password (required for edit/delete):');
         break;
 
       case 'password':
         if (trimmed === '') {
-          this.print('<span style="color: #858585">Password skipped</span>');
-          state.data.password = null;
-        } else {
-          state.data.password = trimmed;
+          this.print('<span style="color: #F48771">Error: Password is required</span>');
+          this.setPrompt('Password (required for edit/delete):');
+          return;
         }
+        state.data.password = trimmed;
         state.step = 'message';
         this.setPrompt('Message:');
         break;
