@@ -15,52 +15,33 @@ Tracking 29 features, 50x token savings, reduced blog writing barrier.
 
 ---
 
-## Background: Problems Working with AI
+## Background: Limitations of daily_work_summary
 
-When using AI coding tools like Claude Code or Cursor, you've probably experienced:
+Initially, I only kept daily work logs in `daily_work_summary/2025-10-15.md` format.
 
-- "What was I working on yesterday?"
-- "I implemented half of this feature, then forgot about it while working on something else..."
-- "I wanted to blog about this later, but I didn't take screenshots..."
-
-AI is smart, but **it doesn't remember your work context**. Starting a new conversation loses context, and token limits prevent explaining all past work.
-
-So I built a system where AI automatically tracks my work and even writes blog drafts.
-
-### 1. Context Keeps Disappearing
-
-```
-Conversation #1: "Build a weekly schedule feature"
-→ 50% implemented
-
-(Computer shutdown)
-
-Conversation #2: "Continue yesterday's work..."
-→ AI: "I don't know what you were working on?"
+```markdown
+# 2025-10-15
+- Fixed login functionality
+- Fixed search bug
+- Started adding caching
 ```
 
-Wasting time re-explaining previous work every time.
+**Problems emerged days later:**
 
-### 2. TODOs Are Scattered Everywhere
+1. **No Feature-Level Tracking**
+   - "How did I fix that search bug?" → digging through multiple date files
+   - "Where are caching-related commits?" → searching entire Git log
 
-- Code comments: `// TODO: refactoring needed`
-- Notion: rough feature list
-- Git Issues: bug reports
-- Mind: "I'll do it later..."
+2. **Claude Conversation Thread Management Failed**
+   - Working on 3 features in parallel → 3 conversation threads
+   - After a few days, forgot thread titles, old threads disappeared from list
+   - Starting new conversation → had to re-explain "what I was working on"
 
-→ **No idea where anything is**
+3. **AI Token Waste**
+   - Explaining "what I did last week" → need to read 5 daily_log files
+   - 33 features → reading all 33 READMEs = 15,000 tokens consumed
 
-### 3. No Screenshots When Writing Blogs
-
-```
-3 weeks later...
-
-Me: "I should blog about this feature!"
-(Checks the feature - UI already changed)
-Me: "No before/after screenshots..."
-```
-
-If you don't capture immediately after development, you can't recreate the same screen.
+→ **Introduced Features system for feature-level tracking + token savings**
 
 ---
 
