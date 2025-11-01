@@ -253,8 +253,8 @@ body {
 .vscode-editor {
   flex: 1;
   overflow-y: auto;
-  padding: 20px 40px;
-  max-width: 1000px;
+  padding: 20px 80px;
+  max-width: none;
 }
 
 /* Status Bar (맨 아래) */
@@ -360,6 +360,12 @@ body {
   margin: 20px 0;
   color: var(--text-secondary);
   font-style: italic;
+}
+
+/* Post Comments Section */
+.post-comments-section {
+  margin-top: 60px;
+  padding-top: 40px;
 }
 
 /* Post List (Home) */
@@ -468,7 +474,12 @@ body {
 }
 
 .right-panel-section.outline {
-  flex: 0 0 40%;
+  flex: 0 0 35%;
+}
+
+.right-panel-section.tags {
+  flex: 0 0 auto;
+  max-height: 200px;
 }
 
 .right-panel-section.minimap {
@@ -515,6 +526,38 @@ body {
   margin-right: 6px;
   font-size: 14px;
   color: var(--text-secondary);
+}
+
+/* Tags in Right Panel */
+.tags-content {
+  padding: 10px 15px;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag-item {
+  background: var(--tab-bg);
+  padding: 4px 10px;
+  border-radius: 3px;
+  font-size: 11px;
+  color: var(--text-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.tag-item:hover {
+  background: var(--activity-bar-active);
+}
+
+.tag-item .codicon {
+  font-size: 12px;
 }
 
 /* Minimap */
@@ -691,9 +734,10 @@ body {
   flex: 1;
   overflow-y: auto !important;
   overflow-x: hidden;
-  padding: 20px 40px;
+  padding: 20px 80px;
   height: 100%;
   width: 100%;
+  max-width: none;
 }
 
 /* Fix: Editor wrapper height */

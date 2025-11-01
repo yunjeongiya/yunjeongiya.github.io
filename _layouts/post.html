@@ -21,6 +21,14 @@ layout: default
   <div class="post-content" id="post-content">
     {{ content }}
   </div>
+
+  <!-- Comments Section -->
+  <div class="post-comments-section">
+    <h2 style="color: var(--keyword); margin-bottom: 20px; font-size: 20px; border-top: 1px solid var(--border-color); padding-top: 40px;">
+      <i class="codicon codicon-comment" style="margin-right: 8px;"></i>Comments
+    </h2>
+    <div class="git-terminal" id="post-comments-content"></div>
+  </div>
 </article>
 
 <!-- Right Panel Data (Outline + Minimap) -->
@@ -67,9 +75,9 @@ window.postTags = {{ page.tags | jsonify }};
   const postId = '{{ page.id | replace: "/", "-" }}';
   const apiUrl = 'https://blog-comments-jnlald3nf-checkus.vercel.app';
 
-  // Inject into terminal panel
-  const targetContainer = document.getElementById('terminal-comments-content');
+  // Inject into post comments section
+  const targetContainer = document.getElementById('post-comments-content');
   if (targetContainer) {
-    new GitTerminal('terminal-comments-content', postId, apiUrl);
+    new GitTerminal('post-comments-content', postId, apiUrl);
   }
 </script>

@@ -24,7 +24,7 @@
       <div class="title">{{ site.title }} - {% if page.title %}{{ page.title }}{% else %}Welcome{% endif %}</div>
     </div>
 
-    <div class="vscode-main {% if page.layout == 'post' %}with-terminal{% endif %}">
+    <div class="vscode-main">
       <div class="vscode-activitybar">
         <a href="{{ "/" | relative_url }}" style="text-decoration: none; color: inherit;">
           <div class="activity-icon active" title="Explorer">
@@ -124,6 +124,25 @@
             <div id="outline-container"></div>
           </div>
 
+          <div class="right-panel-section tags">
+            <div class="right-panel-header">
+              <i class="codicon codicon-tag"></i> TAGS
+            </div>
+            <div class="tags-content">
+              {% if page.tags.size > 0 %}
+              <div class="tag-list">
+                {% for tag in page.tags %}
+                <span class="tag-item">
+                  <i class="codicon codicon-tag"></i> {{ tag }}
+                </span>
+                {% endfor %}
+              </div>
+              {% else %}
+              <p style="color: var(--text-secondary); font-size: 12px; padding: 10px 15px;">No tags</p>
+              {% endif %}
+            </div>
+          </div>
+
           <div class="right-panel-section minimap">
             <div class="right-panel-header">
               <i class="codicon codicon-symbol-misc"></i> MINIMAP
@@ -135,57 +154,11 @@
       </div>
     </div>
 
-    {% if page.layout == 'post' %}
-    <div class="vscode-terminal-panel" id="terminal-panel">
-      <div class="terminal-resize-handle" id="terminal-resize-handle"></div>
-      <div class="terminal-tabs">
-        <div class="terminal-tab active" data-tab="tags">
-          <i class="codicon codicon-tag"></i>
-          <span>TAGS</span>
-        </div>
-        <div class="terminal-tab" data-tab="comments">
-          <i class="codicon codicon-comment"></i>
-          <span>COMMENTS</span>
-        </div>
-      </div>
-      <div class="terminal-content">
-        <div class="terminal-tab-content" id="tags-content">
-          {% if page.tags.size > 0 %}
-          <div class="terminal-tags">
-            {% for tag in page.tags %}
-            <span class="terminal-tag">
-              <i class="codicon codicon-tag"></i> {{ tag }}
-            </span>
-            {% endfor %}
-          </div>
-          {% else %}
-          <p style="color: var(--text-secondary); font-size: 13px;">No tags</p>
-          {% endif %}
-        </div>
-
-        <div class="terminal-tab-content terminal-comments" id="comments-content" style="display: none;">
-          <div class="terminal-header">
-            <span class="terminal-prompt">user@blog:~/comments$</span>
-            <span>git comment --post="{{ page.title | escape }}"</span>
-            <span class="terminal-cursor"></span>
-          </div>
-          <div class="terminal-comments-wrapper" id="terminal-comments-content">
-            <!-- Git Terminal Comments will be injected here by post.html -->
-          </div>
-        </div>
-      </div>
-    </div>
-    {% endif %}
 
     <div class="vscode-statusbar">
       <div class="statusbar-left">
         <span><i class="codicon codicon-circle-filled" style="color: #4EC9B0;"></i> Jekyll</span>
         <span><i class="codicon codicon-markdown"></i> Markdown</span>
-        {% if page.layout == 'post' %}
-        <span class="statusbar-toggle" id="terminal-toggle" title="Toggle Terminal Panel">
-          <i class="codicon codicon-terminal"></i> Terminal
-        </span>
-        {% endif %}
       </div>
       <div class="statusbar-right">
         {% assign current_lang = page.lang | default: "ko" %}
@@ -258,58 +231,7 @@
     };
 
     document.addEventListener('DOMContentLoaded', function() {
-      const terminalPanel = document.getElementById('terminal-panel');
-      const terminalToggle = document.getElementById('terminal-toggle');
-
-      if (terminalToggle && terminalPanel) {
-        terminalToggle.addEventListener('click', function() {
-          terminalPanel.classList.toggle('hidden');
-        });
-      }
-
-      const terminalTabs = document.querySelectorAll('.terminal-tab');
-      terminalTabs.forEach(function(tab) {
-        tab.addEventListener('click', function() {
-          terminalTabs.forEach(function(t) { t.classList.remove('active'); });
-          tab.classList.add('active');
-
-          const tabName = tab.getAttribute('data-tab');
-          document.getElementById('tags-content').style.display = tabName === 'tags' ? 'block' : 'none';
-          document.getElementById('comments-content').style.display = tabName === 'comments' ? 'block' : 'none';
-        });
-      });
-
-      // Terminal resize functionality
-      const resizeHandle = document.getElementById('terminal-resize-handle');
-      if (resizeHandle && terminalPanel) {
-        let isResizing = false;
-        let startY = 0;
-        let startHeight = 0;
-
-        resizeHandle.addEventListener('mousedown', function(e) {
-          isResizing = true;
-          startY = e.clientY;
-          startHeight = terminalPanel.offsetHeight;
-          document.body.style.cursor = 'ns-resize';
-          document.body.style.userSelect = 'none';
-          e.preventDefault();
-        });
-
-        document.addEventListener('mousemove', function(e) {
-          if (!isResizing) return;
-          const deltaY = startY - e.clientY;
-          const newHeight = Math.max(150, Math.min(600, startHeight + deltaY));
-          terminalPanel.style.height = newHeight + 'px';
-        });
-
-        document.addEventListener('mouseup', function() {
-          if (isResizing) {
-            isResizing = false;
-            document.body.style.cursor = '';
-            document.body.style.userSelect = '';
-          }
-        });
-      }
+      // No terminal panel functionality needed anymore
     });
   </script>
   {% endif %}
