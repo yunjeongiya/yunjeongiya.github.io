@@ -82,6 +82,8 @@ export class GitCommandParser {
       parentHash: null,
     };
 
+    console.log('[DEBUG] parseCommit parts:', parts);
+
     for (let i = 2; i < parts.length; i++) {
       const part = parts[i];
 
@@ -90,8 +92,10 @@ export class GitCommandParser {
         i++;
       } else if (part.startsWith('--author=')) {
         result.author = part.substring(9).replace(/^["']|["']$/g, '');
+        console.log('[DEBUG] Found --author=, value:', result.author);
       } else if (part === '--author' && i + 1 < parts.length) {
         result.author = parts[i + 1];
+        console.log('[DEBUG] Found --author (space), value:', result.author);
         i++;
       } else if (part.startsWith('--password=')) {
         result.password = part.substring(11).replace(/^["']|["']$/g, '');
@@ -106,6 +110,7 @@ export class GitCommandParser {
       }
     }
 
+    console.log('[DEBUG] parseCommit result:', result);
     return result;
   }
 
