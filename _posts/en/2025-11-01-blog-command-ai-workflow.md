@@ -111,6 +111,8 @@ WebSearch query examples:
 
 ### Step 2: Read Features Documentation (Top Priority)
 
+> **What is the Features folder?** A system that tracks all work in `docs/features/F001-xxx/` format. Each feature has a README.md documenting tasks, technical decisions, and problems solved. For details, see the [Features tracking system post](/2025/11/01/features-tracking-system.html).
+
 Information source priority:
 1. **Features/README.md** (highest)
 2. daily_work_summary (supplementary)
@@ -136,6 +138,8 @@ checkus-docs/features/F033/README.md
 - No mixing with other features
 
 ### Step 3: Reference daily_work_summary (Supplementary)
+
+> **What is daily_work_summary?** A daily log file documenting work. While Features tracks "what was done", daily_work_summary captures "why this approach was chosen" and "what trial-and-error occurred" - the decision-making context.
 
 Supplement details not in Features:
 - Trial and error (why B instead of A?)

@@ -118,6 +118,8 @@ WebSearch 쿼리 예시:
 
 ### 2단계: Features 문서 읽기 (최우선)
 
+> **Features 폴더란?** 모든 작업을 `docs/features/F001-xxx/` 형식으로 추적하는 시스템이다. 각 기능마다 README.md에 작업 내용, 기술적 결정사항, 해결한 문제를 기록한다. 자세한 내용은 [Features 추적 시스템 글](/2025/11/01/features-tracking-system.html)을 참고하라.
+
 정보 소스 우선순위는 다음과 같다:
 
 1. **Features/README.md** (최우선)
@@ -146,6 +148,8 @@ checkus-docs/features/F033/README.md
 - 다른 기능과 섞이지 않음
 
 ### 3단계: daily_work_summary 참조 (보완)
+
+> **daily_work_summary란?** 하루 단위로 작업 내용을 기록하는 로그 파일이다. Features 문서가 "무엇을 했는지"를 기록한다면, daily_work_summary는 "왜 이 방법을 선택했는지", "어떤 시행착오가 있었는지" 등 의사결정 맥락을 기록한다.
 
 Features에 없는 디테일을 보완한다:
 
