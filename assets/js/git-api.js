@@ -7,9 +7,13 @@ export class GitCommentAPI {
   // GET /api/comments?post_id=xxx
   async getComments(postId) {
     try {
-      const response = await fetch(`${this.baseUrl}/api/comments?post_id=${postId}`);
+      const url = `${this.baseUrl}/api/comments?post_id=${postId}`;
+      console.log('[API] GET', url);
+      const response = await fetch(url);
       if (!response.ok) throw new Error('Failed to fetch comments');
-      return await response.json();
+      const data = await response.json();
+      console.log('[API] Response:', data);
+      return data;
     } catch (error) {
       console.error('Get comments error:', error);
       throw error;
@@ -19,16 +23,19 @@ export class GitCommentAPI {
   // POST /api/comments
   async createComment(postId, author, password, message, parentHash = null) {
     try {
+      const payload = {
+        post_id: postId,
+        author,
+        password,
+        message,
+        parent_hash: parentHash,
+      };
+      console.log('[API] POST /api/comments', payload);
+
       const response = await fetch(`${this.baseUrl}/api/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          post_id: postId,
-          author,
-          password,
-          message,
-          parent_hash: parentHash,
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -36,7 +43,9 @@ export class GitCommentAPI {
         throw new Error(error.message || 'Failed to create comment');
       }
 
-      return await response.json();
+      const data = await response.json();
+      console.log('[API] Create response:', data);
+      return data;
     } catch (error) {
       console.error('Create comment error:', error);
       throw error;

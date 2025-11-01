@@ -239,7 +239,13 @@ export class GitTerminal {
         break;
 
       case 'message':
-        state.data.message = input;
+        if (trimmed === '') {
+          this.print('<span style="color: #F48771">Error: Message cannot be empty</span>');
+          this.setPrompt('Message:');
+          return;
+        }
+
+        state.data.message = trimmed;
         this.resetPrompt();
 
         // 댓글 작성 실행
