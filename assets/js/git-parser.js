@@ -82,25 +82,31 @@ export class GitCommandParser {
       parentHash: null,
     };
 
-    console.log('[DEBUG] parseCommit parts:', parts);
-
     for (let i = 2; i < parts.length; i++) {
       const part = parts[i];
 
       if (part === '-m' && i + 1 < parts.length) {
         result.message = parts[i + 1];
         i++;
+      } else if (part === '--author=' && i + 1 < parts.length) {
+        // --author="value" 가 ['--author=', 'value']로 파싱된 경우
+        result.author = parts[i + 1];
+        i++;
       } else if (part.startsWith('--author=')) {
         result.author = part.substring(9).replace(/^["']|["']$/g, '');
-        console.log('[DEBUG] Found --author=, value:', result.author);
       } else if (part === '--author' && i + 1 < parts.length) {
         result.author = parts[i + 1];
-        console.log('[DEBUG] Found --author (space), value:', result.author);
+        i++;
+      } else if (part === '--password=' && i + 1 < parts.length) {
+        result.password = parts[i + 1];
         i++;
       } else if (part.startsWith('--password=')) {
         result.password = part.substring(11).replace(/^["']|["']$/g, '');
       } else if (part === '--password' && i + 1 < parts.length) {
         result.password = parts[i + 1];
+        i++;
+      } else if (part === '--fixup=' && i + 1 < parts.length) {
+        result.parentHash = parts[i + 1];
         i++;
       } else if (part.startsWith('--fixup=')) {
         result.parentHash = part.substring(8);
@@ -110,7 +116,6 @@ export class GitCommandParser {
       }
     }
 
-    console.log('[DEBUG] parseCommit result:', result);
     return result;
   }
 
