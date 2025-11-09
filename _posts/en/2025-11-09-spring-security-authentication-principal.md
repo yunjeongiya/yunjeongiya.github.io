@@ -8,7 +8,7 @@ lang: en
 ---
 
 ## TL;DR
-I was about to build a custom `@CurrentUser` annotation to inject authentication info into controllers, then discovered Spring Security already provides `@AuthenticationPrincipal`. Don't reinvent the wheel.
+Was building a custom `@CurrentUser` annotation. Found out Spring already has `@AuthenticationPrincipal`. Saved 2 hours of pointless work.
 
 ---
 

@@ -8,7 +8,7 @@ lang: en
 ---
 
 ## TL;DR
-Replaced 860 inconsistent manual logs across 86 files with a single Spring AOP aspect. Includes automatic sensitive data filtering and performance measurement. Implementation time: 30 minutes.
+Replaced 860 scattered logs with one AOP aspect. Passwords get filtered automatically, execution time gets logged automatically. Everything just works.
 
 ---
 

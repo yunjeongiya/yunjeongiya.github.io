@@ -8,7 +8,7 @@ lang: ko
 ---
 
 ## TL;DR
-Controller에서 인증 정보를 가져오려고 커스텀 `@CurrentUser` 어노테이션을 만들려다가, Spring Security가 이미 제공하는 `@AuthenticationPrincipal`을 발견. 바퀴를 재발명하지 말자.
+커스텀 `@CurrentUser` 만들려다가 Spring Security에 이미 `@AuthenticationPrincipal`이 있는 걸 발견. 2시간 삽질할 뻔했는데 30분만에 끝났다.
 
 ---
 
