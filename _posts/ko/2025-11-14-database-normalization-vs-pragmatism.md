@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "DB 설계 논쟁: 정규화 vs 실용주의 - 실제 의사결정 과정"
-date: 2025-11-14 20:00:00 +0900
+date: 2025-11-14 14:30:00 +0900
 categories: [Backend, Database]
 tags: [database, normalization, pragmatism, yagni, tradeoffs, architecture, mysql]
 lang: ko

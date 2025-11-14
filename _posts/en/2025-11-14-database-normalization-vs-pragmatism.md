@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Database Design Debate: Normalization vs Pragmatism - A Real Decision Process"
-date: 2025-11-14 20:00:00 +0900
+date: 2025-11-14 14:30:00 +0900
 categories: [Backend, Database]
 tags: [database, normalization, pragmatism, yagni, tradeoffs, architecture, mysql]
 lang: en
