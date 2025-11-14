@@ -7,8 +7,6 @@ tags: [database, normalization, pragmatism, yagni, tradeoffs, architecture, mysq
 lang: en
 ---
 
-# Database Design Debate: Normalization vs Pragmatism - A Real Decision Process
-
 ## 📋 Introduction
 
 While improving the weekly recurring schedule input feature, I spent hours pondering "how should we design the database?" This is an unfiltered record of the actual debate process between Claude Code, Gemini, and myself.

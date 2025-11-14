@@ -7,8 +7,6 @@ tags: [database, normalization, pragmatism, yagni, tradeoffs, architecture, mysq
 lang: ko
 ---
 
-# DB 설계 논쟁: 정규화 vs 실용주의 - 실제 의사결정 과정
-
 ## 📋 서론
 
 주간 고정 일정 입력 기능을 개선하면서 "어떻게 DB를 설계할 것인가"를 놓고 3시간 동안 고민했습니다. Claude Code, Gemini, 그리고 저 사이에서 벌어진 실제 논쟁 과정을 있는 그대로 기록합니다.
