@@ -180,10 +180,11 @@
         {% assign current_lang = page.lang | default: "ko" %}
 
         {% if page.layout == 'post' %}
-          <!-- Post pages: language switcher based on alternative post -->
+          <!-- Post pages: language switcher based on slug -->
           {% if current_lang == 'ko' %}
-            {% capture post_slug %}{{ page.url | split: "/" | last | split: ".html" | first }}{% endcapture %}
-            {% assign en_post = site.posts | where: "lang", "en" | where_exp: "p", "p.url contains post_slug" | first %}
+            {% assign base_slug = page.slug %}
+            {% capture en_slug %}{{ base_slug }}-en{% endcapture %}
+            {% assign en_post = site.posts | where: "lang", "en" | where: "slug", en_slug | first %}
             {% if en_post %}
               <a href="{{ en_post.url | relative_url }}" style="text-decoration: none; color: inherit;">
                 <span class="statusbar-lang" title="Click to view in English">한국어</span>
@@ -192,8 +193,9 @@
               <span class="statusbar-lang-disabled" title="English version not available">한국어</span>
             {% endif %}
           {% else %}
-            {% capture post_slug %}{{ page.url | split: "/" | last | split: ".html" | first }}{% endcapture %}
-            {% assign ko_post = site.posts | where: "lang", "ko" | where_exp: "p", "p.url contains post_slug" | first %}
+            {% assign en_slug = page.slug %}
+            {% assign base_slug = en_slug | remove: "-en" %}
+            {% assign ko_post = site.posts | where: "lang", "ko" | where: "slug", base_slug | first %}
             {% if ko_post %}
               <a href="{{ ko_post.url | relative_url }}" style="text-decoration: none; color: inherit;">
                 <span class="statusbar-lang" title="Click to view in 한국어">English</span>
