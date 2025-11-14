@@ -287,29 +287,29 @@ INSERT INTO weekly_schedule VALUES
 ```
 
 2. **Update Safety**:
-```sql
--- groupId: Must update 3 rows simultaneously (error-prone)
-UPDATE weekly_schedule
-SET title = 'Math Academy (Sinchon)'
-WHERE group_id = 'G1';  -- Updates 3 rows
+   ```sql
+   -- groupId: Must update 3 rows simultaneously (error-prone)
+   UPDATE weekly_schedule
+   SET title = 'Math Academy (Sinchon)'
+   WHERE group_id = 'G1';  -- Updates 3 rows
 
--- Normalization: Update only 1 row (atomicity guaranteed)
-UPDATE weekly_schedules
-SET title = 'Math Academy (Sinchon)'
-WHERE id = 1;  -- Updates 1 row only
-```
+   -- Normalization: Update only 1 row (atomicity guaranteed)
+   UPDATE weekly_schedules
+   SET title = 'Math Academy (Sinchon)'
+   WHERE id = 1;  -- Updates 1 row only
+   ```
 
 3. **Data Integrity via FK Constraints**:
-```sql
--- Normalization: Auto-delete children when parent deleted
-ALTER TABLE weekly_schedule_times
-ADD CONSTRAINT fk_schedule
-FOREIGN KEY (schedule_id) REFERENCES weekly_schedules(id)
-ON DELETE CASCADE;
+   ```sql
+   -- Normalization: Auto-delete children when parent deleted
+   ALTER TABLE weekly_schedule_times
+   ADD CONSTRAINT fk_schedule
+   FOREIGN KEY (schedule_id) REFERENCES weekly_schedules(id)
+   ON DELETE CASCADE;
 
--- groupId: Must manually delete all rows in group
-DELETE FROM weekly_schedule WHERE group_id = 'G1';
-```
+   -- groupId: Must manually delete all rows in group
+   DELETE FROM weekly_schedule WHERE group_id = 'G1';
+   ```
 
 **Me**: "Hmm... theoretically correct, I guess?"
 
@@ -1000,18 +1000,3 @@ After the debate, we learned:
 - Normalization is a powerful tool, but **not a silver bullet**
 - **Practical choices** considering project scale, team capability, and schedule are real engineering
 - AI can be wrong too. **Measure and verify**
-
----
-
-## 🔗 Related Resources
-
-- Feature Documentation: [F066-weekly-schedule-multi-timeslot-refactoring](../features/F066-weekly-schedule-multi-timeslot-refactoring/README.md)
-- Migration File: `V20251114200000__add_group_id_to_weekly_schedule.sql`
-- YAGNI Principle: https://martinfowler.com/bliki/Yagni.html
-- Database Normalization: https://en.wikipedia.org/wiki/Database_normalization
-
----
-
-**Written**: 2025-11-14
-**Category**: Database Design, Architecture, Decision Making
-**Tags**: #database #normalization #pragmatism #yagni #tradeoffs #claude-vs-gemini

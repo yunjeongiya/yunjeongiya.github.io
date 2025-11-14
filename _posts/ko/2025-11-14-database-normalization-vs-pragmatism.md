@@ -287,29 +287,29 @@ INSERT INTO weekly_schedule VALUES
 ```
 
 2. **수정 안전성**:
-```sql
--- groupId: 3개 row를 동시에 수정해야 함 (실수 위험)
-UPDATE weekly_schedule
-SET title = '수학학원(신촌점)'
-WHERE group_id = 'G1';  -- 3 rows 동시 수정
+   ```sql
+   -- groupId: 3개 row를 동시에 수정해야 함 (실수 위험)
+   UPDATE weekly_schedule
+   SET title = '수학학원(신촌점)'
+   WHERE group_id = 'G1';  -- 3 rows 동시 수정
 
--- 정규화: 1개 row만 수정 (원자성 보장)
-UPDATE weekly_schedules
-SET title = '수학학원(신촌점)'
-WHERE id = 1;  -- 1 row만 수정
-```
+   -- 정규화: 1개 row만 수정 (원자성 보장)
+   UPDATE weekly_schedules
+   SET title = '수학학원(신촌점)'
+   WHERE id = 1;  -- 1 row만 수정
+   ```
 
 3. **FK 제약조건으로 데이터 정합성 보장**:
-```sql
--- 정규화: 부모 삭제 시 자식도 자동 삭제
-ALTER TABLE weekly_schedule_times
-ADD CONSTRAINT fk_schedule
-FOREIGN KEY (schedule_id) REFERENCES weekly_schedules(id)
-ON DELETE CASCADE;
+   ```sql
+   -- 정규화: 부모 삭제 시 자식도 자동 삭제
+   ALTER TABLE weekly_schedule_times
+   ADD CONSTRAINT fk_schedule
+   FOREIGN KEY (schedule_id) REFERENCES weekly_schedules(id)
+   ON DELETE CASCADE;
 
--- groupId: 그룹 삭제 시 수동으로 모든 row 삭제 필요
-DELETE FROM weekly_schedule WHERE group_id = 'G1';
-```
+   -- groupId: 그룹 삭제 시 수동으로 모든 row 삭제 필요
+   DELETE FROM weekly_schedule WHERE group_id = 'G1';
+   ```
 
 **나**: "음... 이론적으로는 맞는 것 같은데?"
 
@@ -994,18 +994,3 @@ SELECT * FROM weekly_schedule WHERE group_id = 'uuid-1';
 - 정규화는 강력한 도구이지만, **만능은 아니다**
 - 프로젝트 규모, 팀 역량, 일정을 고려한 **실용적 선택**이 진짜 엔지니어링이다
 - AI도 틀릴 수 있다. **측정하고 검증하라**
-
----
-
-## 🔗 관련 자료
-
-- Feature 문서: [F066-weekly-schedule-multi-timeslot-refactoring](../features/F066-weekly-schedule-multi-timeslot-refactoring/README.md)
-- 마이그레이션 파일: `V20251114200000__add_group_id_to_weekly_schedule.sql`
-- YAGNI 원칙: https://martinfowler.com/bliki/Yagni.html
-- Database Normalization: https://en.wikipedia.org/wiki/Database_normalization
-
----
-
-**작성일**: 2025-11-14
-**카테고리**: Database Design, Architecture, Decision Making
-**태그**: #database #normalization #pragmatism #yagni #tradeoffs #claude-vs-gemini
