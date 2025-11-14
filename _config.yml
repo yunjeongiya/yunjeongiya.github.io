@@ -33,14 +33,13 @@ defaults:
       layout: "post"
       lang: "ko"
 
-  # English posts (with /en/ prefix)
+  # English posts
   - scope:
       path: "_posts/en"
       type: "posts"
     values:
       layout: "post"
       lang: "en"
-      permalink: "/en/:categories/:year/:month/:day/:title/"
 
 # Exclude from processing
 exclude:
