@@ -84,8 +84,6 @@ INSERT INTO weekly_schedules VALUES (2, 100, 'English', 'EXTERNAL');
 INSERT INTO weekly_schedule_times VALUES (3, 2, '16:00', '18:00', '2,4');
 ```
 
-**Me**: "Clean, right? Even with multiple time slots per schedule, it's neatly managed with table separation!"
-
 **Claude Code**: "If you store days as an array, how will you query 'what schedule is on Wednesday?'"
 
 ```sql
@@ -101,9 +99,8 @@ WHERE days_of_week LIKE '%3%';  -- Full Table Scan!
 WHERE days_of_week >= '1' AND days_of_week <= '5'  -- Impossible!
 ```
 
-**Me**: "Well... but we don't have 'find Wednesday schedules' query, right? We just fetch everything?"
+**Me**: "Ah... right. And our system needs to **query 'currently running schedules' every minute**."
 
-**Claude Code**: "Really? Check the code."
 
 ```typescript
 // checkus-teacher-web/src/features/students/hooks/useWeeklySchedules.ts
@@ -124,8 +121,6 @@ const currentSchedule = schedules.filter(s => {
          s.endTime > currentTime;
 });
 ```
-
-**Me**: "Oh... right. Our system needs to query **'currently running schedules' every minute**."
 
 **Performance Analysis**:
 - 100 students, 5 schedules each = 500 rows
@@ -215,7 +210,7 @@ List<WeeklySchedule> findByGroupId(String groupId);
 void deleteByGroupId(String groupId);
 ```
 
-**Downsides (Honestly)**:
+**Downsides**:
 ```sql
 -- Data duplication occurs
 -- "Math Academy" string stored 3 times
@@ -230,30 +225,7 @@ SET title = 'Math Academy (Sinchon)'
 WHERE id = 1;  -- ← Only one row in G1 group updated! (Bug)
 ```
 
-**Me**: "Oh, simple! But what about data duplication and integrity issues?"
-
-**Claude Code**: "Wrap it with `@Transactional` in the Service layer."
-
-```java
-@Transactional
-public void updateScheduleGroup(String groupId, WeeklyScheduleUpdateRequest req) {
-    // Update entire group atomically
-    List<WeeklySchedule> schedules = repository.findByGroupId(groupId);
-
-    // Validate: all rows in group have same title/type
-    validateGroupIntegrity(schedules);
-
-    // Update all (at once)
-    schedules.forEach(s -> {
-        s.setTitle(req.getTitle());
-        s.setScheduleType(req.getScheduleType());
-    });
-
-    repository.saveAll(schedules);
-}
-```
-
-**Me**: "This looks good? Let's go with this... but wait, should I ask Gemini about normalization?"
+**Me**: "Oh, simple! But data duplication and integrity issues feel concerning..."
 
 ---
 
@@ -373,52 +345,243 @@ WHERE d.day_of_week = 3
 
 ## 💬 Round 4: Reality Check During Implementation
 
-Started implementing the 3-table structure.
+Started implementing the 3-table structure. But then...
 
-### Problem 1: Cascading Complexity
+### Problem 1: Entity Design Complexity
 
+**Existing Approach (Single Table)**:
 ```java
-// Write 3 Entity classes
-@Entity WeeklySchedule { ... }
-@Entity WeeklyScheduleTime { ... }
-@Entity WeeklyScheduleDay { ... }
-
-// Set up bidirectional relationships
-@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-private List<WeeklyScheduleTime> times;
-
-@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-private List<WeeklyScheduleDay> days;
-
-// Need to modify 19 existing files!
+// WeeklySchedule.java - Done!
+@Entity
+public class WeeklySchedule {
+    @Id @GeneratedValue
+    private Long id;
+    private Long userId;
+    private String title;
+    private String scheduleType;
+    private Long campusId;
+    private Integer dayOfWeek;
+    private LocalTime startTime;
+    private LocalTime endTime;
+}
 ```
 
-### Problem 2: Migration Complexity
+**3-Table Approach (Normalization)**:
+```java
+// 1. WeeklySchedule.java
+@Entity
+public class WeeklySchedule {
+    @Id @GeneratedValue
+    private Long id;
+    private Long userId;
+    private String title;
+    private String scheduleType;
+    private Long campusId;
 
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WeeklyScheduleTime> times = new ArrayList<>();
+
+    public void addTime(WeeklyScheduleTime time) {
+        times.add(time);
+        time.setSchedule(this);
+    }
+}
+
+// 2. WeeklyScheduleTime.java
+@Entity
+public class WeeklyScheduleTime {
+    @Id @GeneratedValue
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "schedule_id")
+    private WeeklySchedule schedule;
+
+    private LocalTime startTime;
+    private LocalTime endTime;
+
+    @OneToMany(mappedBy = "timeSlot", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WeeklyScheduleDay> days = new ArrayList<>();
+}
+
+// 3. WeeklyScheduleDay.java
+@Entity
+public class WeeklyScheduleDay {
+    @Id @GeneratedValue
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "time_id")
+    private WeeklyScheduleTime timeSlot;
+
+    private Integer dayOfWeek;
+}
+```
+
+**Me**: "3 Entity files, bidirectional relationships, LazyLoading issues... my head hurts already?"
+
+### Problem 2: Ripple Effect on Other Services
+
+Shocking discovery: `WeeklySchedule` isn't only used in `WeeklyScheduleService`!
+
+#### 1. StudyTimeService (Study Time Monitoring)
+
+```java
+// BEFORE (simple)
+public List<StudyTime> getCurrentStudyTimes(Long userId) {
+    LocalTime now = LocalTime.now();
+    int today = LocalDate.now().getDayOfWeek().getValue();
+
+    List<WeeklySchedule> schedules = weeklyScheduleRepository
+        .findByUserIdAndDayOfWeek(userId, today);
+
+    return schedules.stream()
+        .filter(s -> s.getStartTime().isBefore(now) && s.getEndTime().isAfter(now))
+        .map(this::convertToStudyTime)
+        .collect(Collectors.toList());
+}
+
+// AFTER (complex)
+public List<StudyTime> getCurrentStudyTimes(Long userId) {
+    LocalTime now = LocalTime.now();
+    int today = LocalDate.now().getDayOfWeek().getValue();
+
+    List<WeeklySchedule> schedules = weeklyScheduleRepository
+        .findByUserIdWithTimesAndDays(userId);  // ← JOIN FETCH x2
+
+    return schedules.stream()
+        .flatMap(s -> s.getTimes().stream())  // ← Nested stream
+        .filter(t -> t.getDays().stream()
+            .anyMatch(d -> d.getDayOfWeek() == today))  // ← Another stream
+        .filter(t -> t.getStartTime().isBefore(now) && t.getEndTime().isAfter(now))
+        .map(this::convertToStudyTime)
+        .collect(Collectors.toList());
+}
+```
+
+#### 2. NotificationService (Schedule Notifications)
+
+```java
+// BEFORE (simple)
+@Scheduled(cron = "0 */30 * * * *")  // Every 30 minutes
+public void sendUpcomingScheduleNotifications() {
+    LocalTime now = LocalTime.now();
+    LocalTime soon = now.plusMinutes(30);
+    int today = LocalDate.now().getDayOfWeek().getValue();
+
+    // Find "schedules starting in 30 minutes"
+    List<WeeklySchedule> upcomingSchedules = weeklyScheduleRepository
+        .findByDayOfWeekAndStartTimeBetween(today, now, soon);
+
+    upcomingSchedules.forEach(schedule ->
+        sendNotification(schedule.getUserId(),
+            schedule.getTitle() + " starting in 30 minutes"));
+}
+
+// AFTER (complex)
+@Scheduled(cron = "0 */30 * * * *")
+public void sendUpcomingScheduleNotifications() {
+    LocalTime now = LocalTime.now();
+    LocalTime soon = now.plusMinutes(30);
+    int today = LocalDate.now().getDayOfWeek().getValue();
+
+    // Fetch all schedules then filter (can't optimize query!)
+    List<WeeklySchedule> allSchedules = weeklyScheduleRepository
+        .findAllWithTimesAndDays();  // ← Full table scan!
+
+    List<UpcomingSchedule> upcomingSchedules = allSchedules.stream()
+        .flatMap(s -> s.getTimes().stream()
+            .filter(t -> t.getStartTime().isAfter(now) && t.getStartTime().isBefore(soon))
+            .flatMap(t -> t.getDays().stream()
+                .filter(d -> d.getDayOfWeek() == today)
+                .map(d -> new UpcomingSchedule(s.getUserId(), s.getTitle(), t.getStartTime()))))
+        .collect(Collectors.toList());
+
+    upcomingSchedules.forEach(schedule ->
+        sendNotification(schedule.getUserId(),
+            schedule.getTitle() + " starting in 30 minutes"));
+}
+```
+
+### Problem 3: Files That Need Modification (Actual Count)
+
+**Backend (checkus-server) - Total 27 files!**
+
+**Core (13 files)**:
+1. WeeklySchedule.java
+2. WeeklyScheduleTime.java (new)
+3. WeeklyScheduleDay.java (new)
+4. WeeklyScheduleRepository.java
+5. WeeklyScheduleTimeRepository.java (new)
+6. WeeklyScheduleDayRepository.java (new)
+7. WeeklyScheduleService.java
+8. WeeklyScheduleController.java
+9-13. 5 DTOs (Request/Response structure changes)
+
+**Affected Other Services (14 files)**:
+14. StudyTimeService.java
+15. DashboardService.java
+16. NotificationService.java
+17. AttendanceService.java
+18. ReportService.java
+19. StatisticsService.java
+20. CalendarService.java
+21. ReminderService.java
+22. ScheduleConflictChecker.java
+23-27. Various Repositories, Validators, EventListeners...
+
+**Frontend (checkus-teacher-web) - Total 12 files**:
+28. types.ts - API type changes
+29. api.ts - API call changes
+30. WeeklyScheduleDialog.tsx - Form structure changes
+31. useWeeklySchedules.ts - React Query logic changes
+32-39. Various component rendering logic changes
+
+**Total 39 files need modification!**
+
+### Problem 4: Migration Script Complexity
+
+**groupId Approach**:
 ```sql
--- How to migrate existing data?
--- 1. Create 3 new tables
--- 2. Distribute existing data across 3 tables
--- 3. Connect FKs
--- 4. Remove old columns
--- 5. Re-test all features
-
--- Estimated work time: 6-8 hours
+-- One line and done!
+ALTER TABLE weekly_schedule ADD COLUMN group_id VARCHAR(50);
+CREATE INDEX idx_group_id ON weekly_schedule(group_id);
 ```
 
-### Problem 3: Query Complexity
+**3-Table Approach**:
+```sql
+-- Step 1: Create 3 new tables
+CREATE TABLE weekly_schedules (...);
+CREATE TABLE weekly_schedule_times (...);
+CREATE TABLE weekly_schedule_days (...);
 
-```java
-// Before (simple)
-List<WeeklySchedule> schedules = repo.findByDayOfWeek(1);
+-- Step 2: Migrate existing data (complex!)
+INSERT INTO weekly_schedules (user_id, title, schedule_type, campus_id)
+SELECT DISTINCT user_id, title, schedule_type, campus_id FROM weekly_schedule;
+-- ... (more complex migration logic)
 
-// 3-table (complex)
-@Query("SELECT s FROM WeeklySchedule s " +
-       "JOIN FETCH s.times t " +
-       "JOIN FETCH t.days d " +
-       "WHERE d.dayOfWeek = :day")
-List<WeeklySchedule> findByDayOfWeek(@Param("day") Integer day);
+-- Step 3: Drop old table
+DROP TABLE weekly_schedule;
 ```
+
+### Problem 5: Actual Work Time Estimate
+
+| Task | groupId | 3-Table |
+|------|---------|---------|
+| Entity Modifications | 10 min | 2 hours |
+| Core Repository/Service | 30 min | 2 hours |
+| Other Service Modifications | 0 min | 4 hours |
+| Controller & DTO | 30 min | 1.5 hours |
+| Frontend | 30 min | 2 hours |
+| Migration | 10 min | 2 hours |
+| Testing (full) | 30 min | 3 hours |
+| **Total Work Time** | **2.5 hours** | **16.5 hours** |
+
+**Claude Code**: "What's worse is, we have to touch all the features other team members already built. StudyTimeService, NotificationService... we need to test and verify each one."
+
+**Me**: "And if any bug occurs? Attendance check fails, notifications don't send... these directly affect users..."
+
+**Claude Code**: "The refactoring risk is too high. This isn't 'design improvement' - it's 'full system rewrite' level."
 
 **Me**: "This is... too big. Something feels wrong?"
 
@@ -430,12 +593,10 @@ List<WeeklySchedule> findByDayOfWeek(@Param("day") Integer day);
 
 ### Realistic Data Analysis
 
-**Actual Usage Patterns**:
-- Math Academy Mon/Wed/Fri 14:00 → 1 time slot, 3 days
-- English Academy Tue/Thu 18:00 → 1 time slot, 2 days
-- **Maximum**: 2 time slots × 3-4 days each = **about 7 rows total**
-
-**Me**: "A week has 7 days, so one schedule can't exceed 7 rows, right?"
+**Weekly Schedule Characteristics**:
+- A week has 7 days, so one schedule won't normally have more than 7 time slots
+- Actual average = 3-4 (patterns like Mon/Wed/Fri, Tue/Thu)
+- **Even in abnormal cases, unlikely to exceed 10**
 
 ### Data Duplication Calculation
 
@@ -488,7 +649,26 @@ WHERE d.day_of_week = 3;
 
 **Gemini**: "The biggest problem with groupId is data inconsistency. For example, when changing title from 'Math Academy' → 'Advanced Math', what if only some rows update?"
 
-**Claude Code**: "Can be solved with @Transactional."
+**Me**: "Wouldn't wrapping with `@Transactional` solve it?"
+
+```java
+@Transactional
+public void updateScheduleGroup(String groupId, WeeklyScheduleUpdateRequest req) {
+    // Update entire group atomically
+    List<WeeklySchedule> schedules = repository.findByGroupId(groupId);
+
+    // Validate: all rows in group have same title/type
+    validateGroupIntegrity(schedules);
+
+    // Update all at once
+    schedules.forEach(s -> {
+        s.setTitle(req.getTitle());
+        s.setScheduleType(req.getScheduleType());
+    });
+
+    repository.saveAll(schedules);
+}
+```
 
 ```java
 @Transactional
@@ -499,16 +679,44 @@ public void updateGroupTitle(String groupId, String newTitle) {
 }
 ```
 
-```java
-// Repository
-@Modifying
-@Query("UPDATE WeeklySchedule ws SET ws.title = :title WHERE ws.groupId = :groupId")
-void updateTitleByGroupId(@Param("groupId") String groupId, @Param("title") String title);
+**Gemini**: "Wouldn't it be better to guarantee integrity through design itself? Having to 'always remember transactions' is a risk factor."
+
+**Me**: "Well... but how much data duplication do we actually have in our system? As mentioned earlier, usually 2-3 per schedule, max 7."
+
+**Gemini**: "Even one inconsistency is critical."
+
+**Me**: "So it's not about the 'quantity' of duplication, but the 'possibility' of inconsistency?"
+
+### Inconsistency Scenario vs Transaction Solution
+
+**Gemini's Concern Scenario**:
+```
+1. Save "Math Academy" (Mon/Wed/Fri) → groupId=100, 3 rows
+2. Change title: "Advanced Math"
+3. Network error → Mon/Wed changed, Fri not updated
+4. DB inconsistency: 2 "Advanced Math" + 1 "Math Academy"
 ```
 
-**Gemini**: "What if a developer accidentally inputs different titles for the same groupId?"
+**My Counter**:
+```java
+@Transactional  // ← This solves it?
+public void updateGroupTitle(String groupId, String newTitle) {
+    scheduleRepository.updateTitleByGroupId(groupId, newTitle);
+    // All succeed or all fail
+}
+```
 
-**Claude Code**: "Validate in Service Layer. 5 lines are enough."
+**Gemini**: "There are mistakes that transactions can't prevent."
+
+```java
+// Developer mistake: input different title for same groupId
+repository.save(new WeeklySchedule()
+    .setGroupId("100")
+    .setTitle("Math Special"));  // ← Different from existing "Advanced Math"!
+// Data breaks regardless of transaction
+```
+
+**Claude Code**: "That can be prevented with 5 lines of Service validation logic."
 
 ```java
 public void createSchedule(WeeklyScheduleRequest req) {
@@ -518,11 +726,27 @@ public void createSchedule(WeeklyScheduleRequest req) {
             throw new BusinessException("Same group must have same title");
         }
     }
-    // Continue with normal logic
+    repository.save(req.toEntity());
 }
 ```
 
-**Me**: "Transaction + 5-line validation for integrity vs 3-table structure... isn't the latter overkill?"
+### Fundamental Difference
+
+**Gemini's Argument**:
+> "Normalization = Integrity guaranteed by design. groupId = Depends on developer attention."
+
+**My Counter**:
+> "But we're already validating tons of business rules in Service Layer.
+> Isn't 'groupId group consistency' just one more of those?"
+
+**Example**:
+```java
+// Validations we're already doing
+validateStartTimeBeforeEndTime();
+validateCampusExists();
+validateNoOverlappingSchedules();
+validateGroupConsistency();  // ← Just adding this one
+```
 
 ---
 

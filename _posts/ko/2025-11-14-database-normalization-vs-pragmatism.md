@@ -84,8 +84,6 @@ INSERT INTO weekly_schedules VALUES (2, 100, '영어회화', 'EXTERNAL');
 INSERT INTO weekly_schedule_times VALUES (3, 2, '16:00', '18:00', '2,4');
 ```
 
-**나**: "깔끔하잖아? 한 일정에 여러 시간대가 있어도 테이블 분리로 깔끔하게 관리되고!"
-
 **Claude Code**: "요일을 배열로 저장하면 '수요일에 무슨 일정이 있지?'를 조회할 때 어떻게 할 건가요?"
 
 ```sql
@@ -101,9 +99,8 @@ WHERE days_of_week LIKE '%3%';  -- Full Table Scan!
 WHERE days_of_week >= '1' AND days_of_week <= '5'  -- 불가능!
 ```
 
-**나**: "음... 그래도 우리는 '수요일 일정 찾기' 같은 게 없잖아? 그냥 전체 조회만 하면 되는데?"
+**나**: "아... 맞네. 게다가 우리 시스템은 **1분마다 '지금 진행 중인 일정'을 조회**해야 해."
 
-**Claude Code**: "정말요? 코드 확인해보세요."
 
 ```typescript
 // checkus-teacher-web/src/features/students/hooks/useWeeklySchedules.ts
@@ -124,8 +121,6 @@ const currentSchedule = schedules.filter(s => {
          s.endTime > currentTime;
 });
 ```
-
-**나**: "아... 맞다. 우리 시스템은 **1분마다 '지금 진행 중인 일정'을 조회**해야 해."
 
 **성능 분석**:
 - 학생 100명, 평균 일정 5개 = 500 rows
@@ -215,7 +210,7 @@ List<WeeklySchedule> findByGroupId(String groupId);
 void deleteByGroupId(String groupId);
 ```
 
-**단점 (솔직하게)**:
+**단점**:
 ```sql
 -- 데이터 중복 발생
 -- "수학학원" 문자열이 3번 반복 저장됨
@@ -230,30 +225,7 @@ SET title = '수학학원(신촌점)'
 WHERE id = 1;  -- ← G1 그룹 중 하나만 수정됨! (버그)
 ```
 
-**나**: "오, 간단하네! 근데 데이터 중복이랑 정합성 문제는?"
-
-**Claude Code**: "Service 계층에서 `@Transactional`로 묶으면 됩니다."
-
-```java
-@Transactional
-public void updateScheduleGroup(String groupId, WeeklyScheduleUpdateRequest req) {
-    // 그룹 전체를 원자적으로 수정
-    List<WeeklySchedule> schedules = repository.findByGroupId(groupId);
-
-    // 검증: 그룹 내 모든 row가 동일한 title/type을 가지는지
-    validateGroupIntegrity(schedules);
-
-    // 전체 수정 (한 번에)
-    schedules.forEach(s -> {
-        s.setTitle(req.getTitle());
-        s.setScheduleType(req.getScheduleType());
-    });
-
-    repository.saveAll(schedules);
-}
-```
-
-**나**: "이거 좋은데? 일단 이걸로 가자... 아 근데 혹시 정규화가 더 나을까? Gemini한테 물어봐야겠다."
+**나**: "오, 간단하네! 근데 데이터 중복이랑 정합성 문제가 찝찝한데..."
 
 ---
 
@@ -373,52 +345,243 @@ WHERE d.day_of_week = 3
 
 ## 💬 4라운드: 구현하다 만난 현실의 벽
 
-3-테이블 구조로 구현을 시작했습니다.
+3-테이블 구조로 구현을 시작했습니다. 그런데...
 
-### 문제 1: 파생되는 복잡도
+### 문제 1: Entity 설계 복잡도
 
+**기존 방식 (단일 테이블)**:
 ```java
-// Entity 클래스 3개 작성
-@Entity WeeklySchedule { ... }
-@Entity WeeklyScheduleTime { ... }
-@Entity WeeklyScheduleDay { ... }
-
-// 양방향 연관관계 설정
-@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-private List<WeeklyScheduleTime> times;
-
-@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-private List<WeeklyScheduleDay> days;
-
-// 기존 코드 19개 파일 수정 필요!
+// WeeklySchedule.java - 끝!
+@Entity
+public class WeeklySchedule {
+    @Id @GeneratedValue
+    private Long id;
+    private Long userId;
+    private String title;
+    private String scheduleType;
+    private Long campusId;
+    private Integer dayOfWeek;
+    private LocalTime startTime;
+    private LocalTime endTime;
+}
 ```
 
-### 문제 2: 마이그레이션 복잡도
+**3-테이블 방식 (정규화)**:
+```java
+// 1. WeeklySchedule.java
+@Entity
+public class WeeklySchedule {
+    @Id @GeneratedValue
+    private Long id;
+    private Long userId;
+    private String title;
+    private String scheduleType;
+    private Long campusId;
 
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WeeklyScheduleTime> times = new ArrayList<>();
+
+    public void addTime(WeeklyScheduleTime time) {
+        times.add(time);
+        time.setSchedule(this);
+    }
+}
+
+// 2. WeeklyScheduleTime.java
+@Entity
+public class WeeklyScheduleTime {
+    @Id @GeneratedValue
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "schedule_id")
+    private WeeklySchedule schedule;
+
+    private LocalTime startTime;
+    private LocalTime endTime;
+
+    @OneToMany(mappedBy = "timeSlot", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WeeklyScheduleDay> days = new ArrayList<>();
+}
+
+// 3. WeeklyScheduleDay.java
+@Entity
+public class WeeklyScheduleDay {
+    @Id @GeneratedValue
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "time_id")
+    private WeeklyScheduleTime timeSlot;
+
+    private Integer dayOfWeek;
+}
+```
+
+**나**: "Entity 파일 3개, 양방향 연관관계, LazyLoading 이슈... 벌써 머리 아픈데?"
+
+### 문제 2: 다른 서비스에서의 파급 효과
+
+충격적 발견: `WeeklySchedule`을 사용하는 곳이 `WeeklyScheduleService`만이 아니었다!
+
+#### 1. StudyTimeService (공부시간 모니터링)
+
+```java
+// BEFORE (단순)
+public List<StudyTime> getCurrentStudyTimes(Long userId) {
+    LocalTime now = LocalTime.now();
+    int today = LocalDate.now().getDayOfWeek().getValue();
+
+    List<WeeklySchedule> schedules = weeklyScheduleRepository
+        .findByUserIdAndDayOfWeek(userId, today);
+
+    return schedules.stream()
+        .filter(s -> s.getStartTime().isBefore(now) && s.getEndTime().isAfter(now))
+        .map(this::convertToStudyTime)
+        .collect(Collectors.toList());
+}
+
+// AFTER (복잡)
+public List<StudyTime> getCurrentStudyTimes(Long userId) {
+    LocalTime now = LocalTime.now();
+    int today = LocalDate.now().getDayOfWeek().getValue();
+
+    List<WeeklySchedule> schedules = weeklyScheduleRepository
+        .findByUserIdWithTimesAndDays(userId);  // ← JOIN FETCH 2번
+
+    return schedules.stream()
+        .flatMap(s -> s.getTimes().stream())  // ← 중첩 스트림
+        .filter(t -> t.getDays().stream()
+            .anyMatch(d -> d.getDayOfWeek() == today))  // ← 또 스트림
+        .filter(t -> t.getStartTime().isBefore(now) && t.getEndTime().isAfter(now))
+        .map(this::convertToStudyTime)
+        .collect(Collectors.toList());
+}
+```
+
+#### 2. NotificationService (일정 알림 발송)
+
+```java
+// BEFORE (단순)
+@Scheduled(cron = "0 */30 * * * *")  // 30분마다
+public void sendUpcomingScheduleNotifications() {
+    LocalTime now = LocalTime.now();
+    LocalTime soon = now.plusMinutes(30);
+    int today = LocalDate.now().getDayOfWeek().getValue();
+
+    // "30분 후 시작하는 일정" 찾기
+    List<WeeklySchedule> upcomingSchedules = weeklyScheduleRepository
+        .findByDayOfWeekAndStartTimeBetween(today, now, soon);
+
+    upcomingSchedules.forEach(schedule ->
+        sendNotification(schedule.getUserId(),
+            schedule.getTitle() + " 30분 후 시작"));
+}
+
+// AFTER (복잡)
+@Scheduled(cron = "0 */30 * * * *")
+public void sendUpcomingScheduleNotifications() {
+    LocalTime now = LocalTime.now();
+    LocalTime soon = now.plusMinutes(30);
+    int today = LocalDate.now().getDayOfWeek().getValue();
+
+    // 모든 스케줄 조회 후 필터링 (쿼리 최적화 불가능!)
+    List<WeeklySchedule> allSchedules = weeklyScheduleRepository
+        .findAllWithTimesAndDays();  // ← 전체 조회!
+
+    List<UpcomingSchedule> upcomingSchedules = allSchedules.stream()
+        .flatMap(s -> s.getTimes().stream()
+            .filter(t -> t.getStartTime().isAfter(now) && t.getStartTime().isBefore(soon))
+            .flatMap(t -> t.getDays().stream()
+                .filter(d -> d.getDayOfWeek() == today)
+                .map(d -> new UpcomingSchedule(s.getUserId(), s.getTitle(), t.getStartTime()))))
+        .collect(Collectors.toList());
+
+    upcomingSchedules.forEach(schedule ->
+        sendNotification(schedule.getUserId(),
+            schedule.getTitle() + " 30분 후 시작"));
+}
+```
+
+### 문제 3: 수정 필요한 파일 목록 (실제)
+
+**Backend (checkus-server) - 총 27개 파일!**
+
+**Core (13개)**:
+1. WeeklySchedule.java
+2. WeeklyScheduleTime.java (새로 작성)
+3. WeeklyScheduleDay.java (새로 작성)
+4. WeeklyScheduleRepository.java
+5. WeeklyScheduleTimeRepository.java (새로 작성)
+6. WeeklyScheduleDayRepository.java (새로 작성)
+7. WeeklyScheduleService.java
+8. WeeklyScheduleController.java
+9-13. DTO 5개 (Request/Response 구조 변경)
+
+**영향받는 다른 서비스들 (14개)**:
+14. StudyTimeService.java
+15. DashboardService.java
+16. NotificationService.java
+17. AttendanceService.java
+18. ReportService.java
+19. StatisticsService.java
+20. CalendarService.java
+21. ReminderService.java
+22. ScheduleConflictChecker.java
+23-27. 각종 Repository, Validator, EventListener...
+
+**Frontend (checkus-teacher-web) - 총 12개 파일**:
+28. types.ts - API 타입 변경
+29. api.ts - API 호출 변경
+30. WeeklyScheduleDialog.tsx - 폼 구조 변경
+31. useWeeklySchedules.ts - React Query 로직 변경
+32-39. 각종 컴포넌트 렌더링 로직 변경
+
+**총 39개 파일 수정 필요!**
+
+### 문제 4: 마이그레이션 스크립트 복잡도
+
+**groupId 방식**:
 ```sql
--- 기존 데이터가 있는데 어떻게 이관하지?
--- 1. 새 테이블 3개 생성
--- 2. 기존 데이터를 3개 테이블로 분산
--- 3. FK 연결
--- 4. 기존 컬럼 제거
--- 5. 모든 기능 다시 테스트
-
--- 예상 작업 시간: 6-8시간
+-- 1줄이면 끝!
+ALTER TABLE weekly_schedule ADD COLUMN group_id VARCHAR(50);
+CREATE INDEX idx_group_id ON weekly_schedule(group_id);
 ```
 
-### 문제 3: 쿼리 복잡도
+**3-테이블 방식**:
+```sql
+-- Step 1: 새 테이블 3개 생성
+CREATE TABLE weekly_schedules (...);
+CREATE TABLE weekly_schedule_times (...);
+CREATE TABLE weekly_schedule_days (...);
 
-```java
-// 기존 (단순)
-List<WeeklySchedule> schedules = repo.findByDayOfWeek(1);
+-- Step 2: 기존 데이터 이관 (복잡!)
+INSERT INTO weekly_schedules (user_id, title, schedule_type, campus_id)
+SELECT DISTINCT user_id, title, schedule_type, campus_id FROM weekly_schedule;
+-- ... (더 복잡한 이관 로직)
 
-// 3-테이블 (복잡)
-@Query("SELECT s FROM WeeklySchedule s " +
-       "JOIN FETCH s.times t " +
-       "JOIN FETCH t.days d " +
-       "WHERE d.dayOfWeek = :day")
-List<WeeklySchedule> findByDayOfWeek(@Param("day") Integer day);
+-- Step 3: 기존 테이블 삭제
+DROP TABLE weekly_schedule;
 ```
+
+### 문제 5: 실제 작업 시간 추정
+
+| 작업 항목 | groupId | 3-테이블 |
+|----------|---------|----------|
+| Entity 수정 | 10분 | 2시간 |
+| Core Repository/Service | 30분 | 2시간 |
+| 다른 서비스 수정 | 0분 | 4시간 |
+| Controller & DTO | 30분 | 1.5시간 |
+| Frontend | 30분 | 2시간 |
+| 마이그레이션 | 10분 | 2시간 |
+| 테스트 (전체) | 30분 | 3시간 |
+| **총 작업 시간** | **2.5시간** | **16.5시간** |
+
+**Claude Code**: "더 심각한 건, 이미 만든 기능들을 모두 건드려야 한다는 겁니다. StudyTimeService, NotificationService... 이거 하나하나 다 테스트하고 검증해야 해요."
+
+**나**: "그리고 혹시라도 버그가 생기면? 출석 체크가 안 되거나, 알림이 안 가거나... 사용자에게 직접 영향 가는 기능들인데..."
+
+**Claude Code**: "리팩토링 리스크가 너무 큽니다. 이건 '설계 개선'이 아니라 '시스템 전체 재작성' 수준이에요."
 
 **나**: "이거... 너무 크다. 뭔가 잘못된 것 같은데?"
 
@@ -430,12 +593,10 @@ List<WeeklySchedule> findByDayOfWeek(@Param("day") Integer day);
 
 ### 현실적 데이터 분석
 
-**실제 사용 패턴**:
-- 수학학원 월수금 14:00 → 시간대 1개, 요일 3개
-- 영어학원 화목 18:00 → 시간대 1개, 요일 2개
-- **최대**: 시간대 2개 × 요일 각 3-4개 = **총 7개 row 정도**
-
-**나**: "일주일이 7일인데, 하나의 일정이 최대 7개 row를 넘을 수가 없잖아?"
+**주간일정의 특성**:
+- 일주일이 7일인데, 하나의 일정이 7개보다 많은 시간대를 가질 일은 보통 없음
+- 실제 평균 = 3-4개 (월수금, 화목 같은 패턴)
+- **비정상적인 경우라도 10개를 넘을 일은 잘 없음**
 
 ### 데이터 중복 계산
 
@@ -488,7 +649,26 @@ WHERE d.day_of_week = 3;
 
 **Gemini**: "groupId 방식의 가장 큰 문제는 데이터 불일치입니다. 예를 들어 제목을 '수학학원' → '심화수학'으로 변경할 때 일부만 업데이트되면?"
 
-**Claude Code**: "@Transactional로 해결 가능합니다."
+**나**: "`@Transactional`로 묶으면 되지 않아?"
+
+```java
+@Transactional
+public void updateScheduleGroup(String groupId, WeeklyScheduleUpdateRequest req) {
+    // 그룹 전체를 원자적으로 수정
+    List<WeeklySchedule> schedules = repository.findByGroupId(groupId);
+
+    // 검증: 그룹 내 모든 row가 동일한 title/type을 가지는지
+    validateGroupIntegrity(schedules);
+
+    // 전체 수정 (한 번에)
+    schedules.forEach(s -> {
+        s.setTitle(req.getTitle());
+        s.setScheduleType(req.getScheduleType());
+    });
+
+    repository.saveAll(schedules);
+}
+```
 
 ```java
 @Transactional
@@ -499,16 +679,44 @@ public void updateGroupTitle(String groupId, String newTitle) {
 }
 ```
 
-```java
-// Repository
-@Modifying
-@Query("UPDATE WeeklySchedule ws SET ws.title = :title WHERE ws.groupId = :groupId")
-void updateTitleByGroupId(@Param("groupId") String groupId, @Param("title") String title);
+**Gemini**: "설계 자체로 무결성을 보장하는 게 낫지 않을까요? 트랜잭션을 '항상 기억해야 한다'는 것 자체가 위험 요소입니다."
+
+**나**: "그렇긴 한데... 우리 시스템에서 데이터 중복이 실제로 얼마나 될까? 앞서 말했 듯 한 일정에 대해 보통은 2~3개, 많아야 7개야."
+
+**Gemini**: "한 건의 불일치도 치명적입니다."
+
+**나**: "데이터 중복이 '개수'는 적지만, 불일치 '가능성'이 문제라는 거네?"
+
+### 불일치 시나리오 vs 트랜잭션 해결
+
+**Gemini가 우려한 시나리오**:
+```
+1. "수학학원" (월수금) 저장 → groupId=100, 3 rows
+2. 제목 변경: "심화수학"
+3. 네트워크 오류 → 월/수만 변경, 금 누락
+4. DB 불일치: "심화수학" 2개 + "수학학원" 1개
 ```
 
-**Gemini**: "개발자가 실수로 같은 groupId에 다른 title을 입력하면?"
+**나의 반박**:
+```java
+@Transactional  // ← 이걸로 해결되는데?
+public void updateGroupTitle(String groupId, String newTitle) {
+    scheduleRepository.updateTitleByGroupId(groupId, newTitle);
+    // 전부 성공 or 전부 실패
+}
+```
 
-**Claude Code**: "Service Layer에서 검증하면 됩니다. 5줄이면 충분해요."
+**Gemini**: "트랜잭션으로 막을 수 없는 실수도 있습니다."
+
+```java
+// 개발자 실수: 같은 groupId에 다른 title 입력
+repository.save(new WeeklySchedule()
+    .setGroupId("100")
+    .setTitle("수학특강"));  // ← 기존 "심화수학"과 다름!
+// 트랜잭션과 무관하게 데이터 깨짐
+```
+
+**Claude Code**: "그건 Service 검증 로직 5줄이면 막을 수 있어요."
 
 ```java
 public void createSchedule(WeeklyScheduleRequest req) {
@@ -518,11 +726,27 @@ public void createSchedule(WeeklyScheduleRequest req) {
             throw new BusinessException("같은 그룹은 같은 제목이어야 합니다");
         }
     }
-    // 정상 로직 진행
+    repository.save(req.toEntity());
 }
 ```
 
-**나**: "트랜잭션 + 5줄 validation으로 무결성 보장 vs 3-테이블 구조... 후자가 너무 과한 것 같은데?"
+### 본질적 차이
+
+**Gemini의 주장**:
+> "정규화 = 설계로 무결성 보장. groupId = 개발자 주의력에 의존."
+
+**나의 반론**:
+> "하지만 우리는 이미 Service Layer에서 수많은 비즈니스 룰을 검증하고 있다.
+> 'groupId 그룹 일관성'도 그 중 하나일 뿐 아닐까?"
+
+**예시**:
+```java
+// 이미 하고 있는 검증들
+validateStartTimeBeforeEndTime();
+validateCampusExists();
+validateNoOverlappingSchedules();
+validateGroupConsistency();  // ← 이것만 추가
+```
 
 ---
 
@@ -610,12 +834,6 @@ GROUP BY group_id, start_time, end_time;
 -- weekly_schedule에 FK 추가
 ALTER TABLE weekly_schedule ADD COLUMN time_id BIGINT;
 ```
-
-**Claude Code**: "지금 필요하지도 않은 기능을 위해 6시간을 투자하는 건 비효율적입니다."
-
-**Gemini**: "이론적으로는 정규화가..."
-
-**나**: "Stop. 이론보다 **현실**을 보자."
 
 ---
 
