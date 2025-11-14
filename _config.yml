@@ -20,8 +20,8 @@ plugins:
 minima:
   skin: dark
 
-# Permalink structure
-permalink: /:categories/:year/:month/:day/:title/
+# Permalink structure (slug-based for stable URLs)
+permalink: /posts/:slug/
 
 # Defaults
 defaults:

@@ -5,6 +5,7 @@ date: 2025-10-28 20:00:00 +0900
 categories: [Frontend, Performance]
 tags: [검색, Fuse.js, SymSpell, 성능최적화, 클라이언트검색, 서버검색, 아키텍처]
 lang: ko
+slug: "005"
 ---
 
 ## TL;DR

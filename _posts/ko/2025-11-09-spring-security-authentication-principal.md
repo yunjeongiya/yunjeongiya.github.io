@@ -5,6 +5,7 @@ date: 2025-11-09 14:00:00 +0900
 categories: [Spring, Security]
 tags: [spring, spring-security, authentication, refactoring, best-practices]
 lang: ko
+slug: "009"
 ---
 
 ## TL;DR

@@ -5,6 +5,7 @@ date: 2025-09-30 17:30:00 +0900
 categories: [Spring Boot, Jackson]
 tags: [spring-boot, jackson, localdatetime, timezone, serialization]
 lang: ko
+slug: "002"
 ---
 
 

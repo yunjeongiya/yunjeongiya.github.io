@@ -5,6 +5,7 @@ date: 2025-11-09 16:00:00 +0900
 categories: [React, Frontend]
 tags: [react-query, multi-tenancy, caching, axios, cors]
 lang: ko
+slug: "007"
 ---
 
 ## TL;DR

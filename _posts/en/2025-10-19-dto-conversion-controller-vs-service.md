@@ -5,6 +5,7 @@ date: 2025-10-19 14:00:00 +0900
 categories: [Spring Boot, Architecture]
 tags: [spring-boot, dto, controller, service, architecture, clean-code, martin-fowler, best-practices]
 lang: en
+slug: "003-en"
 ---
 
 ## TL;DR

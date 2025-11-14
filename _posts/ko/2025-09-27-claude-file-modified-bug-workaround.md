@@ -5,6 +5,7 @@ date: 2025-09-27 10:00:00 +0900
 categories: [Claude, DevTools]
 tags: [claude, claude-code, bug, workaround, file-editing, debugging]
 lang: ko
+slug: "001"
 ---
 
 갑자기 Claude에서 **File has been unexpectedly modified** 에러가 계속 나온다면, 당신이 미친 게 아닙니다 (뭐, 이 버그 때문에 약간은 그럴 수도 있지만요). 최근 몇 주 사이에 많은 개발자들이 겪고 있는 버그예요.

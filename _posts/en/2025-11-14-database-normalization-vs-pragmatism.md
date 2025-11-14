@@ -5,10 +5,11 @@ date: 2025-11-14 14:30:00 +0900
 categories: [Backend, Database]
 tags: [database, normalization, pragmatism, yagni, tradeoffs, architecture, mysql]
 lang: en
+slug: "011-en"
 image: /assets/images/posts/database-normalization-vs-pragmatism.jpg
 ---
 
-![Database Normalization vs Pragmatism](/assets/images/posts/database-normalization-vs-pragmatism.jpg)
+<img src="/assets/images/posts/database-normalization-vs-pragmatism.jpg" alt="Database Normalization vs Pragmatism" style="max-width: 600px; width: 100%; height: auto;">
 
 ## 📋 Introduction
 

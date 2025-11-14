@@ -5,6 +5,7 @@ date: 2025-11-09 17:00:00 +0900
 categories: [Frontend, Debug]
 tags: [javascript, css, scroll, coordinates, debugging]
 lang: en
+slug: "006-en"
 ---
 
 ## TL;DR

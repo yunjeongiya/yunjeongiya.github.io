@@ -5,6 +5,7 @@ date: 2025-11-09 15:00:00 +0900
 categories: [Spring, AOP]
 tags: [spring, aop, logging, security, performance]
 lang: ko
+slug: "008"
 ---
 
 ## TL;DR

@@ -5,6 +5,7 @@ date: 2025-10-26 14:30:00 +0900
 categories: [Frontend, React]
 tags: [React, UI/UX, TreeStructure, Search, useRef, scrollIntoView, UserExperience]
 lang: en
+slug: "004-en"
 ---
 
 ## TL;DR
