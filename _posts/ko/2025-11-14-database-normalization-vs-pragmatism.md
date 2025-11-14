@@ -1,11 +1,14 @@
 ---
 layout: post
-title: "DB 설계 논쟁: 정규화 vs 실용주의 - 실제 의사결정 과정"
+title: "예쁘게 설계하지 말까? 정규화된 구조가 항상 정답은 아닌 이유"
 date: 2025-11-14 14:30:00 +0900
 categories: [Backend, Database]
 tags: [database, normalization, pragmatism, yagni, tradeoffs, architecture, mysql]
 lang: ko
+image: /assets/images/posts/database-normalization-vs-pragmatism.jpg
 ---
+
+![Database Normalization vs Pragmatism](/assets/images/posts/database-normalization-vs-pragmatism.jpg)
 
 ## 📋 서론
 
