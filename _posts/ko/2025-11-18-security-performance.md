@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "보안과 성능 최적화 - CheckUS 아키텍처 시리즈 (3/5)"
+title: "여러 캠퍼스-여러 역할 JWT 설계와 ThreadLocal 안전성"
 date: 2025-11-18 10:00:00 +0900
 categories: [Architecture, Backend]
 tags: [security, performance, jwt, testing, checkus]

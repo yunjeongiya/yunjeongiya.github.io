@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "다양한 구현 방법 비교 - CheckUS 아키텍처 시리즈 (4/5)"
+title: "Row-Level Security 5가지 구현 방법 비교와 선택 가이드"
 date: 2025-11-19 10:00:00 +0900
 categories: [Architecture, Backend]
 tags: [postgresql, hibernate, api-gateway, comparison, checkus]

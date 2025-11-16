@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "CheckUS 4-Tier 아키텍처 구현 - CheckUS 아키텍처 시리즈 (2/5)"
+title: "멀티테넌시에서 데이터 유출 막는 4-Tier 보안 아키텍처"
 date: 2025-11-17 10:00:00 +0900
 categories: [Architecture, Backend]
 tags: [multi-tenancy, spring-boot, aop, threadlocal, checkus]

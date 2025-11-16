@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "멀티테넌시란 무엇인가? - CheckUS 아키텍처 시리즈 (1/5)"
+title: "하나의 계정, 여러 학원, 다양한 역할: CheckUS 멀티테넌시 아키텍처"
 date: 2025-11-16 10:00:00 +0900
 categories: [Architecture, Backend]
 tags: [multi-tenancy, database, architecture, saas, checkus]

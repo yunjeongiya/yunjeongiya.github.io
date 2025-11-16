@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Legacy Migration Strategy - CheckUS Architecture Series (5/5)"
+title: "Legacy System Multi-Tenancy Migration: Adding campus_id Column Guide"
 date: 2025-11-20 10:00:00 +0900
 categories: [Architecture, Backend]
 tags: [migration, deployment, database, strategy, checkus]

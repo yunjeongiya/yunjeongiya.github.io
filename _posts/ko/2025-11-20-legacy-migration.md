@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "레거시 마이그레이션 전략 - CheckUS 아키텍처 시리즈 (5/5)"
+title: "레거시 시스템 멀티테넌시 전환: campus_id 컬럼 추가 실전 가이드"
 date: 2025-11-20 10:00:00 +0900
 categories: [Architecture, Backend]
 tags: [migration, deployment, database, strategy, checkus]

@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Comparing Implementation Methods - CheckUS Architecture Series (4/5)"
+title: "Comparing 5 Row-Level Security Implementations and Selection Guide"
 date: 2025-11-19 10:00:00 +0900
 categories: [Architecture, Backend]
 tags: [postgresql, hibernate, api-gateway, comparison, checkus]
