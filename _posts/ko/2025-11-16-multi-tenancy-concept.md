@@ -18,6 +18,8 @@ slug: "012"
 
 ---
 
+![CheckUS 멀티테넌시 아키텍처](/assets/images/posts/012-multi-tenancy-architecture.jpg){: width="600"}
+
 ## 시작하며
 
 학원 관리 서비스 CheckUS를 개발하면서 가장 중요하게 고민한 문제 중 하나는 바로 **"여러 학원의 데이터를 어떻게 안전하게 분리할 것인가?"**였습니다.

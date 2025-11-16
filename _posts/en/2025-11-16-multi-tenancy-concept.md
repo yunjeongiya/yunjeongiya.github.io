@@ -20,6 +20,8 @@ slug: "012-en"
 
 ---
 
+![CheckUS Multi-Tenancy Architecture](/assets/images/posts/012-multi-tenancy-architecture.jpg){: width="600"}
+
 ## Introduction
 
 While developing CheckUS, an academy management service, one of the most critical challenges we faced was: **"How do we safely isolate data across multiple academies?"**
