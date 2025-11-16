@@ -6,6 +6,7 @@ categories: [Architecture, Backend]
 tags: [migration, deployment, database, strategy, checkus]
 series: "CheckUS Multi-Tenancy Architecture"
 lang: ko
+slug: "016"
 ---
 
 # 레거시 마이그레이션 전략 - CheckUS 아키텍처 시리즈 (5/5)

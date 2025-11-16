@@ -6,6 +6,7 @@ categories: [Architecture, Backend]
 tags: [multi-tenancy, database, architecture, saas, checkus]
 series: "CheckUS Multi-Tenancy Architecture"
 lang: en
+slug: "012-en"
 ---
 
 # What is Multi-Tenancy? - CheckUS Architecture Series (1/5)

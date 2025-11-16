@@ -6,6 +6,7 @@ categories: [Architecture, Backend]
 tags: [multi-tenancy, database, architecture, saas, checkus]
 series: "CheckUS Multi-Tenancy Architecture"
 lang: ko
+slug: "012"
 ---
 
 > **시리즈 안내**

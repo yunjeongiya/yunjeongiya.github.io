@@ -6,6 +6,7 @@ categories: [Architecture, Backend]
 tags: [security, performance, jwt, testing, checkus]
 series: "CheckUS Multi-Tenancy Architecture"
 lang: ko
+slug: "014"
 ---
 
 # 보안과 성능 최적화 - CheckUS 아키텍처 시리즈 (3/5)

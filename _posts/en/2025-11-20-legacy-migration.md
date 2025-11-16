@@ -6,6 +6,7 @@ categories: [Architecture, Backend]
 tags: [migration, deployment, database, strategy, checkus]
 series: "CheckUS Multi-Tenancy Architecture"
 lang: en
+slug: "016-en"
 ---
 
 # Legacy Migration Strategy - CheckUS Architecture Series (5/5)

@@ -6,6 +6,7 @@ categories: [Architecture, Backend]
 tags: [postgresql, hibernate, api-gateway, comparison, checkus]
 series: "CheckUS Multi-Tenancy Architecture"
 lang: ko
+slug: "015"
 ---
 
 # 다양한 구현 방법 비교 - CheckUS 아키텍처 시리즈 (4/5)

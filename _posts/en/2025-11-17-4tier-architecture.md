@@ -6,6 +6,7 @@ categories: [Architecture, Backend]
 tags: [multi-tenancy, spring-boot, aop, threadlocal, checkus]
 series: "CheckUS Multi-Tenancy Architecture"
 lang: en
+slug: "013-en"
 ---
 
 # CheckUS 4-Tier Architecture Implementation - CheckUS Architecture Series (2/5)
