@@ -9,20 +9,18 @@ lang: en
 slug: "013-en"
 ---
 
-# CheckUS 4-Tier Architecture Implementation - CheckUS Architecture Series (2/5)
-
 > **Series Navigation**
-> - Part 1: Multi-Tenancy Concept
-> - **Part 2: CheckUS 4-Tier Architecture Implementation** ← Current
-> - Part 3: Security and Performance Optimization
-> - Part 4: Comparing Implementation Methods
-> - Part 5: Legacy Migration Strategy
+> - Part 1: One Account, Multiple Schools, Multiple Roles
+> - **Part 2: 4-Tier Security to Prevent Data Leaks in Multi-Tenancy** ← Current
+> - Part 3: Multi-Campus, Multi-Role JWT Design and ThreadLocal Safety
+> - Part 4: Comparing 5 Row-Level Security Implementations and Selection Guide
+> - Part 5: Legacy System Multi-Tenancy Migration
 
 ---
 
 ## Previously
 
-[Part 1](./part1-multi-tenancy-concept.md) explored three multi-tenancy patterns (Database-per-Tenant, Schema-per-Tenant, Row-Level Security) and why CheckUS chose Row-Level Security for cross-campus support.
+[Part 1](/posts/012-en/) explored three multi-tenancy patterns (Database-per-Tenant, Schema-per-Tenant, Row-Level Security) and why CheckUS chose Row-Level Security for cross-campus support.
 
 However, the biggest challenge with Row-Level Security was: **"What if developers accidentally forget to add filters?"**
 
@@ -659,7 +657,7 @@ public List<X> getX() {
 
 Part 2 explored how CheckUS's 4-Tier architecture is implemented, examining each layer's role and code in detail.
 
-**Part 3: Security and Performance Optimization** will cover:
+**Part 3: Multi-Campus, Multi-Role JWT Design and ThreadLocal Safety** will cover:
 
 - 🔐 JWT Token Design: How to store multiple campus roles?
 - ⚡ ThreadLocal Performance Issues and Solutions
@@ -669,13 +667,13 @@ Part 2 explored how CheckUS's 4-Tier architecture is implemented, examining each
 
 We'll reveal problems encountered in practice and their solutions.
 
-**👉 Continue to [Part 3: Security and Performance Optimization](./part3-security-performance.md)**
+**👉 Continue to [Part 3: Multi-Campus, Multi-Role JWT Design and ThreadLocal Safety](/posts/014-en/)**
 
 ---
 
 **CheckUS Architecture Series**
-- Part 1: Multi-Tenancy Concept
-- Part 2: CheckUS 4-Tier Architecture Implementation ← Current
-- Part 3: Security and Performance Optimization
-- Part 4: Comparing Implementation Methods
-- Part 5: Legacy Migration Strategy
+- Part 1: One Account, Multiple Schools, Multiple Roles
+- Part 2: 4-Tier Security to Prevent Data Leaks in Multi-Tenancy ← Current
+- Part 3: Multi-Campus, Multi-Role JWT Design and ThreadLocal Safety
+- Part 4: Comparing 5 Row-Level Security Implementations and Selection Guide
+- Part 5: Legacy System Multi-Tenancy Migration

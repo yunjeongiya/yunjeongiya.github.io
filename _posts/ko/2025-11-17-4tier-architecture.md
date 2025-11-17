@@ -9,20 +9,18 @@ lang: ko
 slug: "013"
 ---
 
-# CheckUS 4-Tier 아키텍처 구현 - CheckUS 아키텍처 시리즈 (2/5)
-
 > **시리즈 안내**
-> - Part 1: 멀티테넌시 개념
-> - **Part 2: CheckUS 4-Tier 아키텍처 구현** ← 현재 글
-> - Part 3: 보안과 성능 최적화
-> - Part 4: 다양한 구현 방법 비교
-> - Part 5: 레거시 마이그레이션 전략
+> - Part 1: 하나의 계정, 여러 학원, 다양한 역할
+> - **Part 2: 멀티테넌시에서 데이터 유출 막는 4-Tier 보안 아키텍처** ← 현재 글
+> - Part 3: 여러 캠퍼스-여러 역할 JWT 설계와 ThreadLocal 안전성
+> - Part 4: Row-Level Security 5가지 구현 방법 비교와 선택 가이드
+> - Part 5: 레거시 시스템 멀티테넌시 전환
 
 ---
 
 ## 이전 이야기
 
-[Part 1](./part1-multi-tenancy-concept.md)에서는 멀티테넌시의 세 가지 패턴(Database-per-Tenant, Schema-per-Tenant, Row-Level Security)과, CheckUS가 크로스 캠퍼스 지원을 위해 Row-Level Security를 선택한 이유를 살펴봤습니다.
+[Part 1](/posts/012/)에서는 멀티테넌시의 세 가지 패턴(Database-per-Tenant, Schema-per-Tenant, Row-Level Security)과, CheckUS가 크로스 캠퍼스 지원을 위해 Row-Level Security를 선택한 이유를 살펴봤습니다.
 
 하지만 Row-Level Security의 가장 큰 과제는 **"개발자가 실수로 필터링을 누락하면 어떡하지?"**였습니다.
 
@@ -659,7 +657,7 @@ public List<X> getX() {
 
 Part 2에서는 CheckUS의 4-Tier 아키텍처가 어떻게 구현되는지, 각 계층의 역할과 코드를 자세히 살펴봤습니다.
 
-**Part 3: 보안과 성능 최적화**에서는:
+**Part 3: 여러 캠퍼스-여러 역할 JWT 설계와 ThreadLocal 안전성**에서는:
 
 - 🔐 JWT 토큰 설계: 여러 캠퍼스 역할을 어떻게 담을까?
 - ⚡ ThreadLocal 성능 이슈와 해결책
@@ -669,13 +667,13 @@ Part 2에서는 CheckUS의 4-Tier 아키텍처가 어떻게 구현되는지, 각
 
 실전에서 마주한 문제들과 해결 과정을 공개합니다.
 
-**👉 [Part 3: 보안과 성능 최적화](./part3-security-performance.md)에서 계속됩니다.**
+**👉 [Part 3: 여러 캠퍼스-여러 역할 JWT 설계와 ThreadLocal 안전성](/posts/014/)에서 계속됩니다.**
 
 ---
 
 **CheckUS 아키텍처 시리즈**
-- Part 1: 멀티테넌시 개념
-- Part 2: CheckUS 4-Tier 아키텍처 구현 ← 현재 글
-- Part 3: 보안과 성능 최적화
-- Part 4: 다양한 구현 방법 비교
-- Part 5: 레거시 마이그레이션 전략
+- Part 1: 하나의 계정, 여러 학원, 다양한 역할
+- Part 2: 멀티테넌시에서 데이터 유출 막는 4-Tier 보안 아키텍처 ← 현재 글
+- Part 3: 여러 캠퍼스-여러 역할 JWT 설계와 ThreadLocal 안전성
+- Part 4: Row-Level Security 5가지 구현 방법 비교와 선택 가이드
+- Part 5: 레거시 시스템 멀티테넌시 전환
