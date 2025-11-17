@@ -83,6 +83,12 @@ const schedules = await api.get('/schedules', {
 
 ### Solution: Axios Request Interceptor
 
+**User's Perspective: Campus Selection**
+
+![CheckUS Campus Selector](/assets/images/posts/012-campus-selector-ui.jpg){: width="350"}
+
+When users select a campus from the top menu, this information is stored globally and automatically included in all API requests.
+
 ```typescript
 // Frontend - API Client Setup (src/api/axiosInstance.ts)
 

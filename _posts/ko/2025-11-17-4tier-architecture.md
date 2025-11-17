@@ -83,6 +83,12 @@ const schedules = await api.get('/schedules', {
 
 ### 해결책: Axios Request Interceptor
 
+**사용자 시점: 캠퍼스 선택**
+
+![CheckUS 캠퍼스 선택](/assets/images/posts/012-campus-selector-ui.jpg){: width="350"}
+
+사용자가 상단 메뉴에서 캠퍼스를 선택하면, 이 정보가 전역 상태로 저장되고 모든 API 요청에 자동으로 포함됩니다.
+
 ```typescript
 // Frontend - API Client 설정 (src/api/axiosInstance.ts)
 
