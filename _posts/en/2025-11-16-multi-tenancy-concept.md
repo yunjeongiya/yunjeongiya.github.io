@@ -12,11 +12,11 @@ slug: "012-en"
 # What is Multi-Tenancy? - CheckUS Architecture Series (1/5)
 
 > **Series Navigation**
-> - **Part 1: Multi-Tenancy Concept** ← Current
-> - Part 2: CheckUS 4-Tier Architecture Implementation
-> - Part 3: Security and Performance Optimization
-> - Part 4: Comparing Implementation Methods
-> - Part 5: Legacy Migration Strategy
+> - **[Part 1: One Account, Multiple Schools, Multiple Roles](/posts/012-en/)** ← Current
+> - [Part 2: 4-Tier Security to Prevent Data Leaks in Multi-Tenancy](/posts/013-en/)
+> - [Part 3: Multi-Campus, Multi-Role JWT Design and ThreadLocal Safety](/posts/014-en/)
+> - [Part 4: Comparing 5 Row-Level Security Implementations and Selection Guide](/posts/015-en/)
+> - [Part 5: Legacy System Multi-Tenancy Migration](/posts/016-en/)
 
 ---
 
