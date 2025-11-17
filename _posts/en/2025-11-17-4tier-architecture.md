@@ -18,21 +18,23 @@ slug: "013-en"
 
 ---
 
+![CheckUS 4-Tier Security Architecture](/assets/images/posts/013-4tier-security-architecture.png){: width="600"}
+
 ## Previously
 
 [Part 1](/posts/012-en/) explored three multi-tenancy patterns (Database-per-Tenant, Schema-per-Tenant, Row-Level Security) and why CheckUS chose Row-Level Security for cross-campus support.
 
-**Row-Level Security sounds great—until one line of forgotten code leaks every campus's student data.**
+However, the biggest challenge with Row-Level Security was: **"What if developers accidentally forget to add filters?"**
 
 ```java
-// ❌ One simple mistake
+// ❌ Risk: Missing campus_id filter
 @GetMapping("/students")
 public List<Student> getStudents() {
-    return studentRepository.findAll();  // 💥 All 3 campuses exposed!
+    return studentRepository.findAll();  // 💥 Exposes all campus data!
 }
 ```
 
-This article explains how CheckUS built a **4-layer safety net** that prevents developers from breaking tenant isolation, even by mistake.
+This article explores CheckUS's **4-Tier Campus Filtering Architecture** designed to solve this problem.
 
 ---
 
