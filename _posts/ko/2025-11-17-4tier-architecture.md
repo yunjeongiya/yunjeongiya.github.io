@@ -18,21 +18,23 @@ slug: "013"
 
 ---
 
+![CheckUS 4-Tier 보안 아키텍처](/assets/images/posts/013-4tier-security-architecture.png){: width="600"}
+
 ## 이전 이야기
 
 [Part 1](/posts/012/)에서는 멀티테넌시의 세 가지 패턴(Database-per-Tenant, Schema-per-Tenant, Row-Level Security)과, CheckUS가 크로스 캠퍼스 지원을 위해 Row-Level Security를 선택한 이유를 살펴봤습니다.
 
-하지만 Row-Level Security의 가장 큰 과제는 **"개발자가 실수로 필터링을 누락하면 어떡하지?"**였습니다.
+**Row-Level Security는 훌륭한 방식이지만, 단 한 줄의 실수로 모든 캠퍼스 데이터가 유출될 수 있습니다.**
 
 ```java
-// ❌ 위험: campus_id 필터링 누락
+// ❌ 단순한 실수 하나
 @GetMapping("/students")
 public List<Student> getStudents() {
-    return studentRepository.findAll();  // 💥 모든 캠퍼스 데이터 노출!
+    return studentRepository.findAll();  // 💥 3개 캠퍼스 전체 노출!
 }
 ```
 
-이번 글에서는 CheckUS가 이 문제를 해결하기 위해 설계한 **4-Tier Campus Filtering Architecture**를 자세히 살펴봅니다.
+이 글에서는 CheckUS가 개발자 실수로부터 테넌트 격리를 보호하는 **4단계 안전망**을 어떻게 구축했는지 설명합니다.
 
 ---
 
@@ -58,7 +60,7 @@ CheckUS는 프론트엔드부터 데이터베이스까지 **4단계의 보안 �
 
 ---
 
-## Layer 1: Frontend - Axios Interceptor
+## Layer 1: Frontend Axios Interceptor — 휴먼 에러 방지
 
 ### 문제 인식
 
@@ -161,7 +163,7 @@ function StudentList() {
 
 ---
 
-## Layer 2: Backend - HTTP Interceptor
+## Layer 2: Backend HTTP Interceptor — 권한 검증 게이트
 
 ### 역할
 
@@ -292,7 +294,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
 ---
 
-## Layer 3: AOP - @CampusFiltered Annotation
+## Layer 3: AOP @CampusFiltered — 개발 규칙 강제
 
 ### 문제 인식
 
@@ -399,7 +401,7 @@ public class StudentService {
 
 ---
 
-## Layer 4: Repository - Query with Campus Filter
+## Layer 4: Repository Layer — 최종 쿼리 격리
 
 ### JPA Repository 메서드
 
@@ -456,6 +458,10 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 ---
 
 ## 프론트엔드 보호: ESLint 규칙
+
+백엔드가 격리되어 있어도, 프론트엔드에서 요청 Body에 `campusId`를 보내면 아키텍처가 깨질 수 있습니다.
+
+팀 전체가 규칙을 지키도록, CheckUS는 커스텀 ESLint 규칙을 도입했습니다.
 
 ### 문제 인식
 
@@ -650,6 +656,24 @@ public List<X> getX() {
 
 - ✅ Axios Interceptor + ESLint로 프론트엔드도 보호
 - ✅ 팀 전체가 동일한 아키텍처 규칙 준수
+
+---
+
+## 요약: 왜 4개 계층이 필요한가?
+
+| 계층 | 막는 실수 |
+|------|----------|
+| **Layer 1: Axios Interceptor** | 개발자가 `X-Campus-Id` 헤더 추가를 잊을 수 없음 |
+| **Layer 2: HTTP Interceptor** | 백엔드가 위조되거나 권한 없는 `campusId`를 받아들일 수 없음 |
+| **Layer 3: AOP** | 개발자가 캠퍼스 필터링 로직을 건너뛸 수 없음 |
+| **Layer 4: Repository** | 쿼리가 실수로 다른 캠퍼스 데이터를 조회할 수 없음 |
+
+**4개 계층이 모두 작동해야만** 완벽한 데이터 격리가 보장됩니다.
+
+- Layer 1만 있으면? → 악의적인 클라이언트가 헤더를 위조 가능
+- Layer 2까지만? → 개발자 실수로 ThreadLocal 무시 가능
+- Layer 3까지만? → 네이티브 쿼리에서 필터링 누락 가능
+- **Layer 4까지** → ✅ 완벽한 격리 보장
 
 ---
 

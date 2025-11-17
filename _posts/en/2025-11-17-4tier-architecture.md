@@ -22,17 +22,17 @@ slug: "013-en"
 
 [Part 1](/posts/012-en/) explored three multi-tenancy patterns (Database-per-Tenant, Schema-per-Tenant, Row-Level Security) and why CheckUS chose Row-Level Security for cross-campus support.
 
-However, the biggest challenge with Row-Level Security was: **"What if developers accidentally forget to add filters?"**
+**Row-Level Security sounds great—until one line of forgotten code leaks every campus's student data.**
 
 ```java
-// ❌ Risk: Missing campus_id filter
+// ❌ One simple mistake
 @GetMapping("/students")
 public List<Student> getStudents() {
-    return studentRepository.findAll();  // 💥 Exposes all campus data!
+    return studentRepository.findAll();  // 💥 All 3 campuses exposed!
 }
 ```
 
-This article explores CheckUS's **4-Tier Campus Filtering Architecture** designed to solve this problem.
+This article explains how CheckUS built a **4-layer safety net** that prevents developers from breaking tenant isolation, even by mistake.
 
 ---
 
@@ -58,7 +58,7 @@ Each layer operates independently, and data can only be accessed after **passing
 
 ---
 
-## Layer 1: Frontend - Axios Interceptor
+## Layer 1: Frontend Axios Interceptor — Preventing Human Error
 
 ### Problem Recognition
 
@@ -161,7 +161,7 @@ function StudentList() {
 
 ---
 
-## Layer 2: Backend - HTTP Interceptor
+## Layer 2: Backend HTTP Interceptor — Authorization Gate
 
 ### Role
 
@@ -292,7 +292,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
 ---
 
-## Layer 3: AOP - @CampusFiltered Annotation
+## Layer 3: AOP @CampusFiltered — Enforcing Developer Discipline
 
 ### Problem Recognition
 
@@ -399,7 +399,7 @@ public class StudentService {
 
 ---
 
-## Layer 4: Repository - Query with Campus Filter
+## Layer 4: Repository Layer — Final Query Isolation
 
 ### JPA Repository Methods
 
@@ -456,6 +456,10 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 ---
 
 ## Frontend Protection: ESLint Rules
+
+Even with backend isolation, the frontend could still break the architecture by sending `campusId` in the request body.
+
+To enforce the contract across teams, CheckUS introduced a custom ESLint rule.
 
 ### Problem Recognition
 
@@ -650,6 +654,21 @@ public List<X> getX() {
 
 - ✅ Axios Interceptor + ESLint protects frontend too
 - ✅ Entire team follows the same architecture rules
+
+---
+
+## Summary: Why 4 Layers Instead of Just One?
+
+Each layer provides a specific guarantee:
+
+| Layer | What It Prevents |
+|-------|-----------------|
+| **Layer 1: Axios Interceptor** | Developers cannot forget to add `X-Campus-Id` header |
+| **Layer 2: HTTP Interceptor** | Backend cannot accept forged or unauthorized `campusId` |
+| **Layer 3: AOP** | Developers cannot skip campus filtering logic |
+| **Layer 4: Repository** | Queries cannot accidentally fetch cross-campus data |
+
+**The result?** Even if a developer makes a mistake in one layer, the others catch it before data leaks.
 
 ---
 
