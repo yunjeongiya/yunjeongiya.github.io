@@ -9,6 +9,8 @@ lang: ko
 slug: "014"
 ---
 
+![CheckUS JWT 설계와 ThreadLocal 보안](/assets/images/posts/014-jwt-threadlocal-security.png){: width="600"}
+
 > **시리즈 안내**
 > - [Part 1: 하나의 계정, 여러 학원, 다양한 역할](/posts/012/)
 > - [Part 2: 멀티테넌시에서 데이터 유출 막는 4-Tier 보안 아키텍처](/posts/013/)

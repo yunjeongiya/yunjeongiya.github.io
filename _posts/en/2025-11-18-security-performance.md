@@ -9,6 +9,8 @@ lang: en
 slug: "014-en"
 ---
 
+![CheckUS JWT Design and ThreadLocal Security](/assets/images/posts/014-jwt-threadlocal-security.png){: width="600"}
+
 > **Series Navigation**
 > - [Part 1: One Account, Multiple Schools, Multiple Roles](/posts/012-en/)
 > - [Part 2: 4-Tier Security to Prevent Data Leaks in Multi-Tenancy](/posts/013-en/)
