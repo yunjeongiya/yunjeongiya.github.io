@@ -9,8 +9,6 @@ lang: ko
 slug: "014"
 ---
 
-# 보안과 성능 최적화 - CheckUS 아키텍처 시리즈 (3/5)
-
 > **시리즈 안내**
 > - [Part 1: 하나의 계정, 여러 학원, 다양한 역할](/posts/012/)
 > - [Part 2: 멀티테넌시에서 데이터 유출 막는 4-Tier 보안 아키텍처](/posts/013/)
@@ -22,7 +20,7 @@ slug: "014"
 
 ## 이전 이야기
 
-[Part 2](./part2-4tier-architecture.md)에서는 CheckUS의 4-Tier 아키텍처 구현을 살펴봤습니다. 프론트엔드 Axios Interceptor부터 백엔드 AOP까지, 4단계 보안 체크가 어떻게 작동하는지 이해했습니다.
+[Part 2](/posts/013/)에서는 CheckUS의 4-Tier 아키텍처 구현을 살펴봤습니다. 프론트엔드 Axios Interceptor부터 백엔드 AOP까지, 4단계 보안 체크가 어떻게 작동하는지 이해했습니다.
 
 이번 글에서는 이 아키텍처를 **실전 환경에 적용하면서 마주한 보안과 성능 이슈**, 그리고 그 해결 과정을 공유합니다.
 
@@ -670,13 +668,13 @@ Part 3에서는 JWT 토큰 설계, ThreadLocal 안전성, 통합 테스트, 모�
 
 CheckUS의 방식과 다른 업계 구현 방법들을 객관적으로 비교합니다.
 
-**👉 [Part 4: 다양한 구현 방법 비교](./part4-implementation-comparison.md)에서 계속됩니다.**
+**👉 [Part 4: Row-Level Security 5가지 구현 방법 비교와 선택 가이드](/posts/015/)에서 계속됩니다.**
 
 ---
 
 **CheckUS 아키텍처 시리즈**
-- Part 1: 멀티테넌시 개념
-- Part 2: CheckUS 4-Tier 아키텍처 구현
-- Part 3: 보안과 성능 최적화 ← 현재 글
-- Part 4: 다양한 구현 방법 비교
-- Part 5: 레거시 마이그레이션 전략
+- Part 1: 하나의 계정, 여러 학원, 다양한 역할
+- Part 2: 멀티테넌시에서 데이터 유출 막는 4-Tier 보안 아키텍처
+- Part 3: 여러 캠퍼스-여러 역할 JWT 설계와 ThreadLocal 안전성 ← 현재 글
+- Part 4: Row-Level Security 5가지 구현 방법 비교와 선택 가이드
+- Part 5: 레거시 시스템 멀티테넌시 전환

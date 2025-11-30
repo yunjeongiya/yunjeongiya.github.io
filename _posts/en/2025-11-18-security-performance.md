@@ -9,8 +9,6 @@ lang: en
 slug: "014-en"
 ---
 
-# Security and Performance Optimization - CheckUS Architecture Series (3/5)
-
 > **Series Navigation**
 > - [Part 1: One Account, Multiple Schools, Multiple Roles](/posts/012-en/)
 > - [Part 2: 4-Tier Security to Prevent Data Leaks in Multi-Tenancy](/posts/013-en/)
@@ -22,7 +20,7 @@ slug: "014-en"
 
 ## Previously
 
-[Part 2](./part2-4tier-architecture.md) examined CheckUS's 4-Tier architecture implementation. We understood how the 4-layer security check works from frontend Axios Interceptor to backend AOP.
+[Part 2](/posts/013-en/) examined CheckUS's 4-Tier architecture implementation. We understood how the 4-layer security check works from frontend Axios Interceptor to backend AOP.
 
 This article shares the **security and performance issues encountered when applying this architecture in production**, and how we solved them.
 
@@ -670,13 +668,13 @@ Part 3 explored security and performance optimization strategies including JWT t
 
 We'll objectively compare CheckUS's approach with other industry implementation methods.
 
-**👉 Continue to [Part 4: Comparing Implementation Methods](./part4-implementation-comparison.md)**
+**👉 Continue to [Part 4: Comparing 5 Row-Level Security Implementations and Selection Guide](/posts/015-en/)**
 
 ---
 
 **CheckUS Architecture Series**
-- Part 1: Multi-Tenancy Concept
-- Part 2: CheckUS 4-Tier Architecture Implementation
-- Part 3: Security and Performance Optimization ← Current
-- Part 4: Comparing Implementation Methods
-- Part 5: Legacy Migration Strategy
+- Part 1: One Account, Multiple Schools, Multiple Roles
+- Part 2: 4-Tier Security to Prevent Data Leaks in Multi-Tenancy
+- Part 3: Multi-Campus, Multi-Role JWT Design and ThreadLocal Safety ← Current
+- Part 4: Comparing 5 Row-Level Security Implementations and Selection Guide
+- Part 5: Legacy System Multi-Tenancy Migration
