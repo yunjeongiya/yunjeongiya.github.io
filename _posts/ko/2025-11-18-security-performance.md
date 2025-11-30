@@ -15,8 +15,8 @@ slug: "014"
 > - [Part 1: 하나의 계정, 여러 학원, 다양한 역할](/posts/012/)
 > - [Part 2: 멀티테넌시에서 데이터 유출 막는 4-Tier 보안 아키텍처](/posts/013/)
 > - **[Part 3: 여러 캠퍼스-여러 역할 JWT 설계와 ThreadLocal 안전성](/posts/014/)** ← 현재 글
-> - [Part 4: Row-Level Security 5가지 구현 방법 비교와 선택 가이드](/posts/015/)
-> - [Part 5: 레거시 시스템 멀티테넌시 전환](/posts/016/)
+> - Part 4: Row-Level Security 5가지 구현 방법 비교와 선택 가이드 (준비 중)
+> - Part 5: 레거시 시스템 멀티테넌시 전환 (준비 중)
 
 ---
 
@@ -670,7 +670,7 @@ Part 3에서는 JWT 토큰 설계, ThreadLocal 안전성, 통합 테스트, 모�
 
 CheckUS의 방식과 다른 업계 구현 방법들을 객관적으로 비교합니다.
 
-**👉 [Part 4: Row-Level Security 5가지 구현 방법 비교와 선택 가이드](/posts/015/)에서 계속됩니다.**
+**👉 Part 4: Row-Level Security 5가지 구현 방법 비교와 선택 가이드에서 계속됩니다. (준비 중)**
 
 ---
 
