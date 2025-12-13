@@ -13,7 +13,7 @@ slug: "013-en"
 > - [Part 1: One Account, Multiple Schools, Multiple Roles](/posts/012-en/)
 > - **[Part 2: 4-Tier Security to Prevent Data Leaks in Multi-Tenancy](/posts/013-en/)** ← Current
 > - [Part 3: Multi-Campus, Multi-Role JWT Design and ThreadLocal Safety](/posts/014-en/)
-> - Part 4: Comparing 5 Row-Level Security Implementations and Selection Guide (Coming Soon)
+> - [Part 4: Comparing 5 Row-Level Security Implementations and Selection Guide](/posts/015-en/)
 > - Part 5: Legacy System Multi-Tenancy Migration (Coming Soon)
 
 ---

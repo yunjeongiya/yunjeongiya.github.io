@@ -9,20 +9,18 @@ lang: en
 slug: "015-en"
 ---
 
-# Comparing Implementation Methods - CheckUS Architecture Series (4/5)
-
 > **Series Navigation**
 > - [Part 1: One Account, Multiple Schools, Multiple Roles](/posts/012-en/)
 > - [Part 2: 4-Tier Security to Prevent Data Leaks in Multi-Tenancy](/posts/013-en/)
 > - [Part 3: Multi-Campus, Multi-Role JWT Design and ThreadLocal Safety](/posts/014-en/)
 > - **[Part 4: Comparing 5 Row-Level Security Implementations and Selection Guide](/posts/015-en/)** ← Current
-> - [Part 5: Legacy System Multi-Tenancy Migration](/posts/016-en/)
+> - Part 5: Legacy System Multi-Tenancy Migration (Coming Soon)
 
 ---
 
 ## Previously
 
-[Part 3](./part3-security-performance.md) covered JWT token design, ThreadLocal safety, integration testing strategies, and real edge cases.
+[Part 3](/posts/014-en/) covered JWT token design, ThreadLocal safety, integration testing strategies, and real edge cases.
 
 This article **objectively compares** CheckUS's 4-Tier AOP approach with other industry implementation methods. Not claiming "CheckUS's way is the best!", but analyzing the **pros, cons, and suitable situations** for each approach.
 
@@ -568,7 +566,7 @@ Part 4 objectively compared various Row-Level Security implementation methods. W
 
 How to apply multi-tenancy to already running systems? We'll reveal practical migration guides.
 
-**👉 Continue to [Part 5: Legacy Migration Strategy](./part5-legacy-migration.md)**
+**👉 Continue to Part 5: Legacy System Multi-Tenancy Migration (Coming Soon)**
 
 ---
 
@@ -590,8 +588,8 @@ How to apply multi-tenancy to already running systems? We'll reveal practical mi
 ---
 
 **CheckUS Architecture Series**
-- Part 1: Multi-Tenancy Concept
-- Part 2: CheckUS 4-Tier Architecture Implementation
-- Part 3: Security and Performance Optimization
-- Part 4: Comparing Implementation Methods ← Current
-- Part 5: Legacy Migration Strategy
+- Part 1: One Account, Multiple Schools, Multiple Roles
+- Part 2: 4-Tier Security to Prevent Data Leaks in Multi-Tenancy
+- Part 3: Multi-Campus, Multi-Role JWT Design and ThreadLocal Safety
+- Part 4: Comparing 5 Row-Level Security Implementations and Selection Guide ← Current
+- Part 5: Legacy System Multi-Tenancy Migration (Coming Soon)
