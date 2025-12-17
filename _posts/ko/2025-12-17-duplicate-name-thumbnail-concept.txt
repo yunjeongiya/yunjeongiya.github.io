@@ -1,0 +1,20 @@
+Thumbnail Concept for Duplicate Name Handling Post:
+
+Visual Design:
+- Clean, minimal design with three name cards
+- Each card shows "김민준" with automatic suffixes A, B, C
+- Arrow showing the automatic progression
+- Light background with subtle gradient
+
+Color Scheme:
+- Primary: CheckUS blue (#2196F3)
+- Cards: White with shadow
+- Text: Dark gray for names, blue for suffixes
+- Background: Light gray to white gradient
+
+Layout:
+[김민준] → [김민준 A] [김민준 B] [김민준 C]
+         ↑
+    "자동 생성"
+
+Message: Shows the automatic nature of the suffix generation system
