@@ -16,30 +16,38 @@ layout: default
       {% for post in filtered_posts %}
         <li>
           <a href="{{ post.url | relative_url }}" style="text-decoration: none;">
-            <div class="post-list-item">
-              <div class="post-list-title">{{ post.title | escape }}</div>
-              <div class="post-list-meta">
-                {{ post.date | date: "%Y-%m-%d" }}
-                {% if post.categories.size > 0 %}
-                  • {{ post.categories | join: ", " }}
-                {% endif %}
-                {% if page_lang == 'ko' %}
-                  {% assign alt_post = site.posts | where: "lang", "en" | where: "date", post.date | first %}
-                  {% if alt_post %}
-                    • <span style="color: var(--string);">🌐 English available</span>
-                  {% endif %}
-                {% else %}
-                  {% assign alt_post = site.posts | where: "lang", "ko" | where: "date", post.date | first %}
-                  {% if alt_post %}
-                    • <span style="color: var(--string);">🌐 한국어 available</span>
-                  {% endif %}
-                {% endif %}
-              </div>
-              {% if post.excerpt %}
-              <div style="color: var(--text-secondary); font-size: 13px; margin-top: 8px; line-height: 1.6;">
-                {{ post.excerpt | strip_html | truncatewords: 30 }}
+            <div class="post-list-item" style="display: flex; gap: 20px; align-items: flex-start;">
+              {% if post.thumbnail %}
+              <div class="post-thumbnail" style="flex-shrink: 0;">
+                <img src="{{ post.thumbnail }}" alt="{{ post.title | escape }}"
+                     style="width: 120px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-color);">
               </div>
               {% endif %}
+              <div style="flex: 1;">
+                <div class="post-list-title">{{ post.title | escape }}</div>
+                <div class="post-list-meta">
+                  {{ post.date | date: "%Y-%m-%d" }}
+                  {% if post.categories.size > 0 %}
+                    • {{ post.categories | join: ", " }}
+                  {% endif %}
+                  {% if page_lang == 'ko' %}
+                    {% assign alt_post = site.posts | where: "lang", "en" | where: "date", post.date | first %}
+                    {% if alt_post %}
+                      • <span style="color: var(--string);">🌐 English available</span>
+                    {% endif %}
+                  {% else %}
+                    {% assign alt_post = site.posts | where: "lang", "ko" | where: "date", post.date | first %}
+                    {% if alt_post %}
+                      • <span style="color: var(--string);">🌐 한국어 available</span>
+                    {% endif %}
+                  {% endif %}
+                </div>
+                {% if post.excerpt %}
+                <div style="color: var(--text-secondary); font-size: 13px; margin-top: 8px; line-height: 1.6;">
+                  {{ post.excerpt | strip_html | truncatewords: 30 }}
+                </div>
+                {% endif %}
+              </div>
             </div>
           </a>
         </li>

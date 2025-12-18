@@ -6,6 +6,7 @@ categories: [Backend, System Design]
 tags: [duplicate-handling, automation, checkus, naming-system, ux]
 lang: ko
 slug: "019"
+thumbnail: /assets/images/posts/019-duplicate-name-system.png
 ---
 
 ![동명이인 자동 구분 시스템](/assets/images/posts/019-duplicate-name-system.png)
