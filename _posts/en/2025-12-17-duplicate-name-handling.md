@@ -6,7 +6,7 @@ categories: [Backend, System Design]
 tags: [duplicate-handling, automation, checkus, naming-system, ux]
 lang: en
 slug: "019-en"
-image: /assets/images/posts/019-duplicate-name-system.svg
+image: /assets/images/posts/019-duplicate-name-system.png
 ---
 
 ## TL;DR
