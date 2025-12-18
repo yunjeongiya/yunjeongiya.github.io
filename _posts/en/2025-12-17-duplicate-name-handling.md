@@ -6,8 +6,9 @@ categories: [Backend, System Design]
 tags: [duplicate-handling, automation, checkus, naming-system, ux]
 lang: en
 slug: "019-en"
-image: /assets/images/posts/019-duplicate-name-system.png
 ---
+
+![Automatic Duplicate Name System](/assets/images/posts/019-duplicate-name-system.png)
 
 ## TL;DR
 Solved the tedious manual process of distinguishing students with identical names in academies using an automatic suffix generation system. When there are 3 students named John Smith, they automatically become A, B, and C.
