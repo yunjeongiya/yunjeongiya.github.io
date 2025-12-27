@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Student+Guardian Creation: From 2-step to 1-step API"
+title: "Student+Guardian Registration: Why We Built a New 1-step API Instead of Combining Existing APIs in Frontend"
 date: 2025-12-27 10:00:00 +0900
 categories: [Backend, API Design]
 tags: [api-design, transaction, atomic-operation, refactoring, checkus]
@@ -12,41 +12,62 @@ thumbnail: /assets/images/posts/020-1step-api-design-en.png
 ![1-step vs 2-step API Design](/assets/images/posts/020-1step-api-design-en.png){: width="600"}
 
 ## TL;DR
-Redesigned a 2-step API that created students and guardians separately into a 1-step API wrapped in a single transaction. No partial failures, 57% less code, network requests reduced from 5→1.
+Instead of combining existing APIs in the frontend to create students and guardians separately, we built a new 1-step API that represents a single business operation. The decision criteria wasn't about "number of steps" but about business boundaries and transaction responsibility.
 
 ---
 
-## The Original 2-step API
+## Background: We Had APIs, But There Were Problems
 
-In our academy system, registering a new student requires creating guardian accounts too. Initially, we implemented it like this:
+CheckUS already had these APIs:
+- Student creation API
+- Guardian account creation API
+- Student-guardian connection API
+
+We could implement "student+guardian registration" by calling these APIs sequentially from the frontend:
 
 ```javascript
-// Step 1: Create student
-const student = await createStudent({ name: "John Smith", ... });
-
-// Step 2: Create and connect guardians
+const student = await createStudent(...)
 for (const guardian of guardians) {
-  const guardianAccount = await registerGuardian({ ... });
-  await connectGuardianToStudent(student.id, guardianAccount.id);
+  const account = await registerGuardian(...)
+  await connectGuardianToStudent(student.id, account.id)
 }
 ```
 
-It looked logically clean. Create student, create guardian, connect them. Each has a clear role.
+Initially, it seemed reasonable. Each API had a clear role and was reusable.
+
+But problems emerged in production.
 
 ---
 
-## Problems in Production
+## Problem 1: Frontend Has No Transactions
 
-### 1. Network Error = Orphan Accounts
+Combining multiple APIs in the frontend looks like one operation, but it's actually multiple independent network requests.
 
 ```
 ✅ Student creation successful
 ❌ Guardian 1 creation failed (network error)
 ```
 
-Result: A student account without guardians remains in the DB. Manual cleanup required.
+In this case:
+- Student is created
+- Some guardians are missing
+- Connection state is incomplete
 
-### 2. Partial Failure Hell
+There's no way to automatically rollback this state.
+
+The result:
+- Orphaned data
+- Manual cleanup required
+- Complex branching logic in frontend
+
+---
+
+## Problem 2: Failure Responsibility Moves to Frontend
+
+When combining APIs in the frontend, the frontend needs to know:
+- How far it succeeded
+- Which step failed
+- What to retry first
 
 ```javascript
 try {
@@ -60,172 +81,125 @@ try {
       results.success.push(guardian);
     } catch (error) {
       results.failed.push({ guardian, error });
-      // Rollback only failed guardian? Rollback everything? 🤔
+      // Partial failure handling logic goes into frontend
     }
   }
-
-  if (results.failed.length > 0) {
-    // How to handle partial success?
-    // Keep successful ones? Cancel everything?
-  }
+  // Complex state management...
 } catch (error) {
-  // Student creation failed
+  // Total failure handling...
 }
 ```
 
-Code becomes complex, UX becomes ambiguous.
-
-### 3. Slow Performance
-
-For registering 2 guardians:
-- 5 API calls (1 student + 2 guardian registrations + 2 connections)
-- At 100ms each, minimum 500ms
-- Actually slower (sequential processing)
+Business state management responsibility leaks to the frontend. This isn't a UI logic problem—it's domain logic placed in the wrong location.
 
 ---
 
-## Redesigned as 1-step API
+## Problem 3: "Partial Success" Was Meaningless
 
-All operations in one transaction:
+This was the key point.
+
+In CheckUS, "new student registration":
+- Is meaningless with just a student created
+- Requires guardian accounts to start operations
+
+This operation should have been All or Nothing from the beginning. The design allowing partial success didn't match domain requirements.
+
+---
+
+## Our Solution: Build a New 1-step API
+
+We kept existing APIs and added one more API that represents the business unit:
 
 ```java
 @Transactional
 public StudentWithGuardiansResponse createStudentWithGuardians(Request request) {
-    // 1. Create student account
     User student = createStudentUser(request.getStudent());
 
-    // 2. Create & connect guardian accounts
-    List<Guardian> guardians = new ArrayList<>();
+    List<User> guardians = new ArrayList<>();
     for (GuardianInfo info : request.getGuardians()) {
         User guardian = createGuardianUser(info);
         connectGuardian(student, guardian);
         guardians.add(guardian);
     }
 
-    // 3. Return everything at once
     return new Response(student, guardians);
-
-    // Any error anywhere → automatic full rollback
 }
 ```
 
----
-
-## Improvements
-
-### Before (2-step)
-```javascript
-// Frontend code: 110 lines
-const student = await studentApi.createStudent(request);
-for (const guardian of data.guardians) {
-  const registerResponse = await authService.registerGuardian(...);
-  await studentGuardianApi.connectGuardianToStudent(...);
-  // Complex error handling...
-}
-```
-
-### After (1-step)
-```javascript
-// Frontend code: 47 lines (57% reduction)
-const response = await studentWithGuardiansApi.createStudentWithGuardians(request);
-// Done. Only success or failure exists
-```
-
-### Improvements in Numbers
-
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| API calls | 5 | 1 | 80% ⬇️ |
-| Frontend code | 110 lines | 47 lines | 57% ⬇️ |
-| Error cases | 5 | 1 | 80% ⬇️ |
-| Transaction guarantee | ❌ | ✅ | 100% |
+The key points:
+- Multiple operations internally
+- Appears as one atomic operation externally
+- Everything rolls back on failure
 
 ---
 
-## Implementation Considerations
+## "Were the Existing APIs Wrong?"
 
-### 1. API Path Naming
+No.
 
-```
-❌ POST /students + guardians in body
-   → Not RESTful
+Existing APIs:
+- Are still valid as independent operations
+- Can be used in other screens or flows
 
-❌ POST /registrations
-   → Too generic, unclear intent
-
-✅ POST /students/with-guardians
-   → Clear intent, maintains RESTful design
-```
-
-### 2. Response Structure
-
-```json
-{
-  "student": {
-    "id": 1234,
-    "username": "student_01012345678",
-    "temporaryPassword": "Temp1234!@"  // Temporary password for teacher to share
-  },
-  "guardians": [{
-    "id": 5678,
-    "username": "guardian_01087654321",
-    "relationship": "mother"
-  }],
-  "credentials": {  // Grouped for security management
-    "student": { "username": "...", "password": "..." },
-    "guardians": [{ "username": "...", "password": "..." }]
-  }
-}
-```
-
-### 3. Duplicate Check Timing
-
-All duplicate checks within the transaction:
-1. Student username duplicate check
-2. Student phone number duplicate check
-3. Each guardian username duplicate check
-4. Each guardian phone number duplicate check
-
-Any duplicate → full rollback.
+The problem was combining existing APIs in the frontend to use them like a single business operation.
 
 ---
 
-## Lessons Learned
+## 2-step vs "Completely Separate Flows" Are Different
 
-### 1. APIs from User Perspective
+The 2-step we're discussing doesn't mean business-separated workflows.
 
-Developer perspective:
-- "Create student" and "create guardian" are separate operations
-- Clean to separate into different APIs
+For example:
+```
+Student registration
+    ↓ (days later)
+Guardian invitation
+```
 
-User perspective:
-- "Register new student" is one operation
-- Partial success is meaningless
+This is:
+- Different timing
+- Different user actions
+- Each step independently meaningful
 
-**User perspective is the right answer.**
+API separation is natural in this case.
 
-### 2. Transaction Boundary = API Boundary
+But if it's executed with the same button on the same screen, it's one business operation.
 
-One business operation = One transaction = One API
+---
 
-Following this principle:
-- No partial failure worries
-- No complex rollback logic needed
-- Simple frontend code
+## Decision Criteria
 
-### 3. Minimize Network Calls
+When deciding whether to split or combine APIs, this one question clarifies it:
 
-Reducing 5→1:
-- Noticeable response time improvement
-- Reduced network error probability
-- Especially important for mobile environments
+**When this operation fails, do you want to keep the partially successful results for the user?**
+
+- Yes → Separate APIs / Frontend combination possible
+- No → Server should handle with 1-step API
+
+---
+
+## Improvements in Numbers
+
+| Metric | Before (Frontend Combination) | After (1-step API) |
+|--------|-------------------------------|-------------------|
+| API calls | 5 | 1 |
+| Frontend code | 110 lines | 47 lines |
+| Error cases | 5 | 1 |
+| Transaction guarantee | ❌ | ✅ |
+| Partial failure handling | Frontend responsibility | None (All or Nothing) |
 
 ---
 
 ## Conclusion
 
-2-step APIs aren't always bad. If operations are truly independent, separation makes sense.
+The problem wasn't "2-step vs 1-step." The problem was where to draw business boundaries.
 
-But for operations like "student+guardian registration" that form **one business operation**, 1-step API is the answer.
+- One user action
+- One business meaning
+- One success/failure
 
-Simple All or Nothing beats complex partial failure handling.
+If these conditions are met, it's better to create a new API representing that operation rather than combining existing APIs.
+
+If an API represents a single business operation, even if its internal implementation is divided into multiple domain operations, it's preferable to expose it as one atomic endpoint externally.
+
+Frontend should be closer to consuming results rather than orchestration.

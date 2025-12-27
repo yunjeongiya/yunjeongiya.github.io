@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "학생+학부모 동시 생성, 2-step에서 1-step API로"
+title: "학생+학부모 등록: 왜 기존 API를 프론트에서 조합하지 않고 1-step API를 새로 만들었는가"
 date: 2025-12-27 10:00:00 +0900
 categories: [Backend, API Design]
 tags: [api-design, transaction, atomic-operation, refactoring, checkus]
@@ -12,41 +12,62 @@ thumbnail: /assets/images/posts/020-1step-api-design-ko.png
 ![1-step vs 2-step API 디자인](/assets/images/posts/020-1step-api-design-ko.png){: width="600"}
 
 ## TL;DR
-학생과 학부모를 각각 생성하던 2-step API를 하나의 트랜잭션으로 묶은 1-step API로 재설계했다. 부분 실패 없고, 코드 57% 줄고, 네트워크 요청 5회→1회로 줄었다.
+학생과 학부모를 각각 생성하던 기존 API를 프론트에서 조합하는 대신, 하나의 비즈니스 작업을 표현하는 1-step API를 새로 만들었다. 이 선택의 기준은 "step 수"가 아니라 비즈니스 경계와 트랜잭션 책임이었다.
 
 ---
 
-## 처음 만든 2-step API
+## 배경: 이미 API는 있었지만, 문제가 있었다
 
-학원 시스템에서 신규 학생 등록은 학부모 계정도 함께 만들어야 한다. 처음엔 이렇게 구현했다:
+CheckUS에는 이미 다음과 같은 API들이 존재했다:
+- 학생 생성 API
+- 학부모 계정 생성 API
+- 학생-학부모 연결 API
+
+이 API들을 프론트엔드에서 순차적으로 호출하면 "학생+학부모 등록" 기능을 구현할 수 있었다:
 
 ```javascript
-// Step 1: 학생 생성
-const student = await createStudent({ name: "김민준", ... });
-
-// Step 2: 학부모 계정 생성하고 연결
+const student = await createStudent(...)
 for (const guardian of guardians) {
-  const guardianAccount = await registerGuardian({ ... });
-  await connectGuardianToStudent(student.id, guardianAccount.id);
+  const account = await registerGuardian(...)
+  await connectGuardianToStudent(student.id, account.id)
 }
 ```
 
-논리적으로 깔끔해 보였다. 학생 생성, 학부모 생성, 연결. 각자 역할이 명확하다.
+처음에는 합리적으로 보였다. 각 API는 역할이 명확했고, 재사용도 가능했다.
+
+하지만 실제 운영에서는 문제가 발생했다.
 
 ---
 
-## 현실에서 터진 문제들
+## 문제 1: 프론트엔드에는 트랜잭션이 없다
 
-### 1. 네트워크 에러 = 고아 계정
+프론트에서 여러 API를 조합하는 방식은 겉보기엔 하나의 작업처럼 보이지만, 실제로는 여러 개의 독립된 네트워크 요청이다.
 
 ```
 ✅ 학생 생성 성공
-❌ 학부모1 생성 실패 (네트워크 에러)
+❌ 학부모1 생성 실패 (네트워크 오류)
 ```
 
-결과: 학부모 없는 학생 계정이 DB에 남는다. 수동으로 삭제해야 한다.
+이 경우:
+- 학생은 생성됨
+- 일부 학부모는 없음
+- 연결 상태는 불완전
 
-### 2. 부분 실패 처리 지옥
+이 상태를 자동으로 되돌릴 방법은 없다.
+
+결국:
+- 고아 데이터가 생기거나
+- 수동 정리가 필요하거나
+- 프론트에서 복잡한 분기 처리가 필요해진다
+
+---
+
+## 문제 2: 실패 책임이 프론트로 이동한다
+
+프론트에서 API를 조합하면, 프론트가 다음을 알아야 한다:
+- 어디까지 성공했는지
+- 어떤 단계에서 실패했는지
+- 재시도 시 무엇부터 해야 하는지
 
 ```javascript
 try {
@@ -60,172 +81,125 @@ try {
       results.success.push(guardian);
     } catch (error) {
       results.failed.push({ guardian, error });
-      // 실패한 학부모만 롤백? 전체 롤백? 🤔
+      // 부분 실패 처리 로직이 프론트엔드에 들어간다
     }
   }
-
-  if (results.failed.length > 0) {
-    // 부분 성공을 어떻게 처리하지?
-    // 성공한 것만 유지? 전체 취소?
-  }
+  // 복잡한 상태 관리...
 } catch (error) {
-  // 학생 생성 실패
+  // 전체 실패 처리...
 }
 ```
 
-코드가 복잡해지고, UX도 애매해진다.
-
-### 3. 느린 속도
-
-학부모 2명 등록 시:
-- API 호출 5회 (학생 1 + 학부모 등록 2 + 연결 2)
-- 각 100ms라면 최소 500ms
-- 실제론 더 느림 (순차 처리)
+즉, 비즈니스 상태 관리 책임이 프론트로 새어나간다. 이건 UI 로직의 문제가 아니라 도메인 로직이 잘못된 위치에 놓인 결과다.
 
 ---
 
-## 1-step API로 재설계
+## 문제 3: "부분 성공"이 의미 없는 작업이었다
 
-모든 작업을 하나의 트랜잭션으로:
+중요한 점은 이거였다.
+
+CheckUS에서 "신규 학생 등록"은:
+- 학생만 생성된 상태로는 의미가 없고
+- 학부모 계정까지 함께 있어야 업무가 시작된다
+
+즉, 이 작업은 처음부터 All or Nothing이어야 했다. 부분 성공을 허용하는 설계 자체가 도메인 요구사항과 맞지 않았다.
+
+---
+
+## 그래서 선택한 방법: 1-step API를 새로 만든다
+
+기존 API를 그대로 두고, 그 위에 비즈니스 단위를 표현하는 API를 하나 더 추가했다:
 
 ```java
 @Transactional
 public StudentWithGuardiansResponse createStudentWithGuardians(Request request) {
-    // 1. 학생 계정 생성
     User student = createStudentUser(request.getStudent());
 
-    // 2. 학부모 계정들 생성 & 연결
-    List<Guardian> guardians = new ArrayList<>();
+    List<User> guardians = new ArrayList<>();
     for (GuardianInfo info : request.getGuardians()) {
         User guardian = createGuardianUser(info);
         connectGuardian(student, guardian);
         guardians.add(guardian);
     }
 
-    // 3. 한 번에 응답
     return new Response(student, guardians);
-
-    // 어디서든 에러 발생 시 → 전체 자동 롤백
 }
 ```
 
----
-
-## 개선 효과
-
-### Before (2-step)
-```javascript
-// 프론트엔드 코드 110줄
-const student = await studentApi.createStudent(request);
-for (const guardian of data.guardians) {
-  const registerResponse = await authService.registerGuardian(...);
-  await studentGuardianApi.connectGuardianToStudent(...);
-  // 복잡한 에러 처리...
-}
-```
-
-### After (1-step)
-```javascript
-// 프론트엔드 코드 47줄 (57% 감소)
-const response = await studentWithGuardiansApi.createStudentWithGuardians(request);
-// 끝. 성공 or 실패만 존재
-```
-
-### 숫자로 보는 개선
-
-| 항목 | Before | After | 개선 |
-|------|--------|-------|------|
-| API 호출 횟수 | 5회 | 1회 | 80% ⬇️ |
-| 프론트 코드 | 110줄 | 47줄 | 57% ⬇️ |
-| 에러 케이스 | 5개 | 1개 | 80% ⬇️ |
-| 트랜잭션 보장 | ❌ | ✅ | 100% |
+핵심은 이거다:
+- 내부적으로는 여러 작업이지만
+- 외부에는 하나의 원자적 작업으로 보인다
+- 실패 시 전부 롤백된다
 
 ---
 
-## 구현 시 고민했던 것들
+## "그럼 기존 API는 잘못 만든 건가?"
 
-### 1. API 경로 네이밍
+아니다.
 
-```
-❌ POST /students + body에 guardians 포함
-   → RESTful하지 않음
+기존 API들은:
+- 독립적인 작업으로는 여전히 유효하고
+- 다른 화면이나 다른 플로우에서는 그대로 쓸 수 있다
 
-❌ POST /registrations
-   → 너무 일반적, 의미 불명확
-
-✅ POST /students/with-guardians
-   → 명확한 의도, RESTful 유지
-```
-
-### 2. 응답 구조
-
-```json
-{
-  "student": {
-    "id": 1234,
-    "username": "student_01012345678",
-    "temporaryPassword": "Temp1234!@"  // 선생님이 전달할 임시 비밀번호
-  },
-  "guardians": [{
-    "id": 5678,
-    "username": "guardian_01087654321",
-    "relationship": "mother"
-  }],
-  "credentials": {  // 한 곳에 모아서 보안 관리
-    "student": { "username": "...", "password": "..." },
-    "guardians": [{ "username": "...", "password": "..." }]
-  }
-}
-```
-
-### 3. 중복 체크 타이밍
-
-트랜잭션 내에서 모든 중복 체크:
-1. 학생 username 중복 체크
-2. 학생 phoneNumber 중복 체크
-3. 각 학부모 username 중복 체크
-4. 각 학부모 phoneNumber 중복 체크
-
-하나라도 중복이면 전체 롤백.
+문제는 기존 API를 프론트에서 조합해 하나의 비즈니스 작업처럼 사용한 것이었다.
 
 ---
 
-## 배운 점
+## 2-step과 "아예 분리된 흐름"은 다르다
 
-### 1. API는 사용자 관점에서
+여기서 말하는 2-step은 비즈니스가 분리된 워크플로우를 의미하지 않는다.
 
-개발자 관점:
-- "학생 생성"과 "학부모 생성"은 별개 작업
-- 각각 API로 분리하는 게 깔끔
+예를 들어:
+```
+학생 등록
+    ↓ (며칠 후)
+학부모 초대
+```
 
-사용자 관점:
-- "신규 학생 등록"은 하나의 작업
-- 부분 성공은 의미 없음
+이건:
+- 다른 시점
+- 다른 사용자 액션
+- 각 단계가 독립적으로 의미 있음
 
-**사용자 관점이 정답이다.**
+이 경우엔 API 분리가 자연스럽다.
 
-### 2. 트랜잭션 경계 = API 경계
-
-하나의 비즈니스 작업 = 하나의 트랜잭션 = 하나의 API
-
-이 원칙을 지키면:
-- 부분 실패 걱정 없음
-- 복잡한 롤백 로직 불필요
-- 프론트엔드 코드 단순
-
-### 3. 네트워크 호출 최소화
-
-5회 → 1회 줄이니:
-- 응답 속도 체감 개선
-- 네트워크 에러 가능성 감소
-- 모바일 환경에서 특히 중요
+반면, 같은 화면에서 같은 버튼으로 실행되는 작업이라면 그건 하나의 비즈니스 작업이다.
 
 ---
 
-## 마치며
+## 판단 기준 정리
 
-2-step API가 항상 나쁜 건 아니다. 독립적인 작업이라면 분리가 맞다.
+API를 나눌지, 합칠지 고민될 때 이 질문 하나로 정리할 수 있다:
 
-하지만 "학생+학부모 등록"처럼 **하나의 비즈니스 작업**이라면, 1-step API가 답이다.
+**이 작업이 실패했을 때, 이미 성공한 일부 결과를 사용자에게 남기고 싶은가?**
 
-복잡한 부분 실패 처리보다, 단순한 All or Nothing이 낫다.
+- Yes → 분리된 API / 프론트 조합 가능
+- No → 서버에서 1-step API로 책임져야 함
+
+---
+
+## 숫자로 보는 개선
+
+| 항목 | Before (프론트 조합) | After (1-step API) |
+|------|---------------------|-------------------|
+| API 호출 횟수 | 5회 | 1회 |
+| 프론트 코드 | 110줄 | 47줄 |
+| 에러 케이스 | 5개 | 1개 |
+| 트랜잭션 보장 | ❌ | ✅ |
+| 부분 실패 처리 | 프론트 책임 | 없음 (All or Nothing) |
+
+---
+
+## 결론
+
+문제는 "2-step이냐 1-step이냐"가 아니었다. 문제는 비즈니스 경계를 어디에 두느냐였다.
+
+- 하나의 사용자 액션
+- 하나의 비즈니스 의미
+- 하나의 성공/실패
+
+이 조건을 만족한다면, 기존 API를 조합하기보다 그 작업을 대표하는 API를 새로 만드는 편이 낫다.
+
+하나의 비즈니스 작업을 표현하는 API가 존재한다면, 그 내부 구현이 여러 도메인 작업으로 나뉘더라도 외부에는 하나의 원자적 엔드포인트로 노출하는 것이 바람직하다.
+
+프론트엔드는 오케스트레이션이 아니라 결과를 소비하는 쪽에 가까워야 한다.
