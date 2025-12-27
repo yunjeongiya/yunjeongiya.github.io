@@ -6,10 +6,10 @@ categories: [Backend, API Design]
 tags: [api-design, transaction, atomic-operation, refactoring, checkus]
 lang: en
 slug: "020-en"
-thumbnail: /assets/images/posts/020-1step-api-design.png
+thumbnail: /assets/images/posts/020-1step-api-design-en.png
 ---
 
-![1-step vs 2-step API Design](/assets/images/posts/020-1step-api-design.png){: width="600"}
+![1-step vs 2-step API Design](/assets/images/posts/020-1step-api-design-en.png){: width="600"}
 
 ## TL;DR
 Redesigned a 2-step API that created students and guardians separately into a 1-step API wrapped in a single transaction. No partial failures, 57% less code, network requests reduced from 5→1.

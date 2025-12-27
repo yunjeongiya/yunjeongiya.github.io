@@ -6,10 +6,10 @@ categories: [Backend, API Design]
 tags: [api-design, transaction, atomic-operation, refactoring, checkus]
 lang: ko
 slug: "020"
-thumbnail: /assets/images/posts/020-1step-api-design.png
+thumbnail: /assets/images/posts/020-1step-api-design-ko.png
 ---
 
-![1-step vs 2-step API 디자인](/assets/images/posts/020-1step-api-design.png){: width="600"}
+![1-step vs 2-step API 디자인](/assets/images/posts/020-1step-api-design-ko.png){: width="600"}
 
 ## TL;DR
 학생과 학부모를 각각 생성하던 2-step API를 하나의 트랜잭션으로 묶은 1-step API로 재설계했다. 부분 실패 없고, 코드 57% 줄고, 네트워크 요청 5회→1회로 줄었다.
