@@ -9,7 +9,7 @@ slug: "021-en"
 thumbnail: /assets/images/posts/021-persona-testing-new.png
 ---
 
-![Persona-Based Exploratory Testing](/assets/images/posts/021-persona-testing.png){: width="600"}
+![Persona-Based Exploratory Testing](/assets/images/posts/021-persona-testing-new.png){: width="600"}
 
 ## TL;DR
 Test cases only catch 5% of real user bugs. Become a rushed teacher, tech-challenged assistant, or mischievous student to torture your system and find the other 95%.
