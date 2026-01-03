@@ -206,19 +206,36 @@ for(let i=0; i<10; i++) {
 
 ---
 
-## 실제 적용 결과
+## 탐색적 테스팅의 효과: 연구 결과
 
-우리 팀이 CheckUS 시스템에 적용한 결과:
+### 버그 발견율 개선
 
-| 테스트 방법 | 소요 시간 | 발견 버그 | 심각도 |
-|------------|----------|----------|--------|
-| 테스트 케이스 (Happy Path) | 3시간 | 2개 | 낮음 |
-| Edge Case 테스트 | 4시간 | 7개 | 중간 |
-| 페르소나 테스팅 | 2시간 | 14개 | 높음 3개 포함 |
+여러 연구에서 탐색적 테스팅의 효과가 입증되었다:
 
-**페르소나 테스팅이 시간 대비 가장 효과적이었다.**
+- **11% 더 많은 이슈 발견**: 탐색적 테스팅이 스크립트 테스팅 대비 평균 11% 더 많은 소프트웨어 오류를 발견한다는 연구 결과가 있다
+- **복잡한 버그 33% 더 발견**: 여러 사용자 상호작용이 필요한 복잡한 버그를 33% 더 많이 발견
+- **최대 50% 효과 개선**: 일부 연구에서는 기존 방법 대비 50%까지 더 효과적으로 결함을 발견한다고 보고
 
-특히 "급한 교사" 페르소나로 발견한 **"저장 버튼 연타 시 중복 생성"** 버그는 실제로 운영 첫 주에 발생했을 뻔한 치명적 이슈였다.
+### 페르소나 기반 테스팅 효과
+
+실제 사례 연구들:
+
+- **여행 앱**: "Globetrotter Gina", "Family Planner Frank" 같은 페르소나 적용 후 **출시 후 버그 45% 감소**
+- **헬스케어 앱**: "Caregiver Claire" 페르소나로 약물 추적 혼란 문제 조기 발견, **$250K 비용 절감**
+- **Capgemini 연구**: 위험 기반 탐색적 테스팅으로 **결함 발견 효율 35% 개선**
+
+### 버그 유형별 효과
+
+IEEE 저널에 발표된 Juha Itkonen 연구팀의 분석:
+
+| 버그 복잡도 | 스크립트 테스팅 강점 | 탐색적 테스팅 강점 |
+|------------|-------------------|------------------|
+| Mode 0 (즉시 보이는 결함) | ✅ 우수 | - |
+| Mode 1 (1회 상호작용) | ✅ 우수 | - |
+| Mode 2 (2회 상호작용) | - | ✅ 우수 |
+| Mode 3+ (3회 이상) | - | ✅ 우수 |
+
+**핵심**: 복잡한 시나리오일수록 페르소나 기반 탐색적 테스팅이 효과적
 
 ---
 
@@ -280,3 +297,14 @@ for(let i=0; i<10; i++) {
 다음에 QA할 때는 테스트 케이스 대신 이렇게 물어보자:
 
 **"우리 시스템은 급한 교사의 저장 버튼 10연타를 견딜 수 있는가?"**
+
+---
+
+## 참고 자료
+
+- [Exploratory Testing vs. Scripted Testing](https://www.qualitylogic.com/knowledge-center/exploratory-testing-vs-scripted-testing/) - QualityLogic
+- [Effectiveness of Exploratory Testing](https://www.researchgate.net/publication/262685821_Effectiveness_of_Exploratory_Testing_An_empirical_scrutiny_of_the_challenges_and_factors_affecting_the_defect_detection_efficiency) - ResearchGate
+- [The Role of Personas in User-Centric Testing](https://www.applause.com/blog/the-role-of-personas-in-user-centric-testing/) - Applause
+- [Persona-based testing to double your test case quality](https://qamind.com/blog/persona-based-testing-test-case-quality/) - QAMIND
+- [Improve your exploratory testing with personas](https://www.getxray.app/blog/exploratory-testing-personas) - Xray Blog
+- Juha Itkonen et al., "Defect Detection Efficiency: Test Case Based vs. Exploratory Testing", IEEE, 2007
