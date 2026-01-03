@@ -6,7 +6,7 @@ categories: [QA, Testing]
 tags: [qa, testing, exploratory-testing, persona, bug-hunting]
 lang: ko
 slug: "021"
-thumbnail: /assets/images/posts/021-persona-testing.png
+thumbnail: /assets/images/posts/021-persona-testing-new.png
 ---
 
 ![페르소나 기반 탐색적 테스팅](/assets/images/posts/021-persona-testing.png){: width="600"}

@@ -6,7 +6,7 @@ categories: [QA, Testing]
 tags: [qa, testing, exploratory-testing, persona, bug-hunting]
 lang: en
 slug: "021-en"
-thumbnail: /assets/images/posts/021-persona-testing.png
+thumbnail: /assets/images/posts/021-persona-testing-new.png
 ---
 
 ![Persona-Based Exploratory Testing](/assets/images/posts/021-persona-testing.png){: width="600"}
