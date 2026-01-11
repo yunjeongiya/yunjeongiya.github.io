@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "외래키 없이 살아남기: String으로 참조하는 소프트 레퍼런스 패턴"
-date: 2026-01-11 14:00:00 +0900
+date: 2026-01-10 14:00:00 +0900
 categories: [Database, Architecture]
 tags: [database, foreign-key, soft-reference, jpa, design-pattern]
 lang: ko

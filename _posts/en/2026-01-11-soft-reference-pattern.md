@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Surviving Without Foreign Keys: The Soft Reference Pattern with Strings"
-date: 2026-01-11 14:00:00 +0900
+date: 2026-01-10 14:00:00 +0900
 categories: [Database, Architecture]
 tags: [database, foreign-key, soft-reference, jpa, design-pattern]
 lang: en
