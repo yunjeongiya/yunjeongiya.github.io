@@ -6,10 +6,10 @@ categories: [Database, Architecture]
 tags: [database, foreign-key, soft-reference, jpa, design-pattern]
 lang: en
 slug: "022-en"
-thumbnail: /assets/images/posts/022-soft-reference.png
+thumbnail: /assets/images/posts/022-soft-reference-en.png
 ---
 
-![Soft Reference Pattern](/assets/images/posts/022-soft-reference.png){: width="600"}
+![Soft Reference Pattern](/assets/images/posts/022-soft-reference-en.png){: width="600"}
 
 ## TL;DR
 The 'soft reference' pattern: using Strings instead of foreign keys. A trade-off that sacrifices data integrity for performance and flexibility. Worth considering for rarely-changing code data like Roles.
