@@ -271,6 +271,47 @@ UPDATE user_role SET role_code = 'INSTRUCTOR' WHERE role_code = 'TEACHER';
 
 **결론**: Role 테이블은 **참조 무결성보다는 마스터 데이터 관리** 목적으로 존재한다. 외래키는 안 쓰지만, 중앙 관리 포인트로서의 가치가 있다.
 
+#### 추가 피드백: 정말 100% 상수라면?
+
+후속 토론에서 이런 의견도 받았다:
+
+**"정말로 100% 고정이면 코드/enum이 더 깔끔한 거 아냐?"**
+
+맞다. 만약 이런 조건이 충족되면 DB 없이 enum이 더 나을 수 있다:
+- Role 종류가 **절대 늘지 않음**
+- 권한이 **절대 변하지 않음**
+- 운영 중 on/off 같은 **관리 요구가 없음**
+- 다국어/표시명 같은 **메타데이터도 필요 없음**
+
+하지만 현실에서 DB를 유지하는 이유:
+
+1. **운영 중 비활성화 필요**
+```sql
+UPDATE role SET active = false WHERE code = 'TEACHER';
+-- 보안 사고 시 즉시 차단 (배포 없이)
+```
+
+2. **메타데이터가 점점 늘어남**
+```sql
+| code    | name | display_name_ko | display_name_en | ui_order |
+|---------|------|-----------------|-----------------|----------|
+| TEACHER | 교사 | 선생님          | Teacher         | 1        |
+```
+
+3. **권한이 데이터로 진화**
+- "이번 캠페인 기간엔 STUDENT 기능 A 숨기자"
+- "ADMIN에만 메뉴 B 노출하자"
+- 코드 배포 없이 DB 업데이트로 해결
+
+**최종 권장안**: Role은 DB에 두되 `code`는 불변으로
+```sql
+-- role.code는 절대 변경 금지 (ROLE_TEACHER)
+-- role.display_name만 변경 가능
+-- CampusRole.parentRole은 code로 참조
+```
+
+이렇게 하면 이름 변경으로 인한 고아 리스크가 사라진다.
+
 ---
 
 ## Gemini와의 3시간 논쟁

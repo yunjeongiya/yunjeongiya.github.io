@@ -214,6 +214,104 @@ private String parentRole; // Just stores "TEACHER" string
 3. Fast queries without JOIN
 4. Role rarely changes anyway (TEACHER is forever TEACHER)
 
+#### But what if we eliminate the Role table entirely?
+
+**"If RolePermission also uses soft reference, we don't need the Role table at all?"**
+
+True! Theoretically possible:
+
+```sql
+-- No Role table
+-- RolePermission only (role_code instead of role_id)
+| campus_id | role_code | permission     |
+|-----------|-----------|----------------|
+| 101       | TEACHER   | VIEW_STUDENT   |
+| 101       | TEACHER   | EDIT_GRADE     |
+| 102       | TEACHER   | VIEW_STUDENT   |
+```
+
+**But we keep the Role table because:**
+
+1. **Centralized validation**
+```java
+// With Role table
+if (!roleRepository.existsByCode("TECHER")) { // Typo!
+    throw new Exception("Invalid role");
+}
+
+// Without Role table
+// "TECHER" typo can spread across tables
+```
+
+2. **Metadata management**
+```sql
+-- Role table
+| code    | name    | description           | created_at |
+|---------|---------|----------------------|------------|
+| TEACHER | Teacher | Student management    | 2024-01-01 |
+```
+
+3. **Single Source of Truth**
+- Manage all valid Roles in one place
+- Add new Role in one place
+- Easy to provide "available Roles" via API
+
+4. **Data migration**
+```sql
+-- When changing Role name (TEACHER → INSTRUCTOR)
+-- With Role table: Update one place
+UPDATE role SET code = 'INSTRUCTOR' WHERE code = 'TEACHER';
+
+-- Without Role table: Update everywhere
+UPDATE role_permission SET role_code = 'INSTRUCTOR' WHERE role_code = 'TEACHER';
+UPDATE campus_role SET parent_role = 'INSTRUCTOR' WHERE parent_role = 'TEACHER';
+UPDATE user_role SET role_code = 'INSTRUCTOR' WHERE role_code = 'TEACHER';
+-- Miss one, system breaks
+```
+
+**Conclusion**: Role table exists for **master data management** rather than referential integrity. No foreign keys, but valuable as a central management point.
+
+#### Additional Feedback: What if it's truly 100% constant?
+
+In follow-up discussions, this point was raised:
+
+**"If it's really 100% fixed, wouldn't code/enum be cleaner?"**
+
+True. If these conditions are met, enum without DB might be better:
+- Role types **never increase**
+- Permissions **never change**
+- No **management needs** like on/off during operation
+- No **metadata** like multilingual display names
+
+But reasons to keep DB in reality:
+
+1. **Need to disable during operation**
+```sql
+UPDATE role SET active = false WHERE code = 'TEACHER';
+-- Immediate blocking during security incident (no deployment)
+```
+
+2. **Metadata keeps growing**
+```sql
+| code    | name    | display_name_ko | display_name_en | ui_order |
+|---------|---------|-----------------|-----------------|----------|
+| TEACHER | Teacher | 선생님          | Teacher         | 1        |
+```
+
+3. **Permissions evolve as data**
+- "Hide feature A from STUDENT during campaign"
+- "Show menu B only to ADMIN"
+- Solved with DB updates without code deployment
+
+**Final recommendation**: Keep Role in DB but make `code` immutable
+```sql
+-- Never change role.code (ROLE_TEACHER)
+-- Only change role.display_name
+-- CampusRole.parentRole references code
+```
+
+This eliminates orphan risk from name changes.
+
 ---
 
 ## 3-Hour Debate with Gemini
