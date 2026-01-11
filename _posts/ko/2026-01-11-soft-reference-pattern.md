@@ -214,6 +214,129 @@ private String parentRole; // "TEACHER" 문자열만 저장
 3. JOIN 없이 빠르게 조회
 4. Role은 어차피 거의 안 바뀜 (TEACHER는 영원히 TEACHER)
 
+#### 잠깐, 그럼 Role 테이블을 아예 없애면?
+
+**"RolePermission도 소프트 레퍼런스로 하면 Role 테이블 자체가 필요 없지 않나?"**
+
+맞다! 이론적으로는 가능하다:
+
+```sql
+-- Role 테이블 없애고
+-- RolePermission 테이블만 (role_id 대신 role_code)
+| campus_id | role_code | permission     |
+|-----------|-----------|----------------|
+| 101       | TEACHER   | VIEW_STUDENT   |
+| 101       | TEACHER   | EDIT_GRADE     |
+| 102       | TEACHER   | VIEW_STUDENT   |
+```
+
+**하지만 Role 테이블을 유지하는 이유:**
+
+1. **유효성 검증 중앙화**
+```java
+// Role 테이블이 있으면
+if (!roleRepository.existsByCode("TECHER")) { // 오타!
+    throw new Exception("Invalid role");
+}
+
+// Role 테이블이 없으면
+// "TECHER" 오타가 여러 테이블에 퍼질 수 있음
+```
+
+2. **메타데이터 관리**
+```sql
+-- Role 테이블
+| code    | name | description            | created_at |
+|---------|------|------------------------|------------|
+| TEACHER | 교사 | 학생 관리 권한 보유     | 2024-01-01 |
+```
+
+3. **단일 진실 공급원 (Single Source of Truth)**
+- 모든 유효한 Role 목록을 한 곳에서 관리
+- 새 Role 추가할 때 한 곳만 수정
+- API로 "사용 가능한 Role 목록" 제공 시 편리
+
+4. **데이터 마이그레이션**
+```sql
+-- Role 이름 변경 시 (TEACHER → INSTRUCTOR)
+-- Role 테이블 있으면: 한 곳만 수정
+UPDATE role SET code = 'INSTRUCTOR' WHERE code = 'TEACHER';
+
+-- Role 테이블 없으면: 모든 테이블 수정
+UPDATE role_permission SET role_code = 'INSTRUCTOR' WHERE role_code = 'TEACHER';
+UPDATE campus_role SET parent_role = 'INSTRUCTOR' WHERE parent_role = 'TEACHER';
+UPDATE user_role SET role_code = 'INSTRUCTOR' WHERE role_code = 'TEACHER';
+-- 하나라도 놓치면 시스템 깨짐
+```
+
+**결론**: Role 테이블은 **참조 무결성보다는 마스터 데이터 관리** 목적으로 존재한다. 외래키는 안 쓰지만, 중앙 관리 포인트로서의 가치가 있다.
+
+---
+
+## Gemini와의 3시간 논쟁
+
+이 설계에 대해 Gemini와 긴 토론을 했다. Gemini의 지적과 우리의 답변을 정리하면:
+
+### Gemini: "외래키를 써야 하는 거 아냐?"
+
+**Gemini**: "로직상 그렇게 필수적이라면, 왜 DB 레벨에서 외래키로 강하게 보장하지 않고 애플리케이션에 책임을 넘기는가?"
+
+**우리 답변**:
+```java
+// UserCampusRoleService의 실제 코드
+Role parentRole = roleRepository.findByName(campusRole.getParentRole())
+    .orElseThrow(() -> new BusinessException("부모 역할을 찾을 수 없습니다"));
+```
+
+이 코드가 외래키 제약조건의 역할을 대신한다. 트레이드오프 문제다:
+
+- **외래키 방식**: DB가 무결성 완벽 보장, 하지만 테이블 강결합
+- **소프트 방식**: 애플리케이션이 검증, 대신 결합도 낮고 유연함
+
+### Gemini: "Role 삭제되면 어떻게 해?"
+
+**Gemini**: "만약 Role 중 하나가 삭제되면 CampusRole들은 고아가 되는데?"
+
+**실제 해결 방법**:
+1. **삭제 방지** (현재 적용)
+```java
+public void deleteRole(String roleName) {
+    if (campusRoleRepository.existsByParentRole(roleName)) {
+        throw new BusinessException("커스텀 역할이 사용 중입니다");
+    }
+    roleRepository.deleteByName(roleName);
+}
+```
+
+2. **예외 처리 완비**
+```java
+@ExceptionHandler(BusinessException.class)
+public ResponseEntity<ResponseBase<Object>> handleBusinessException(BusinessException ex) {
+    log.warn("Business exception: code={}, message={}", ex.getCode(), ex.getMessage());
+    return ResponseEntity.badRequest()
+            .body(ResponseBase.error(ex.getCode(), ex.getMessage()));
+}
+```
+
+### Gemini: "부모 Role이 바뀌면?"
+
+**시나리오**: `TEACHER` → `INSTRUCTOR`로 이름 변경
+
+**문제**: 모든 CampusRole의 parentRole이 깨짐
+
+**해결**: 트랜잭션으로 연쇄 업데이트
+```sql
+BEGIN;
+UPDATE campus_role SET parent_role = 'INSTRUCTOR'
+WHERE parent_role = 'TEACHER';
+
+UPDATE role SET name = 'INSTRUCTOR'
+WHERE name = 'TEACHER';
+COMMIT;
+```
+
+**Gemini의 인정**: "Role이 거의 변하지 않는 핵심 시스템 데이터라면 소프트 참조는 합리적인 선택"
+
 ---
 
 ## 하지만 리스크는 있다

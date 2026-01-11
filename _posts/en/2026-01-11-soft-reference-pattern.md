@@ -216,6 +216,72 @@ private String parentRole; // Just stores "TEACHER" string
 
 ---
 
+## 3-Hour Debate with Gemini
+
+I had a long discussion with Gemini about this design. Here's the summary:
+
+### Gemini: "Shouldn't you use foreign keys?"
+
+**Gemini**: "If it's that essential in logic, why not enforce it strongly with foreign keys at the DB level instead of passing responsibility to the application?"
+
+**Our response**:
+```java
+// Actual code in UserCampusRoleService
+Role parentRole = roleRepository.findByName(campusRole.getParentRole())
+    .orElseThrow(() -> new BusinessException("Parent role not found"));
+```
+
+This code acts as the foreign key constraint. It's a trade-off:
+
+- **Foreign key approach**: DB guarantees integrity perfectly, but tables tightly coupled
+- **Soft approach**: Application validates, but lower coupling and more flexible
+
+### Gemini: "What if a Role gets deleted?"
+
+**Gemini**: "If one of the Roles is deleted, CampusRoles become orphans?"
+
+**Actual solutions**:
+1. **Deletion prevention** (currently applied)
+```java
+public void deleteRole(String roleName) {
+    if (campusRoleRepository.existsByParentRole(roleName)) {
+        throw new BusinessException("Custom roles are using this");
+    }
+    roleRepository.deleteByName(roleName);
+}
+```
+
+2. **Complete exception handling**
+```java
+@ExceptionHandler(BusinessException.class)
+public ResponseEntity<ResponseBase<Object>> handleBusinessException(BusinessException ex) {
+    log.warn("Business exception: code={}, message={}", ex.getCode(), ex.getMessage());
+    return ResponseEntity.badRequest()
+            .body(ResponseBase.error(ex.getCode(), ex.getMessage()));
+}
+```
+
+### Gemini: "What if parent Role changes?"
+
+**Scenario**: `TEACHER` → `INSTRUCTOR` name change
+
+**Problem**: All CampusRole parentRoles break
+
+**Solution**: Cascading update in transaction
+```sql
+BEGIN;
+UPDATE campus_role SET parent_role = 'INSTRUCTOR'
+WHERE parent_role = 'TEACHER';
+
+UPDATE role SET name = 'INSTRUCTOR'
+WHERE name = 'TEACHER';
+COMMIT;
+```
+
+**Gemini's acknowledgment**: "If Role is core system data that rarely changes, soft reference is a reasonable choice"
+
+---
+
 ## But There Are Risks
 
 ### Risk 1: Referencing Non-existent Roles
