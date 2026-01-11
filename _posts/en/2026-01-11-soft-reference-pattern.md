@@ -11,18 +11,45 @@ thumbnail: /assets/images/posts/022-soft-reference-en.png
 
 ![Soft Reference Pattern](/assets/images/posts/022-soft-reference-en.png){: width="600"}
 
-## TL;DR
-The 'soft reference' pattern: using Strings instead of foreign keys. A trade-off that sacrifices data integrity for performance and flexibility. Worth considering for rarely-changing code data like Roles.
 
-> 💡 Soft Reference here means logical references in DB design using IDs or codes without foreign keys, not the Java GC concept.
+## TL;DR
+
+- This post is **not** an argument against foreign keys.
+- The real questions are:
+  1. Is `Role` a pure constant or operational data?
+  2. What do we reference — **name or immutable code**?
+  3. Who is responsible for data integrity — **the database or the application**?
+- In CheckUS, the most balanced solution was:
+  **keep `Role` in the database, but reference it only by immutable codes using soft references.**
 
 ---
 
-## The Problem: How to Reference Parent Roles in Custom Roles
+## The Question That Started It All
 
-I was designing the permission system for the CheckUS project.
+> Does `CampusRole` really need a `parentRole`?  
+> And if it does, should that relationship be enforced with a foreign key?
 
-The system has base roles (`TEACHER`, `STUDENT`), and each campus can create custom roles (`Lead Teacher`, `Assistant Teacher`) based on them.
+This was the question that kept coming up while designing the authorization system for **CheckUS**.
+
+The system defines global base roles:
+
+- `TEACHER`
+- `STUDENT`
+- `ADMIN`
+
+Each campus can then define **custom roles**:
+
+- “Senior Teacher”
+- “Assistant Teacher”
+- “Trial Student”
+
+A custom role is always derived from a base role and can only select **a subset of that base role’s permissions**.
+
+“Senior Teacher” is still a kind of `TEACHER`.
+
+---
+
+## What Does `CampusRole` Represent?
 
 ```java
 @Entity
@@ -30,538 +57,282 @@ public class CampusRole {
     @Id
     private Long id;
 
-    private String name; // "Lead Teacher"
+    private String name; // "Senior Teacher"
 
-    // This is the problem
-    private ??? parentRole; // How to reference TEACHER?
+    @Column(name = "parent_role", nullable = false)
+    private String parentRole; // "TEACHER"
 }
+````
+
+The interesting part is that `parentRole` is **not a foreign key**.
+It’s just a `String`.
+
+At first glance, this looks dangerous.
+
+> “Aren’t we giving up database-level integrity?”
+
+Yes — intentionally.
+
+---
+
+## Misconception: `parentRole` Is for Permission Checks
+
+It’s not.
+
+At read time (authorization), we only care about `CampusRolePermission`.
+
+```java
+List<Permission> permissions =
+    campusRolePermissionRepository.findByCampusRoleId(campusRoleId);
 ```
 
-Two options:
+No joins.
+No need to load `Role`.
 
-1. **Foreign key reference** (traditional)
+This is not about `LAZY` vs `EAGER` fetching or query optimization.
+
+---
+
+## Where `parentRole` Actually Matters
+
+`parentRole` is critical during **writes**, not reads.
+
+```java
+// UserCampusRoleService.assignCampusRole()
+Role parentRole = roleRepository.findByName(campusRole.getParentRole())
+    .orElseThrow(() -> new BusinessException("Parent role not found"));
+```
+
+When assigning a custom role (“Senior Teacher”) to a user, the system must ensure:
+
+1. Which base role this custom role belongs to
+2. Whether the user already has that base role (`TEACHER`)
+3. If not, assign the base role first, then attach the custom role
+
+So `parentRole` is not about permissions.
+It defines the **lineage of the role**.
+
+---
+
+## Then Shouldn’t This Be a Foreign Key?
+
+That’s a fair question.
+
 ```java
 @ManyToOne
 @JoinColumn(name = "parent_role_id")
 private Role parentRole;
 ```
 
-2. **String reference** (soft reference)
+### Advantages of Foreign Keys
+
+* Database-enforced referential integrity
+* Safe deletes and updates
+* Renaming a role does not break references (PK-based)
+
+### But Also Trade-offs
+
+* Strong coupling between `CampusRole` and `Role`
+* Two conceptually different domains become tightly bound at the DB level
+* Less flexibility as the system evolves
+
+So we chose a **soft reference**.
+
+---
+
+## The Real Problem with Soft References
+
+Here’s the key insight:
+
+> **Soft references are not the problem.
+> Referencing mutable values is.**
+
 ```java
-@Column(name = "parent_role")
+// ❌ Dangerous
 private String parentRole; // "TEACHER"
 ```
 
-It's actually safer to reference by immutable roleCode (e.g., `ROLE_TEACHER`) rather than user-facing names.
+`name` is mutable.
+People change it.
+Product requirements change it.
+Rebranding changes it.
+
+And when it changes, everything breaks.
 
 ---
 
-## Our Choice: String Reference
+## The Critical Failure Scenario: Renaming a Role
 
-We went with the soft reference using Strings.
-
-```java
-@Entity
-public class CampusRole {
-    @Id
-    private Long id;
-
-    private String name;
-
-    @Column(name = "parent_role", nullable = false)
-    private String parentRole; // "TEACHER" (String!)
-}
+```sql
+UPDATE role SET name = 'INSTRUCTOR' WHERE name = 'TEACHER';
 ```
 
-**"Did you just give up DB integrity?"**
+The database is perfectly happy.
 
-Yes. But we had our reasons.
+The application is not.
+
+```java
+roleRepository.findByName("TEACHER")
+    .orElseThrow(...)
+```
+
+This is the **true risk** of name-based soft references.
 
 ---
 
-## Why No Foreign Keys
+## Do We Abandon Soft References?
 
-### 1. Roles Almost Never Change
+No.
 
-System base roles like `TEACHER`, `STUDENT`, `ADMIN` are basically **constants**.
+We change **what we reference**.
 
-They haven't changed since project start, and they won't change in the future.
+### Core Rule
 
-### 2. No Joins Needed
-
-Permission checks only need the `CampusRolePermission` table, not parent Role info.
+> Soft references must always point to **immutable identifiers**.
 
 ```java
-// Actual permission check logic
-List<Permission> permissions = campusRolePermissionRepository
-    .findByCampusRoleId(campusRoleId);
-// parentRole info not used!
+// ✅ Safe
+private String parentRoleCode; // "ROLE_TEACHER"
 ```
 
-### 3. We Wanted Lower Coupling
+* `code` is internal and immutable
+* Renaming is forbidden
+* Changes happen via **add + migrate**, never rename
 
-Role and CampusRole tables are different domains:
-- Role: System-wide code data
-- CampusRole: Campus-specific business data
+Display names live separately.
 
-Why strongly couple them at the DB level?
-
-### 4. But Why Store Roles in DB?
-
-**"Wait, if Roles are constants, why not keep them as enums in code?"**
-
-Good question. We actually debated this. Let me explain in detail.
-
-#### Option 1: Enum Only (No DB)
 ```java
-public enum SystemRole {
-    TEACHER("Teacher"),
-    STUDENT("Student"),
-    ADMIN("Admin");
-}
-
-// Permissions hardcoded
-if (user.getRole() == SystemRole.TEACHER) {
-    // TEACHER always has same permissions
-    return List.of("VIEW_STUDENT", "EDIT_GRADE");
+Role {
+    String code;        // ROLE_TEACHER (immutable)
+    String displayName; // Teacher / 강사 (mutable)
+    boolean active;
 }
 ```
-
-**Problem**:
-- Campus A TEACHER can edit grades
-- Campus B TEACHER can only view grades
-- How to differentiate? Code branching? 🤯
-
-#### Option 2: Store Roles in DB (Current approach)
-```sql
--- Role table (system-wide, rarely changes)
-| id | name    | code         |
-|----|---------|--------------|
-| 1  | Teacher | TEACHER      |
-| 2  | Student | STUDENT      |
-
--- RolePermission table (different per campus!)
-| campus_id | role_id | permission     |
-|-----------|---------|----------------|
-| 101       | 1       | VIEW_STUDENT   | -- Campus A TEACHER
-| 101       | 1       | EDIT_GRADE     | -- Campus A TEACHER
-| 102       | 1       | VIEW_STUDENT   | -- Campus B TEACHER (no edit)
-
--- CampusRole table (custom roles)
-| id | campus_id | name           | parent_role |
-|----|-----------|----------------|-------------|
-| 1  | 101       | Lead Teacher   | TEACHER     | -- Campus A Lead
-| 2  | 101       | Assistant      | TEACHER     | -- Campus A Assistant
-```
-
-#### Real Usage Example
-
-```java
-// When user logs in
-User user = findUser("john@example.com");
-Campus campus = user.getCampus(); // Campus A
-
-// 1. Check base Role (DB)
-Role role = roleRepository.findByCode("TEACHER");
-
-// 2. What permissions does TEACHER have at this campus? (DB - dynamic!)
-List<Permission> permissions = permissionRepository
-    .findByCampusAndRole(campus.getId(), role.getId());
-// Campus A: [VIEW_STUDENT, EDIT_GRADE]
-// Campus B: [VIEW_STUDENT] only
-
-// 3. Custom role?
-CampusRole campusRole = campusRoleRepository
-    .findByUserAndCampus(user.getId(), campus.getId());
-// "Lead Teacher" - parentRole: "TEACHER"
-
-// 4. Lead Teacher permissions are subset of TEACHER
-List<Permission> actualPermissions = campusRolePermissionRepository
-    .findByCampusRole(campusRole.getId());
-// [VIEW_STUDENT] - Lead Teacher restricted to view only
-```
-
-#### Key Difference
-
-**Enum**:
-- `TEACHER = always same permissions`
-- Campus differences? Impossible
-- Runtime changes? Impossible
-
-**DB**:
-- `TEACHER = name fixed, permissions flexible`
-- Campus A TEACHER ≠ Campus B TEACHER
-- Can modify permissions via admin panel
-
-#### So Why Soft Reference?
-
-```java
-// When CampusRole references parentRole
-
-// ❌ Foreign key approach
-@ManyToOne
-@JoinColumn(name = "parent_role_id")
-private Role parentRole; // Needs JOIN
-
-// ✅ Soft reference
-@Column(name = "parent_role")
-private String parentRole; // Just stores "TEACHER" string
-```
-
-**Reasons**:
-1. Don't need Role info when querying CampusRole
-2. Just need the code "TEACHER"
-3. Fast queries without JOIN
-4. Role rarely changes anyway (TEACHER is forever TEACHER)
-
-#### But what if we eliminate the Role table entirely?
-
-**"If RolePermission also uses soft reference, we don't need the Role table at all?"**
-
-True! Theoretically possible:
-
-```sql
--- No Role table
--- RolePermission only (role_code instead of role_id)
-| campus_id | role_code | permission     |
-|-----------|-----------|----------------|
-| 101       | TEACHER   | VIEW_STUDENT   |
-| 101       | TEACHER   | EDIT_GRADE     |
-| 102       | TEACHER   | VIEW_STUDENT   |
-```
-
-**But we keep the Role table because:**
-
-1. **Centralized validation**
-```java
-// With Role table
-if (!roleRepository.existsByCode("TECHER")) { // Typo!
-    throw new Exception("Invalid role");
-}
-
-// Without Role table
-// "TECHER" typo can spread across tables
-```
-
-2. **Metadata management**
-```sql
--- Role table
-| code    | name    | description           | created_at |
-|---------|---------|----------------------|------------|
-| TEACHER | Teacher | Student management    | 2024-01-01 |
-```
-
-3. **Single Source of Truth**
-- Manage all valid Roles in one place
-- Add new Role in one place
-- Easy to provide "available Roles" via API
-
-4. **Data migration**
-```sql
--- When changing Role name (TEACHER → INSTRUCTOR)
--- With Role table: Update one place
-UPDATE role SET code = 'INSTRUCTOR' WHERE code = 'TEACHER';
-
--- Without Role table: Update everywhere
-UPDATE role_permission SET role_code = 'INSTRUCTOR' WHERE role_code = 'TEACHER';
-UPDATE campus_role SET parent_role = 'INSTRUCTOR' WHERE parent_role = 'TEACHER';
-UPDATE user_role SET role_code = 'INSTRUCTOR' WHERE role_code = 'TEACHER';
--- Miss one, system breaks
-```
-
-**Conclusion**: Role table exists for **master data management** rather than referential integrity. No foreign keys, but valuable as a central management point.
-
-#### Additional Feedback: What if it's truly 100% constant?
-
-In follow-up discussions, this point was raised:
-
-**"If it's really 100% fixed, wouldn't code/enum be cleaner?"**
-
-True. If these conditions are met, enum without DB might be better:
-- Role types **never increase**
-- Permissions **never change**
-- No **management needs** like on/off during operation
-- No **metadata** like multilingual display names
-
-But reasons to keep DB in reality:
-
-1. **Need to disable during operation**
-```sql
-UPDATE role SET active = false WHERE code = 'TEACHER';
--- Immediate blocking during security incident (no deployment)
-```
-
-2. **Metadata keeps growing**
-```sql
-| code    | name    | display_name_ko | display_name_en | ui_order |
-|---------|---------|-----------------|-----------------|----------|
-| TEACHER | Teacher | 선생님          | Teacher         | 1        |
-```
-
-3. **Permissions evolve as data**
-- "Hide feature A from STUDENT during campaign"
-- "Show menu B only to ADMIN"
-- Solved with DB updates without code deployment
-
-**Final recommendation**: Keep Role in DB but make `code` immutable
-```sql
--- Never change role.code (ROLE_TEACHER)
--- Only change role.display_name
--- CampusRole.parentRole references code
-```
-
-This eliminates orphan risk from name changes.
 
 ---
 
-## 3-Hour Debate with Gemini
+## Then Why Not Remove the Role Table Entirely?
 
-I had a long discussion with Gemini about this design. Here's the summary:
+A very reasonable question.
 
-### Gemini: "Shouldn't you use foreign keys?"
+### When Code/Enum Is Enough
 
-**Gemini**: "If it's that essential in logic, why not enforce it strongly with foreign keys at the DB level instead of passing responsibility to the application?"
+You can remove the `Role` table entirely if **all** of these are true:
 
-**Our response**:
-```java
-// Actual code in UserCampusRoleService
-Role parentRole = roleRepository.findByName(campusRole.getParentRole())
-    .orElseThrow(() -> new BusinessException("Parent role not found"));
-```
+* The set of roles will never grow
+* Role policies and permissions never change
+* No enable/disable requirements
+* No localization or metadata
+* Deploying for every change is acceptable
 
-This code acts as the foreign key constraint. It's a trade-off:
-
-- **Foreign key approach**: DB guarantees integrity perfectly, but tables tightly coupled
-- **Soft approach**: Application validates, but lower coupling and more flexible
-
-### Gemini: "What if a Role gets deleted?"
-
-**Gemini**: "If one of the Roles is deleted, CampusRoles become orphans?"
-
-**Actual solutions**:
-1. **Deletion prevention** (currently applied)
-```java
-public void deleteRole(String roleName) {
-    if (campusRoleRepository.existsByParentRole(roleName)) {
-        throw new BusinessException("Custom roles are using this");
-    }
-    roleRepository.deleteByName(roleName);
-}
-```
-
-2. **Complete exception handling**
-```java
-@ExceptionHandler(BusinessException.class)
-public ResponseEntity<ResponseBase<Object>> handleBusinessException(BusinessException ex) {
-    log.warn("Business exception: code={}, message={}", ex.getCode(), ex.getMessage());
-    return ResponseEntity.badRequest()
-            .body(ResponseBase.error(ex.getCode(), ex.getMessage()));
-}
-```
-
-### Gemini: "What if parent Role changes?"
-
-**Scenario**: `TEACHER` → `INSTRUCTOR` name change
-
-**Problem**: All CampusRole parentRoles break
-
-**Solution**: Cascading update in transaction
-```sql
-BEGIN;
-UPDATE campus_role SET parent_role = 'INSTRUCTOR'
-WHERE parent_role = 'TEACHER';
-
-UPDATE role SET name = 'INSTRUCTOR'
-WHERE name = 'TEACHER';
-COMMIT;
-```
-
-**Gemini's acknowledgment**: "If Role is core system data that rarely changes, soft reference is a reasonable choice"
+In that case, roles are just constants.
 
 ---
 
-## But There Are Risks
+## Reality: Roles Tend to Become Operational Data
 
-### Risk 1: Referencing Non-existent Roles
+Over time, systems usually need:
 
-```java
-// Runtime error if TEACHER doesn't exist!
-Role parentRole = roleRepository.findByName("TEACHER")
-    .orElseThrow(() -> new BusinessException("Parent role not found"));
-```
+* Temporary role deactivation (`active = false`)
+* Localized display names
+* Permission presets
+* UI grouping and ordering
+* Audit logs
+* Multi-tenant customization
 
-**Solution**: Validate on Role deletion
+At that point, roles are no longer constants.
+They are **operational data**.
 
-```java
-public void deleteRole(String roleName) {
-    // Check if any CampusRole references this Role
-    if (campusRoleRepository.existsByParentRole(roleName)) {
-        throw new BusinessException("Custom roles are using this");
-    }
-    roleRepository.deleteByName(roleName);
-}
-```
-
-### Risk 2: What if Role Names Change?
-
-If `TEACHER` changes to `INSTRUCTOR`, all CampusRoles become orphans.
-
-**Solution**: Cascading update in transaction
-
-```sql
-BEGIN;
--- Children first
-UPDATE campus_role SET parent_role = 'INSTRUCTOR'
-WHERE parent_role = 'TEACHER';
-
--- Parent later
-UPDATE role SET name = 'INSTRUCTOR'
-WHERE name = 'TEACHER';
-COMMIT;
-```
-
-But honestly... will Role names ever change? No.
+That’s why keeping `Role` in the database makes sense.
 
 ---
 
-## Performance Comparison
+## The Two Viable Options
 
-We actually measured it.
+### Option A: Code-Only Roles (Enum-Based)
 
-### Foreign Key Approach
-```sql
-SELECT cr.*, r.* FROM campus_role cr
-JOIN role r ON cr.parent_role_id = r.id
-WHERE cr.id = ?
--- Execution time: 3ms
-```
+* No `Role` table
+* All references are enum codes
+* Very simple
+* Low operational flexibility
 
-### Soft Reference Approach
-```sql
-SELECT * FROM campus_role WHERE id = ?
--- Execution time: 0.8ms
-```
+### Option B: Role Table + Immutable Codes (CheckUS Choice)
 
-Seems minor, but this query runs **on every user login**.
+* `Role` remains operational data
+* `code` is immutable and unique
+* `displayName` is mutable
+* All references use `code`, not `name`
 
-With 1000 daily logins, that's 2.2 seconds difference. 13 minutes annually.
-
-Of course, this difference varies by environment and can be mitigated with caching or indexes. However, our goal was to eliminate unnecessary joins from the login path entirely.
+This removes rename-related risks while keeping flexibility.
 
 ---
 
-## When It's Useful
+## “Isn’t This Basically the Same as a Foreign Key?”
 
-### When Soft References Work
+It may look similar, but it’s not.
 
-✅ **Reference target is code data**
-- Rarely changes like system constants
-- Things like `STATUS_CODE`, `ROLE`, `CATEGORY`
+| Aspect                | Foreign Key     | Soft Reference (Code)   |
+| --------------------- | --------------- | ----------------------- |
+| Integrity enforced by | Database        | Application + process   |
+| Rename safety         | High            | High (via immutability) |
+| DB-level features     | Cascades, joins | None                    |
+| Domain coupling       | Strong          | Loose                   |
 
-✅ **Joins rarely needed**
-- Just need to store the name
-- Don't need parent's other fields
-
-✅ **Performance matters**
-- Frequently queried tables
-- Want to reduce join costs
-
-### When You Need Foreign Keys
-
-❌ **Reference target changes often**
-- Dynamic data like posts-comments
-- User-created/deleted data
-
-❌ **Integrity is critical**
-- Financial, payment data
-- Wrong references cause major losses
-
-❌ **CASCADE behavior needed**
-- Delete children when parent deleted
-- Leverage JPA cascade operations
+The difference is not *what* you reference,
+but **who is responsible**.
 
 ---
 
-## How to Show in ERD
+## How to Represent This in ERD
 
-Don't draw relationship lines in physical ERD. No foreign keys.
-
-Use **dashed lines** in logical ERD:
+* Physical ERD: no relationship line
+* Logical ERD: dashed line
 
 ```
 ┌─────────────┐         ┌──────────┐
 │ CampusRole  │         │   Role   │
 ├─────────────┤         ├──────────┤
 │ id          │         │ id       │
-│ name        │         │ name     │
-│ parentRole  │ - - - > │ desc     │
-└─────────────┘         └──────────┘
+│ name        │         │ code     │
+│ parentCode  │ - - - > │ display  │
+└─────────────┘
    (logical reference)
 ```
 
-Solid line = Foreign key (strong reference)
-Dashed line = Soft reference (weak reference)
-
 ---
 
-## Real-world Lessons
+## Final Decision (CheckUS)
 
-### 1. Transactions Can Ensure Integrity Too
-
-Even without foreign keys, `@Transactional` and proper validation are enough.
-
-```java
-@Transactional
-public void updateCampusRole(Long id, String newParentRole) {
-    // 1. Check if new parent role exists
-    if (!roleRepository.existsByName(newParentRole)) {
-        throw new BusinessException("Role doesn't exist");
-    }
-
-    // 2. Update
-    campusRoleRepository.updateParentRole(id, newParentRole);
-}
-```
-
-### 2. Soft Delete for Code Data
-
-Never physically delete core system data like Roles.
-
-```java
-@Entity
-public class Role {
-    private String name;
-    private boolean active = true; // soft delete
-    private LocalDateTime deletedAt;
-}
-```
-
-### 3. Document Trade-offs Clearly
-
-```java
-/**
- * Why parentRole is stored as String:
- * 1. Role is system constant, rarely changes
- * 2. Reduce join costs (runs on every login)
- * 3. But needs validation on Role deletion
- */
-@Column(name = "parent_role")
-private String parentRole;
-```
+* Keep `Role` in the database
+* Treat it as operational data
+* **Reference only immutable `code` values**
+* Avoid `name` in any reference
+* Keep existing FK usage where already present (e.g., `UserCampusRole`)
 
 ---
 
 ## Conclusion
 
-"Foreign keys vs soft references" has no right answer.
+The real design question was never:
 
-What matters is **knowing what you're trading off**.
+> “Foreign key or not?”
 
-We traded some data integrity for performance and flexibility. This was possible because Roles are code data that rarely change.
+It was:
 
-If it were frequently changing business data? We'd definitely use foreign keys.
+> **What should be immutable, and who should enforce integrity?**
 
-**The best choice is the one that fits your situation.**
+In CheckUS,
+**soft references backed by immutable codes** provided the best balance between:
+
+* safety
+* flexibility
+* and long-term maintainability
+
+Soft references are not a replacement for foreign keys.
+They are a **shift in responsibility**.
+
+If you are ready to own that responsibility,
+soft references can absolutely survive in production.
 
 ---
 
