@@ -106,6 +106,30 @@ Role and CampusRole tables are different domains:
 
 Why strongly couple them at the DB level?
 
+### 4. But Why Store Roles in DB?
+
+**"Wait, if Roles are constants, why not keep them as enums in code?"**
+
+Good question. We actually debated this.
+
+```java
+// Could have done this
+public enum SystemRole {
+    TEACHER("Teacher", Set.of(PERMISSION_A, PERMISSION_B)),
+    STUDENT("Student", Set.of(PERMISSION_C)),
+    ADMIN("Admin", Set.of(PERMISSION_ALL));
+}
+```
+
+But there are reasons for DB storage:
+
+1. **Dynamic permission management**: Change Role-Permission mappings without code deployment
+2. **Campus customization**: Different permissions for same TEACHER role per campus
+3. **Audit trail**: Track who got which Role when at DB level
+4. **External system integration**: Easier to provide Role info via API or sync
+
+So while Roles themselves are constants, the **permissions and metadata linked to Roles are dynamic**, requiring DB storage.
+
 ---
 
 ## But There Are Risks

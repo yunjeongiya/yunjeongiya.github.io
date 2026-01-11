@@ -106,6 +106,30 @@ Role 테이블과 CampusRole 테이블이 다른 도메인이다:
 
 굳이 DB 레벨에서 강하게 묶을 필요가 있을까?
 
+### 4. 그런데 Role을 왜 DB에 저장하지?
+
+**"잠깐, Role이 상수라면 왜 코드에 enum으로 두지 않고 DB에 저장해?"**
+
+좋은 질문이다. 실제로 고민했던 부분이다.
+
+```java
+// 이렇게 할 수도 있었다
+public enum SystemRole {
+    TEACHER("교사", Set.of(PERMISSION_A, PERMISSION_B)),
+    STUDENT("학생", Set.of(PERMISSION_C)),
+    ADMIN("관리자", Set.of(PERMISSION_ALL));
+}
+```
+
+하지만 DB에 저장하는 이유가 있다:
+
+1. **권한 동적 관리**: Role-Permission 매핑을 코드 배포 없이 변경 가능
+2. **캠퍼스별 커스터마이징**: 같은 TEACHER라도 캠퍼스마다 다른 권한 부여 가능
+3. **감사 추적**: 누가 언제 어떤 Role을 할당받았는지 DB 레벨에서 추적
+4. **외부 시스템 연동**: API로 Role 정보를 제공하거나 동기화할 때 DB가 유리
+
+즉, Role 자체는 상수지만, Role과 연결된 **권한이나 메타데이터는 동적**이라서 DB 저장이 필요했다.
+
 ---
 
 ## 하지만 리스크는 있다
