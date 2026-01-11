@@ -285,19 +285,15 @@ but **who is responsible**.
 
 ## How to Represent This in ERD
 
-* Physical ERD: no relationship line
-* Logical ERD: dashed line
+* **Physical ERD**: No relationship line (no foreign key)
+* **Logical ERD**: Dashed line (logical reference)
 
-```
-┌─────────────┐         ┌──────────┐
-│ CampusRole  │         │   Role   │
-├─────────────┤         ├──────────┤
-│ id          │         │ id       │
-│ name        │         │ code     │
-│ parentCode  │ - - - > │ display  │
-└─────────────┘
-   (logical reference)
-```
+![ERD Notation - Soft Reference](/assets/images/posts/erd-soft-reference.svg){: width="600"}
+
+In the diagram above:
+- **Dashed arrow**: Soft reference (no FK constraint)
+- **parentRoleCode → code**: Referenced by String value
+- Physically independent but logically connected
 
 ---
 

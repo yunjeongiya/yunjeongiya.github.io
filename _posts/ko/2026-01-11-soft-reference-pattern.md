@@ -288,19 +288,15 @@ Role {
 
 ## ERD에서는 어떻게 표현할까
 
-* 물리 ERD: 관계선 없음
-* 논리 ERD: 점선(dashed)
+* **물리 ERD**: 관계선 없음 (외래키가 없으므로)
+* **논리 ERD**: 점선으로 표현 (논리적 참조)
 
-```
-┌─────────────┐         ┌──────────┐
-│ CampusRole  │         │   Role   │
-├─────────────┤         ├──────────┤
-│ id          │         │ id       │
-│ name        │         │ code     │
-│ parentCode  │ - - - > │ display  │
-└─────────────┘
-   (논리적 참조)
-```
+![ERD 표기법 - 소프트 레퍼런스](/assets/images/posts/erd-soft-reference.svg){: width="600"}
+
+위 다이어그램에서:
+- **점선 화살표**: 소프트 레퍼런스 (FK 제약 없음)
+- **parentRoleCode → code**: String 값으로 참조
+- 물리적으로는 독립적이지만 논리적으로 연결됨
 
 ---
 
