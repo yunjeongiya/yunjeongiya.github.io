@@ -110,25 +110,109 @@ Role 테이블과 CampusRole 테이블이 다른 도메인이다:
 
 **"잠깐, Role이 상수라면 왜 코드에 enum으로 두지 않고 DB에 저장해?"**
 
-좋은 질문이다. 실제로 고민했던 부분이다.
+좋은 질문이다. 실제로 고민했던 부분이다. 더 자세히 설명해보겠다.
 
+#### Option 1: Enum만 사용 (DB 없이)
 ```java
-// 이렇게 할 수도 있었다
 public enum SystemRole {
-    TEACHER("교사", Set.of(PERMISSION_A, PERMISSION_B)),
-    STUDENT("학생", Set.of(PERMISSION_C)),
-    ADMIN("관리자", Set.of(PERMISSION_ALL));
+    TEACHER("교사"),
+    STUDENT("학생"),
+    ADMIN("관리자");
+}
+
+// 권한도 하드코딩
+if (user.getRole() == SystemRole.TEACHER) {
+    // TEACHER는 항상 같은 권한
+    return List.of("VIEW_STUDENT", "EDIT_GRADE");
 }
 ```
 
-하지만 DB에 저장하는 이유가 있다:
+**문제**:
+- A학원 TEACHER는 성적 수정 가능
+- B학원 TEACHER는 성적 조회만 가능
+- 이걸 어떻게 구분? 코드 분기? 🤯
 
-1. **권한 동적 관리**: Role-Permission 매핑을 코드 배포 없이 변경 가능
-2. **캠퍼스별 커스터마이징**: 같은 TEACHER라도 캠퍼스마다 다른 권한 부여 가능
-3. **감사 추적**: 누가 언제 어떤 Role을 할당받았는지 DB 레벨에서 추적
-4. **외부 시스템 연동**: API로 Role 정보를 제공하거나 동기화할 때 DB가 유리
+#### Option 2: DB에 Role 저장 (현재 방식)
+```sql
+-- Role 테이블 (시스템 전역, 거의 안 바뀜)
+| id | name    | code         |
+|----|---------|--------------|
+| 1  | 교사    | TEACHER      |
+| 2  | 학생    | STUDENT      |
 
-즉, Role 자체는 상수지만, Role과 연결된 **권한이나 메타데이터는 동적**이라서 DB 저장이 필요했다.
+-- RolePermission 테이블 (캠퍼스별로 다름!)
+| campus_id | role_id | permission     |
+|-----------|---------|----------------|
+| 101       | 1       | VIEW_STUDENT   | -- A학원 TEACHER
+| 101       | 1       | EDIT_GRADE     | -- A학원 TEACHER
+| 102       | 1       | VIEW_STUDENT   | -- B학원 TEACHER (수정 권한 없음)
+
+-- CampusRole 테이블 (커스텀 역할)
+| id | campus_id | name      | parent_role |
+|----|-----------|-----------|-------------|
+| 1  | 101       | 정교사    | TEACHER     | -- A학원 정교사
+| 2  | 101       | 보조교사  | TEACHER     | -- A학원 보조교사
+```
+
+#### 실제 사용 예시
+
+```java
+// 사용자가 로그인하면
+User user = findUser("john@example.com");
+Campus campus = user.getCampus(); // A학원
+
+// 1. 기본 Role 확인 (DB)
+Role role = roleRepository.findByCode("TEACHER");
+
+// 2. 이 캠퍼스에서 TEACHER의 권한은? (DB - 동적!)
+List<Permission> permissions = permissionRepository
+    .findByCampusAndRole(campus.getId(), role.getId());
+// A학원: [VIEW_STUDENT, EDIT_GRADE]
+// B학원: [VIEW_STUDENT] only
+
+// 3. 커스텀 역할이 있다면?
+CampusRole campusRole = campusRoleRepository
+    .findByUserAndCampus(user.getId(), campus.getId());
+// "정교사" - parentRole: "TEACHER"
+
+// 4. 정교사의 권한은 TEACHER 권한의 부분집합
+List<Permission> actualPermissions = campusRolePermissionRepository
+    .findByCampusRole(campusRole.getId());
+// [VIEW_STUDENT] - 정교사는 조회만 가능하게 제한
+```
+
+#### 핵심 차이점
+
+**Enum**:
+- `TEACHER = 항상 같은 권한`
+- 캠퍼스별 차이? 불가능
+- 런타임 변경? 불가능
+
+**DB**:
+- `TEACHER = 이름만 고정, 권한은 유동적`
+- A학원 TEACHER ≠ B학원 TEACHER
+- 관리자 페이지에서 권한 수정 가능
+
+#### 그래서 왜 소프트 레퍼런스?
+
+```java
+// CampusRole이 parentRole을 참조할 때
+
+// ❌ 외래키 방식
+@ManyToOne
+@JoinColumn(name = "parent_role_id")
+private Role parentRole; // JOIN 필요
+
+// ✅ 소프트 레퍼런스
+@Column(name = "parent_role")
+private String parentRole; // "TEACHER" 문자열만 저장
+```
+
+**이유**:
+1. CampusRole 조회할 때 Role 정보 필요 없음
+2. "TEACHER"라는 코드만 알면 됨
+3. JOIN 없이 빠르게 조회
+4. Role은 어차피 거의 안 바뀜 (TEACHER는 영원히 TEACHER)
 
 ---
 

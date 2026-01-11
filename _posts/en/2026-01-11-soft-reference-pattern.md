@@ -110,25 +110,109 @@ Why strongly couple them at the DB level?
 
 **"Wait, if Roles are constants, why not keep them as enums in code?"**
 
-Good question. We actually debated this.
+Good question. We actually debated this. Let me explain in detail.
 
+#### Option 1: Enum Only (No DB)
 ```java
-// Could have done this
 public enum SystemRole {
-    TEACHER("Teacher", Set.of(PERMISSION_A, PERMISSION_B)),
-    STUDENT("Student", Set.of(PERMISSION_C)),
-    ADMIN("Admin", Set.of(PERMISSION_ALL));
+    TEACHER("Teacher"),
+    STUDENT("Student"),
+    ADMIN("Admin");
+}
+
+// Permissions hardcoded
+if (user.getRole() == SystemRole.TEACHER) {
+    // TEACHER always has same permissions
+    return List.of("VIEW_STUDENT", "EDIT_GRADE");
 }
 ```
 
-But there are reasons for DB storage:
+**Problem**:
+- Campus A TEACHER can edit grades
+- Campus B TEACHER can only view grades
+- How to differentiate? Code branching? 🤯
 
-1. **Dynamic permission management**: Change Role-Permission mappings without code deployment
-2. **Campus customization**: Different permissions for same TEACHER role per campus
-3. **Audit trail**: Track who got which Role when at DB level
-4. **External system integration**: Easier to provide Role info via API or sync
+#### Option 2: Store Roles in DB (Current approach)
+```sql
+-- Role table (system-wide, rarely changes)
+| id | name    | code         |
+|----|---------|--------------|
+| 1  | Teacher | TEACHER      |
+| 2  | Student | STUDENT      |
 
-So while Roles themselves are constants, the **permissions and metadata linked to Roles are dynamic**, requiring DB storage.
+-- RolePermission table (different per campus!)
+| campus_id | role_id | permission     |
+|-----------|---------|----------------|
+| 101       | 1       | VIEW_STUDENT   | -- Campus A TEACHER
+| 101       | 1       | EDIT_GRADE     | -- Campus A TEACHER
+| 102       | 1       | VIEW_STUDENT   | -- Campus B TEACHER (no edit)
+
+-- CampusRole table (custom roles)
+| id | campus_id | name           | parent_role |
+|----|-----------|----------------|-------------|
+| 1  | 101       | Lead Teacher   | TEACHER     | -- Campus A Lead
+| 2  | 101       | Assistant      | TEACHER     | -- Campus A Assistant
+```
+
+#### Real Usage Example
+
+```java
+// When user logs in
+User user = findUser("john@example.com");
+Campus campus = user.getCampus(); // Campus A
+
+// 1. Check base Role (DB)
+Role role = roleRepository.findByCode("TEACHER");
+
+// 2. What permissions does TEACHER have at this campus? (DB - dynamic!)
+List<Permission> permissions = permissionRepository
+    .findByCampusAndRole(campus.getId(), role.getId());
+// Campus A: [VIEW_STUDENT, EDIT_GRADE]
+// Campus B: [VIEW_STUDENT] only
+
+// 3. Custom role?
+CampusRole campusRole = campusRoleRepository
+    .findByUserAndCampus(user.getId(), campus.getId());
+// "Lead Teacher" - parentRole: "TEACHER"
+
+// 4. Lead Teacher permissions are subset of TEACHER
+List<Permission> actualPermissions = campusRolePermissionRepository
+    .findByCampusRole(campusRole.getId());
+// [VIEW_STUDENT] - Lead Teacher restricted to view only
+```
+
+#### Key Difference
+
+**Enum**:
+- `TEACHER = always same permissions`
+- Campus differences? Impossible
+- Runtime changes? Impossible
+
+**DB**:
+- `TEACHER = name fixed, permissions flexible`
+- Campus A TEACHER ≠ Campus B TEACHER
+- Can modify permissions via admin panel
+
+#### So Why Soft Reference?
+
+```java
+// When CampusRole references parentRole
+
+// ❌ Foreign key approach
+@ManyToOne
+@JoinColumn(name = "parent_role_id")
+private Role parentRole; // Needs JOIN
+
+// ✅ Soft reference
+@Column(name = "parent_role")
+private String parentRole; // Just stores "TEACHER" string
+```
+
+**Reasons**:
+1. Don't need Role info when querying CampusRole
+2. Just need the code "TEACHER"
+3. Fast queries without JOIN
+4. Role rarely changes anyway (TEACHER is forever TEACHER)
 
 ---
 
