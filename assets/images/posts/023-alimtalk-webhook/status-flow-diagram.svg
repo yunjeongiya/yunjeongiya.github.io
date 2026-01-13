@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+  <!-- Background -->
+  <rect width="800" height="500" fill="#f8f9fa"/>
+
+  <!-- Title -->
+  <text x="400" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#333">
+    알림톡 발송 상태 흐름
+  </text>
+
+  <!-- Actors -->
+  <g id="actors">
+    <!-- 우리 서버 -->
+    <rect x="50" y="60" width="100" height="40" fill="#4A90E2" rx="5"/>
+    <text x="100" y="85" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="white">우리 서버</text>
+    <line x1="100" y1="100" x2="100" y2="450" stroke="#333" stroke-width="2" stroke-dasharray="5,5"/>
+
+    <!-- 비즈고 -->
+    <rect x="250" y="60" width="100" height="40" fill="#7ED321" rx="5"/>
+    <text x="300" y="85" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="white">비즈고</text>
+    <line x1="300" y1="100" x2="300" y2="450" stroke="#333" stroke-width="2" stroke-dasharray="5,5"/>
+
+    <!-- 카카오 -->
+    <rect x="450" y="60" width="100" height="40" fill="#FFA500" rx="5"/>
+    <text x="500" y="85" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="white">카카오</text>
+    <line x1="500" y1="100" x2="500" y2="450" stroke="#333" stroke-width="2" stroke-dasharray="5,5"/>
+
+    <!-- 사용자 -->
+    <rect x="650" y="60" width="100" height="40" fill="#9013FE" rx="5"/>
+    <text x="700" y="85" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="white">사용자</text>
+    <line x1="700" y1="100" x2="700" y2="450" stroke="#333" stroke-width="2" stroke-dasharray="5,5"/>
+  </g>
+
+  <!-- Messages -->
+  <g id="messages">
+    <!-- 1. 발송 요청 -->
+    <g>
+      <line x1="100" y1="140" x2="290" y2="140" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+      <text x="195" y="130" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#333">알림톡 발송 요청</text>
+    </g>
+
+    <!-- 2. A000 응답 -->
+    <g>
+      <line x1="290" y1="170" x2="110" y2="170" stroke="#333" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrowhead)"/>
+      <text x="200" y="160" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#333">A000 (접수 성공) + msgKey</text>
+    </g>
+
+    <!-- PENDING 상태 -->
+    <rect x="40" y="185" width="120" height="30" fill="#FFE4B5" rx="3"/>
+    <text x="100" y="203" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#333">status = PENDING</text>
+
+    <!-- 3. 비즈고 → 카카오 -->
+    <g>
+      <line x1="300" y1="250" x2="490" y2="250" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+      <text x="395" y="240" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#333">메시지 전달</text>
+    </g>
+
+    <!-- 4. 카카오 → 사용자 -->
+    <g>
+      <line x1="500" y1="280" x2="690" y2="280" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+      <text x="595" y="270" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#333">알림톡 도착</text>
+    </g>
+
+    <!-- 5. Webhook -->
+    <g>
+      <line x1="300" y1="350" x2="110" y2="350" stroke="#4A90E2" stroke-width="2" marker-end="url(#arrowhead-blue)"/>
+      <text x="205" y="340" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#4A90E2" font-weight="bold">Webhook (reportCode: 10000)</text>
+    </g>
+
+    <!-- SENT 상태 -->
+    <rect x="40" y="370" width="120" height="30" fill="#90EE90" rx="3"/>
+    <text x="100" y="388" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#333">status = SENT</text>
+  </g>
+
+  <!-- Arrow markers -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+    </marker>
+    <marker id="arrowhead-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4A90E2"/>
+    </marker>
+  </defs>
+
+  <!-- Legend -->
+  <g transform="translate(50, 430)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="11" fill="#666">
+      <tspan x="0" dy="0">⚠️ A000은 "접수 성공"일 뿐, 실제 발송 성공은 Webhook으로 확인</tspan>
+    </text>
+  </g>
+</svg>
