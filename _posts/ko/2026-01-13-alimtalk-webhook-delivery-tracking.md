@@ -6,9 +6,10 @@ categories: [Backend, Debugging]
 tags: [alimtalk, webhook, spring-boot, bizgo, incident]
 lang: ko
 slug: "023"
-thumbnail: /assets/images/posts/023-alimtalk-webhook/status-flow-diagram.svg
+thumbnail: /assets/images/posts/023-alimtalk-webhook/thumbnail.png
 ---
 
+![알림톡 발송 실패 - 한 달간 몰랐던 사고](/assets/images/posts/023-alimtalk-webhook/thumbnail.png){: width="700"}
 
 ![슬랙 메세지](/assets/images/posts/023-alimtalk-webhook/slack-alert.png){: width="600"}
 
