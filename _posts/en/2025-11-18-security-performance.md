@@ -7,10 +7,10 @@ tags: [security, performance, jwt, testing, checkus]
 series: "CheckUS Multi-Tenancy Architecture"
 lang: en
 slug: "014-en"
-thumbnail: /assets/images/posts/014-jwt-threadlocal-security.png
+thumbnail: /assets/images/posts/014-security-performance/thumbnail.png
 ---
 
-![CheckUS JWT Design and ThreadLocal Security](/assets/images/posts/014-jwt-threadlocal-security.png){: width="600"}
+![CheckUS JWT Design and ThreadLocal Security](/assets/images/posts/014-security-performance/thumbnail.png){: width="600"}
 
 > **Series Navigation**
 > - [Part 1: One Account, Multiple Schools, Multiple Roles](/posts/012-en/)

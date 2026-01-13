@@ -7,7 +7,7 @@ tags: [multi-tenancy, spring-boot, aop, threadlocal, checkus]
 series: "CheckUS Multi-Tenancy Architecture"
 lang: en
 slug: "013-en"
-thumbnail: /assets/images/posts/013-4tier-security-architecture.png
+thumbnail: /assets/images/posts/013-4tier-architecture/thumbnail.png
 ---
 
 > **Series Navigation**
@@ -19,7 +19,7 @@ thumbnail: /assets/images/posts/013-4tier-security-architecture.png
 
 ---
 
-![CheckUS 4-Tier Security Architecture](/assets/images/posts/013-4tier-security-architecture.png){: width="600"}
+![CheckUS 4-Tier Security Architecture](/assets/images/posts/013-4tier-architecture/thumbnail.png){: width="600"}
 
 ## Previously
 
