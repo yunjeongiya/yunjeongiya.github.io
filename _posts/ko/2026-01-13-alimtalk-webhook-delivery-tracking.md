@@ -107,11 +107,11 @@ resultMsg: 계정 사용 권한 없음
 
 좌측 메뉴에서 **"연동 관리"** 클릭. 그런데 여기서 상세 정보를 보려면 각 항목의 **"상세"** 버튼을 클릭해야 한다.
 
-#### 2. 리포트 탭에서 Webhook URL 확인
+#### 2. 리포트 영역에서 Webhook URL 확인
 
 ![비즈고 콘솔 - Webhook URL 확인](/assets/images/posts/023-alimtalk-webhook/bizgo-console-webhook-detail.jpg){: width="700"}
 
-상세 팝업에서 **"리포트"** 탭을 클릭하면 등록된 Webhook URL을 확인할 수 있다.
+상세 팝업에서 **"리포트"** 영역을 보보면 등록된 Webhook URL을 확인할 수 있다.
 
 ```
 ❌ 관리 콘솔에서 직접 등록/수정 불가
