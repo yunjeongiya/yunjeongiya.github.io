@@ -9,7 +9,8 @@ slug: "023"
 thumbnail: /assets/images/posts/023-alimtalk-webhook/status-flow-diagram.svg
 ---
 
-![알림톡 발송 상태 흐름](/assets/images/posts/023-alimtalk-webhook/status-flow-diagram.svg){: width="700"}
+
+![슬랙 메세지](/assets/images/posts/023-alimtalk-webhook/slack-alert.png){: width="600"}
 
 ## TL;DR
 비즈고 API의 "A000" 응답을 발송 성공으로 처리했다가, 한 달간 알림톡이 실제로는 전달되지 않았던 사고. A000은 "접수 성공"이지 "발송 성공"이 아니었다. Webhook으로 실제 결과를 추적해서 해결했다.
@@ -250,9 +251,7 @@ return ResponseEntity.ok(Map.of("msgKey", msgKey));
 - **SENT**: Webhook으로 성공 확인 (reportCode: 10000)
 - **DEAD_LETTER**: Webhook으로 실패 확인
 
-실제로 Webhook이 정상 작동하면서 이제는 실패 건을 바로 알 수 있게 되었다:
-
-![슬랙 알림 - Webhook 수신 확인](/assets/images/posts/023-alimtalk-webhook/slack-alert.png){: width="600"}
+실제로 Webhook이 정상 작동하면서 이제는 실패 건을 바로 알 수 있게 되었다.
 
 추후 DEAD_LETTER 건에 대해 알림을 보내거나, 대시보드에서 모니터링하는 기능을 추가할 수 있다.
 
