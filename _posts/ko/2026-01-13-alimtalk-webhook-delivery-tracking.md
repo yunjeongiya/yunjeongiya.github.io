@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "\"알림톡 발송 성공\"이라고 믿었는데, 한 달간 아무도 못 받고 있었다"
-date: 2026-01-13 11:00:00 +0900
+date: 2026-01-12 11:00:00 +0900
 categories: [Backend, Debugging]
 tags: [alimtalk, webhook, spring-boot, bizgo, incident]
 lang: ko
