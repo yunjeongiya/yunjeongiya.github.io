@@ -74,6 +74,22 @@ resultMsg: 계정 사용 권한 없음
 
 비즈고는 발송 결과를 Webhook으로 전달해준다. 이걸 받아서 실제 상태를 업데이트하도록 변경했다.
 
+### Webhook 등록 방법
+
+여기서 삽질했다. **비즈고 관리 콘솔에는 Webhook 등록 메뉴가 없다!**
+
+```
+❌ 관리 콘솔에서 찾기 (메뉴 없음)
+❌ API로 직접 등록 (지원 안 함)
+✅ 담당자에게 이메일/전화로 요청
+```
+
+비즈고 담당자에게 직접 연락해서 다음 정보를 전달해야 한다:
+- Webhook URL: `https://api.checkus.app/webhook/bizgo/alimtalk`
+- 수신할 이벤트 타입: 알림톡 발송 결과
+
+등록 완료 후 테스트 발송으로 Webhook이 정상적으로 오는지 확인 필수.
+
 ### 변경된 상태 흐름
 
 ![알림톡 발송 상태 흐름](/assets/images/posts/023-alimtalk-webhook/status-flow-diagram.svg){: width="700"}
