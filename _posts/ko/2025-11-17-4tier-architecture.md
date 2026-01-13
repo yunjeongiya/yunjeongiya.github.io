@@ -7,7 +7,7 @@ tags: [multi-tenancy, spring-boot, aop, threadlocal, checkus]
 series: "CheckUS Multi-Tenancy Architecture"
 lang: ko
 slug: "013"
-thumbnail: /assets/images/posts/013-4tier-security-architecture.png
+thumbnail: /assets/images/posts/013-4tier-architecture/thumbnail.png
 ---
 
 > **시리즈 안내**
@@ -19,7 +19,7 @@ thumbnail: /assets/images/posts/013-4tier-security-architecture.png
 
 ---
 
-![CheckUS 4-Tier 보안 아키텍처](/assets/images/posts/013-4tier-security-architecture.png){: width="600"}
+![CheckUS 4-Tier 보안 아키텍처](/assets/images/posts/013-4tier-architecture/thumbnail.png){: width="600"}
 
 ## 이전 이야기
 
@@ -86,7 +86,7 @@ const schedules = await api.get('/schedules', {
 
 **사용자 시점: 캠퍼스 선택**
 
-![CheckUS 캠퍼스 선택](/assets/images/posts/012-campus-selector-ui.jpg){: width="350"}
+![CheckUS 캠퍼스 선택](/assets/images/posts/012-multi-tenancy/campus-selector-ui.jpg){: width="350"}
 
 사용자가 상단 메뉴에서 캠퍼스를 선택하면, 이 정보가 전역 상태로 저장되고 모든 API 요청에 자동으로 포함됩니다.
 

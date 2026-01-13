@@ -7,10 +7,10 @@ tags: [security, performance, jwt, testing, checkus]
 series: "CheckUS Multi-Tenancy Architecture"
 lang: ko
 slug: "014"
-thumbnail: /assets/images/posts/014-jwt-threadlocal-security.png
+thumbnail: /assets/images/posts/014-security-performance/thumbnail.png
 ---
 
-![CheckUS JWT 설계와 ThreadLocal 보안](/assets/images/posts/014-jwt-threadlocal-security.png){: width="600"}
+![CheckUS JWT 설계와 ThreadLocal 보안](/assets/images/posts/014-security-performance/thumbnail.png){: width="600"}
 
 > **시리즈 안내**
 > - [Part 1: 하나의 계정, 여러 학원, 다양한 역할](/posts/012/)

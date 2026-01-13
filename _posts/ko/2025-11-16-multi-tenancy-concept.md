@@ -18,7 +18,7 @@ slug: "012"
 
 ---
 
-![CheckUS 멀티테넌시 아키텍처](/assets/images/posts/012-multi-tenancy-architecture.jpg){: width="600"}
+![CheckUS 멀티테넌시 아키텍처](/assets/images/posts/012-multi-tenancy/thumbnail.jpg){: width="600"}
 
 ## 시작하며
 
