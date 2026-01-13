@@ -18,6 +18,10 @@ thumbnail: /assets/images/posts/023-alimtalk-webhook/status-flow-diagram.svg
 
 ## 배경: API 응답 = 발송 성공?
 
+우리 시스템의 알림 내역 화면. 모두 "발송 완료"로 표시되어 있었다:
+
+![CheckUS 알림 내역 - 모두 성공으로 표시](/assets/images/posts/023-alimtalk-webhook/checkus-notification-history.jpg){: width="600"}
+
 기존 코드는 이렇게 동작했다:
 
 ```java
@@ -54,6 +58,8 @@ if (response.getStatusCode() == HttpStatus.OK) {
 ## 문제 발견: 한 달 후
 
 한 달 후 우연히 비즈고 콘솔에서 발송 내역을 확인하다가 발견했다.
+
+![비즈고 콘솔 - 발송 실패 내역](/assets/images/posts/023-alimtalk-webhook/bizgo-console-failed.jpg){: width="600"}
 
 ```
 reportCode: 64008
@@ -243,6 +249,10 @@ return ResponseEntity.ok(Map.of("msgKey", msgKey));
 - **PENDING**: API 요청 접수됨, 결과 대기 중
 - **SENT**: Webhook으로 성공 확인 (reportCode: 10000)
 - **DEAD_LETTER**: Webhook으로 실패 확인
+
+실제로 Webhook이 정상 작동하면서 이제는 실패 건을 바로 알 수 있게 되었다:
+
+![슬랙 알림 - Webhook 수신 확인](/assets/images/posts/023-alimtalk-webhook/slack-alert.png){: width="600"}
 
 추후 DEAD_LETTER 건에 대해 알림을 보내거나, 대시보드에서 모니터링하는 기능을 추가할 수 있다.
 
