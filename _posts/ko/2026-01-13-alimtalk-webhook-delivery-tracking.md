@@ -11,8 +11,6 @@ thumbnail: /assets/images/posts/023-alimtalk-webhook/thumbnail.png
 
 ![알림톡 발송 실패 - 한 달간 몰랐던 사고](/assets/images/posts/023-alimtalk-webhook/thumbnail.png){: width="700"}
 
-![슬랙 메세지](/assets/images/posts/023-alimtalk-webhook/slack-alert.png){: width="600"}
-
 ## TL;DR
 비즈고 API의 "A000" 응답을 발송 성공으로 처리했다가, 한 달간 알림톡이 실제로는 전달되지 않았던 사고. A000은 "접수 성공"이지 "발송 성공"이 아니었다. Webhook으로 실제 결과를 추적해서 해결했다.
 
@@ -58,6 +56,8 @@ if (response.getStatusCode() == HttpStatus.OK) {
 ---
 
 ## 문제 발견: 한 달 후
+
+![슬랙 메세지](/assets/images/posts/023-alimtalk-webhook/slack-alert.png){: width="600"}
 
 슬랙으로 에러 제보를 받고 이전에 자동이체 설정에 문제가 있어 연체된 적이 있던 것이 떠올라 비즈고 콘솔을 확인해보니 계정이 정지되어 있었다.
 
