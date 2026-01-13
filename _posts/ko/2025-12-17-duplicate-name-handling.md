@@ -6,10 +6,10 @@ categories: [Backend, System Design]
 tags: [duplicate-handling, automation, checkus, naming-system, ux]
 lang: ko
 slug: "019"
-thumbnail: /assets/images/posts/019-duplicate-name-system.png
+thumbnail: /assets/images/posts/019-duplicate-name/thumbnail.png
 ---
 
-![동명이인 자동 구분 시스템](/assets/images/posts/019-duplicate-name-system.png){: width="600"}
+![동명이인 자동 구분 시스템](/assets/images/posts/019-duplicate-name/thumbnail.png){: width="600"}
 
 ## TL;DR
 학원에서 동명이인 학생들을 수동으로 구분하던 번거로움을 자동 접미사 생성 시스템으로 해결했다. 김민준이 3명이면 자동으로 A, B, C가 붙는다.

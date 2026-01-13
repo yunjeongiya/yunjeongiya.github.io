@@ -6,10 +6,10 @@ categories: [Database, Architecture]
 tags: [database, foreign-key, soft-reference, jpa, design-pattern]
 lang: ko
 slug: "022"
-thumbnail: /assets/images/posts/022-soft-reference.png
+thumbnail: /assets/images/posts/022-soft-reference/thumbnail-ko.png
 ---
 
-![소프트 레퍼런스 패턴](/assets/images/posts/022-soft-reference.png){: width="600"}
+![소프트 레퍼런스 패턴](/assets/images/posts/022-soft-reference/thumbnail-ko.png){: width="600"}
 
 
 ## TL;DR
@@ -291,7 +291,7 @@ Role {
 * **물리 ERD**: 관계선 없음 (외래키가 없으므로)
 * **논리 ERD**: 점선으로 표현 (논리적 참조)
 
-![ERD 표기법 - 소프트 레퍼런스](/assets/images/posts/erd-soft-reference.svg){: width="600"}
+![ERD 표기법 - 소프트 레퍼런스](/assets/images/posts/022-soft-reference/erd-diagram.svg){: width="600"}
 
 위 다이어그램에서:
 - **점선 화살표**: 소프트 레퍼런스 (FK 제약 없음)

@@ -6,10 +6,10 @@ categories: [QA, Testing]
 tags: [qa, testing, exploratory-testing, persona, bug-hunting]
 lang: ko
 slug: "021"
-thumbnail: /assets/images/posts/021-persona-testing-new.png
+thumbnail: /assets/images/posts/021-persona-testing/thumbnail.png
 ---
 
-![페르소나 기반 탐색적 테스팅](/assets/images/posts/021-persona-testing-new.png){: width="600"}
+![페르소나 기반 탐색적 테스팅](/assets/images/posts/021-persona-testing/thumbnail.png){: width="600"}
 
 ## TL;DR
 테스트 케이스만으로는 실제 사용자 버그의 5%만 잡는다. 급한 교사, IT 초보 조교, 장난꾸러기 학생이 되어 시스템을 괴롭히면 나머지 95%를 찾을 수 있다.

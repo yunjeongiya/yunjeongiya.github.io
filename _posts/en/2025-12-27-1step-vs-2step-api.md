@@ -6,10 +6,10 @@ categories: [Backend, API Design]
 tags: [api-design, transaction, atomic-operation, refactoring, checkus]
 lang: en
 slug: "020-en"
-thumbnail: /assets/images/posts/020-1step-api-design-en.png
+thumbnail: /assets/images/posts/020-api-design/thumbnail-en.png
 ---
 
-![1-step vs 2-step API Design](/assets/images/posts/020-1step-api-design-en.png){: width="600"}
+![1-step vs 2-step API Design](/assets/images/posts/020-api-design/thumbnail-en.png){: width="600"}
 
 ## TL;DR
 Instead of combining existing APIs in the frontend to create students and guardians separately, we built a new 1-step API that represents a single business operation. The decision criteria wasn't about "number of steps" but about business boundaries and transaction responsibility.

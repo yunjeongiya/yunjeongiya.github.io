@@ -6,10 +6,10 @@ categories: [Backend, API Design]
 tags: [api-design, transaction, atomic-operation, refactoring, checkus]
 lang: ko
 slug: "020"
-thumbnail: /assets/images/posts/020-1step-api-design-ko.png
+thumbnail: /assets/images/posts/020-api-design/thumbnail-ko.png
 ---
 
-![1-step vs 2-step API 디자인](/assets/images/posts/020-1step-api-design-ko.png){: width="600"}
+![1-step vs 2-step API 디자인](/assets/images/posts/020-api-design/thumbnail-ko.png){: width="600"}
 
 ## TL;DR
 학생과 학부모를 각각 생성하던 기존 API를 프론트에서 조합하는 대신, 하나의 비즈니스 작업을 표현하는 1-step API를 새로 만들었다. 이 선택의 기준은 "step 수"가 아니라 비즈니스 경계와 트랜잭션 책임이었다.

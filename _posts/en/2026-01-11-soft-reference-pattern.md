@@ -6,10 +6,10 @@ categories: [Database, Architecture]
 tags: [database, foreign-key, soft-reference, jpa, design-pattern]
 lang: en
 slug: "022-en"
-thumbnail: /assets/images/posts/022-soft-reference-en.png
+thumbnail: /assets/images/posts/022-soft-reference/thumbnail-en.png
 ---
 
-![Soft Reference Pattern](/assets/images/posts/022-soft-reference-en.png){: width="600"}
+![Soft Reference Pattern](/assets/images/posts/022-soft-reference/thumbnail-en.png){: width="600"}
 
 
 ## TL;DR
@@ -288,7 +288,7 @@ but **who is responsible**.
 * **Physical ERD**: No relationship line (no foreign key)
 * **Logical ERD**: Dashed line (logical reference)
 
-![ERD Notation - Soft Reference](/assets/images/posts/erd-soft-reference.svg){: width="600"}
+![ERD Notation - Soft Reference](/assets/images/posts/022-soft-reference/erd-diagram.svg){: width="600"}
 
 In the diagram above:
 - **Dashed arrow**: Soft reference (no FK constraint)
