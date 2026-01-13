@@ -84,11 +84,31 @@ resultMsg: 계정 사용 권한 없음
 ✅ 담당자에게 이메일/전화로 요청
 ```
 
-비즈고 담당자에게 직접 연락해서 다음 정보를 전달해야 한다:
-- Webhook URL: `https://api.checkus.app/webhook/bizgo/alimtalk`
-- 수신할 이벤트 타입: 알림톡 발송 결과
+실제로 보낸 문의:
+
+> **문의 내용**
+>
+> 안녕하세요,
+>
+> 알림톡 발송 결과 리포트를 Webhook으로 수신하기 위해
+> URL 등록을 요청드립니다.
+>
+> - Webhook URL: https://api.checkus.app/webhook/bizgo/alimtalk
+> - Method: POST
+> - Content-Type: application/json
+>
+> 추가로, X-IB-Signature 검증을 위한 secret 값도
+> 함께 전달 부탁드립니다.
+
+답변:
+
+> **비즈고 담당자 답변**
+>
+> 요청 주신 웹훅URL 등록 해드렸습니다.
+> 콘솔내애서도 일반탭을 누르시면 발급된 계정에 대해서 확인 가능합니다.
 
 등록 완료 후 테스트 발송으로 Webhook이 정상적으로 오는지 확인 필수.
+참고로 콘솔의 "일반탭"에서 등록된 Webhook URL을 확인할 수는 있지만, 직접 등록/수정은 불가능하다.
 
 ### 변경된 상태 흐름
 
