@@ -84,15 +84,9 @@ resultMsg: 계정 사용 권한 없음
 
 ### Webhook 등록 방법
 
-여기서 삽질했다. **비즈고 관리 콘솔에는 Webhook 등록 메뉴가 없다!**
+여기서 삽질했다. **비즈고 관리 콘솔에서 Webhook URL을 직접 등록할 수 없다!**
 
-```
-❌ 관리 콘솔에서 찾기 (메뉴 없음)
-❌ API로 직접 등록 (지원 안 함)
-✅ 담당자에게 이메일/전화로 요청
-```
-
-실제로 보낸 문의:
+처음엔 담당자에게 이메일로 요청했다:
 
 > **문의 내용**
 >
@@ -104,19 +98,27 @@ resultMsg: 계정 사용 권한 없음
 > - Webhook URL: https://api.checkus.app/webhook/bizgo/alimtalk
 > - Method: POST
 > - Content-Type: application/json
->
-> 추가로, X-IB-Signature 검증을 위한 secret 값도
-> 함께 전달 부탁드립니다.
 
-답변:
+담당자가 등록 완료 후 전화로 확인 방법을 알려줬다:
 
-> **비즈고 담당자 답변**
->
-> 요청 주신 웹훅URL 등록 해드렸습니다.
-> 콘솔내애서도 일반탭을 누르시면 발급된 계정에 대해서 확인 가능합니다.
+#### 1. 연동 관리 메뉴 접근
+
+![비즈고 콘솔 - 연동 관리 메뉴](/assets/images/posts/023-alimtalk-webhook/bizgo-console-webhook-menu.jpg){: width="700"}
+
+좌측 메뉴에서 **"연동 관리"** 클릭. 그런데 여기서 상세 정보를 보려면 각 항목의 **"상세"** 버튼을 클릭해야 한다.
+
+#### 2. 리포트 탭에서 Webhook URL 확인
+
+![비즈고 콘솔 - Webhook URL 확인](/assets/images/posts/023-alimtalk-webhook/bizgo-console-webhook-detail.jpg){: width="700"}
+
+상세 팝업에서 **"리포트"** 탭을 클릭하면 등록된 Webhook URL을 확인할 수 있다.
+
+```
+❌ 관리 콘솔에서 직접 등록/수정 불가
+✅ 담당자에게 요청 → 등록 완료 → 연동 관리 > 상세 > 리포트 탭에서 확인
+```
 
 등록 완료 후 테스트 발송으로 Webhook이 정상적으로 오는지 확인 필수.
-참고로 콘솔의 "일반탭"에서 등록된 Webhook URL을 확인할 수는 있지만, 직접 등록/수정은 불가능하다.
 
 ### 변경된 상태 흐름
 
