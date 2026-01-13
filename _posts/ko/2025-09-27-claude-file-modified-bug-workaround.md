@@ -12,7 +12,7 @@ slug: "001"
 
 이 버그는 상황이나 사용자, 심지어 시간대에 따라서도 다르게 작동합니다. 그래서 이 글에서 제시하는 솔루션이 통하지 않을 수도 있습니다...
 
-![Claude Code Error](/assets/images/posts/2025-09-28-claude-bug/1_BPfY5nXCsBge-KoLsdbNkA.png)
+![Claude Code Error](/assets/images/posts/001-claude-bug/1_BPfY5nXCsBge-KoLsdbNkA.png)
 
 이 버그가 터졌을 때는 진짜 손이 잘린 기분이었어요. 아무것도 못하겠더라고요. Claude 하나 죽으니까 저도 같이 쓸모없어지는 거예요. 이게 바로 **Single Point of Failure**구나 싶었죠.
 
