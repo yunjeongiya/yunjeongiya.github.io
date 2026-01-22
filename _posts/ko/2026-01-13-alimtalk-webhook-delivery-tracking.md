@@ -6,10 +6,10 @@ categories: [Backend, Debugging]
 tags: [alimtalk, webhook, spring-boot, bizgo, incident]
 lang: ko
 slug: "023"
-thumbnail: /assets/images/posts/023-alimtalk-webhook/thumbnail.png
+thumbnail: /assets/images/posts/023-alimtalk-webhook/thumbnail-ko.png
 ---
 
-![알림톡 발송 실패 - 한 달간 몰랐던 사고](/assets/images/posts/023-alimtalk-webhook/thumbnail.png){: width="700"}
+![알림톡 발송 실패 - 한 달간 몰랐던 사고](/assets/images/posts/023-alimtalk-webhook/thumbnail-ko.png){: width="700"}
 
 ## TL;DR
 비즈고 API의 "A000" 응답을 발송 성공으로 처리했다가, 한 달간 알림톡이 실제로는 전달되지 않았던 사고. A000은 "접수 성공"이지 "발송 성공"이 아니었다. Webhook으로 실제 결과를 추적해서 해결했다.
