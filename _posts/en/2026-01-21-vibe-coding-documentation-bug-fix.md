@@ -76,13 +76,17 @@ SELECT * FROM online_study_session WHERE student_id = 40;
 
 ---
 
-## Solution: "I Must Have Documented It, Go Find It"
+## Solution: "There Should Be Related Docs, Go Find Them"
 
 This is where documentation showed its power. I told Claude:
 
-> "This looks like the Discord attendance system migration that got stopped halfway. I must have documented it as F052. Go find it."
+> "This looks like the Discord attendance system migration that got stopped halfway. There should be related documentation. Go find it."
 
-Claude found and opened the F052 document:
+Claude searched through the Features documents and found F052:
+
+> "Found F052 - Discord Attendance/Notification System Complete Redesign document. Checking... Phase 4 is incomplete."
+
+Claude read the document and discovered the problem:
 
 ```markdown
 ## 📋 Overview
@@ -95,7 +99,7 @@ Complete redesign to fundamentally solve the complexity of the current Discord a
 
 **Phase 4 was incomplete.**
 
-Reading further made it clear:
+Claude analyzed the documentation further:
 - Old: Uses `ActualStudyTime` table
 - New: Uses `OnlineStudySession` table
 - Discord bot already writes data to `OnlineStudySession`
@@ -159,7 +163,7 @@ Commit and deploy. **From problem discovery to resolution: 5 minutes.**
 
 ### 1. Documentation is Essential When Working with AI
 
-AI can't remember. When context is lost, you have to explain everything from scratch. But with documentation? Just say **"I must have documented it as F052, go find it"**. Even if I don't remember exactly what I did, if I vaguely remember the document number, the AI will find and read it on its own.
+AI can't remember. When context is lost, you have to explain everything from scratch. But with documentation? Just say **"There should be related docs, go find them"**. Even if I don't remember what I did or what number it was, the AI will find it and even identify the problem on its own.
 
 ### 2. Tracking Incomplete Status is Key
 
