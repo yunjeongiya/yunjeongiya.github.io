@@ -6,7 +6,10 @@ categories: [AI, Debugging]
 tags: [vibe-coding, claude, documentation, debugging, ai, features-system]
 lang: en
 slug: "024-en"
+thumbnail: /assets/images/posts/024-vibe-coding/thumbnail.png
 ---
+
+![Vibe Coding Auto-Documentation - 5 Minute Bug Fix](/assets/images/posts/024-vibe-coding/thumbnail.png){: width="700"}
 
 ## TL;DR
 Fixed a Discord attendance system bug in 5 minutes. The secret? Auto-documentation system. When working with AI, documentation is "a gift to your future self." One Phase checkbox made the difference between 5 minutes and 5 hours.

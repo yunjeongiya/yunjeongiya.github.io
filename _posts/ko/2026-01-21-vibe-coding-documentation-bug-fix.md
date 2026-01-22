@@ -6,7 +6,10 @@ categories: [AI, Debugging]
 tags: [vibe-coding, claude, documentation, debugging, ai, features-system]
 lang: ko
 slug: "024"
+thumbnail: /assets/images/posts/024-vibe-coding/thumbnail-ko.png
 ---
+
+![바이브코딩 자동 문서화 - 5분 버그 수정](/assets/images/posts/024-vibe-coding/thumbnail-ko.png){: width="700"}
 
 ## TL;DR
 Discord 출석 시스템 버그를 5분 만에 수정. 비결은 자동 문서화 시스템. AI와 협업할 때 문서화는 "미래의 나를 위한 선물"이다. Phase별 체크박스 하나가 5분 vs 5시간을 갈랐다.
