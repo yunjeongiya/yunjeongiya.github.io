@@ -76,11 +76,13 @@ SELECT * FROM online_study_session WHERE student_id = 40;
 
 ---
 
-## Solution: The Documentation Had the Answer
+## Solution: "I Must Have Documented It, Go Find It"
 
-This is where documentation showed its power. The keyword "ActualStudyTime" caught my eye.
+This is where documentation showed its power. I told Claude:
 
-Opened the F052 document:
+> "This looks like the Discord attendance system migration that got stopped halfway. I must have documented it as F052. Go find it."
+
+Claude found and opened the F052 document:
 
 ```markdown
 ## 📋 Overview
@@ -157,7 +159,7 @@ Commit and deploy. **From problem discovery to resolution: 5 minutes.**
 
 ### 1. Documentation is Essential When Working with AI
 
-AI can't remember. When context is lost, you have to explain everything from scratch. But with documentation? Just say **"Read the F052 document"**.
+AI can't remember. When context is lost, you have to explain everything from scratch. But with documentation? Just say **"I must have documented it as F052, go find it"**. Even if I don't remember exactly what I did, if I vaguely remember the document number, the AI will find and read it on its own.
 
 ### 2. Tracking Incomplete Status is Key
 
