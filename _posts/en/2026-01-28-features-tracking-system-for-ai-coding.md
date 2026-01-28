@@ -179,6 +179,20 @@ Auto-generated blog drafts and screenshot timing management are things I haven't
 
 ---
 
+## The Industry Is Heading the Same Way
+
+I built this system 3 months ago. Looking at the tools that have launched since, the direction is remarkably similar.
+
+[Google Antigravity](https://antigravityai.org/) has agents that plan, implement, and verify work while generating **Artifacts** — task lists, implementation plans, screenshots. [AWS Kiro](https://kiro.dev/) calls it **spec-driven development**: a single prompt generates requirements docs, and development follows from there. Claude Code itself added [sub-agents, hooks, and skills](https://venturebeat.com/orchestration/claude-code-2-1-0-arrives-with-smoother-workflows-and-smarter-agents/) in 2.1.0 for agent orchestration.
+
+Standardization efforts point the same way. [AGENTS.md](https://agents.md/) is building a "README for AI agents" format under the Linux Foundation. [Google Conductor](https://developers.googleblog.com/conductor-introducing-context-driven-development-for-gemini-cli/) provides markdown-based planning with pause/resume. The GitHub Blog even introduced [spec-driven development using markdown as a programming language](https://github.blog/ai-and-ml/generative-ai/spec-driven-development-using-markdown-as-a-programming-language-when-building-with-ai/).
+
+They're all solving the same problem: **how to pass context to AI.** The more autonomous agents become, the more valuable structured context documents get.
+
+Being markdown-based also means no vendor lock-in. Switch from Claude Code to Antigravity tomorrow, and the features/ folder comes as-is.
+
+---
+
 ## References
 
 - [Claude Task Master](https://github.com/eyaltoledano/claude-task-master) - MCP-based task management

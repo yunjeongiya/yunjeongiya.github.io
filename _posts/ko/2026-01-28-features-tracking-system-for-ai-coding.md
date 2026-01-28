@@ -179,6 +179,20 @@ AI한테 "지금 뭐 하고 있었지?"라고 물으면, INDEX.md만 보고 바�
 
 ---
 
+## 업계도 같은 방향으로 가고 있다
+
+이 시스템을 3개월 전에 만들어서 쓰고 있었는데, 최근 나온 도구들을 보니 방향이 거의 같더라.
+
+[Google Antigravity](https://antigravityai.org/)는 에이전트가 작업 계획, 구현, 검증까지 수행하면서 **Artifacts**(태스크 목록, 구현 계획, 스크린샷)를 생성한다. [AWS Kiro](https://kiro.dev/)는 **spec-driven development**라고 해서, 한 줄 프롬프트에서 요구사항 문서를 자동 생성하고 그걸 기반으로 개발한다. Claude Code 자체도 [2.1.0](https://venturebeat.com/orchestration/claude-code-2-1-0-arrives-with-smoother-workflows-and-smarter-agents/)에서 sub-agent, hooks, skills 같은 에이전트 오케스트레이션 기능이 추가됐다.
+
+표준화 움직임도 비슷하다. [AGENTS.md](https://agents.md/)는 Linux Foundation 산하에서 "AI 에이전트를 위한 README" 포맷을 표준으로 만들고 있고, [Google Conductor](https://developers.googleblog.com/conductor-introducing-context-driven-development-for-gemini-cli/)는 마크다운 파일로 작업을 계획하고 pause/resume하는 구조를 제공한다. GitHub Blog에서는 아예 [마크다운을 프로그래밍 언어처럼 쓰는 spec-driven development](https://github.blog/ai-and-ml/generative-ai/spec-driven-development-using-markdown-as-a-programming-language-when-building-with-ai/)를 소개하기도 했다.
+
+결국 다 같은 문제를 풀고 있는 거다 — **AI한테 맥락을 어떻게 넘기느냐.** 에이전트가 더 자율적으로 움직일수록, 읽을 수 있는 맥락 문서의 가치는 더 올라간다.
+
+마크다운 기반이라 도구에 종속되지 않는 것도 장점이다. Claude Code에서 Antigravity로 옮기더라도 features/ 폴더는 그대로 쓸 수 있다.
+
+---
+
 ## 참고 자료
 
 - [Claude Task Master](https://github.com/eyaltoledano/claude-task-master) - MCP 기반 작업 관리
