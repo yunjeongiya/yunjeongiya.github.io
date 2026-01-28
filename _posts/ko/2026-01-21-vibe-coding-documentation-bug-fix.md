@@ -202,7 +202,7 @@ ActualStudyTime → OnlineStudySession 전환을 4단계로 나눠서 진행했�
 3. **기능 완료**: `/finish` 명령어로 자동 커밋 + 문서 업데이트
 4. **중단 시**: `/pause` 명령어로 현재 상태 기록
 
-이 패턴이 궁금하다면 [/blog 명령어 포스트](/posts/024/)를 참고.
+이 패턴이 궁금하다면 [Features 추적 시스템 포스트](/posts/025/)를 참고.
 
 ---
 
