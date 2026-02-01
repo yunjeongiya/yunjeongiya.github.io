@@ -6,7 +6,10 @@ categories: [AI, Productivity]
 tags: [ai, claude-code, workflow, project-management, developer-productivity, features-system]
 lang: ko
 slug: "025"
+thumbnail: /assets/images/posts/025-features-system/thumbnail-ko.png
 ---
+
+![AI 맥락, 가장 싸게 넘기기](/assets/images/posts/025-features-system/thumbnail-ko.png){: width="700"}
 
 ## TL;DR
 

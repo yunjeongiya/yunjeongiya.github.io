@@ -6,7 +6,10 @@ categories: [AI, Productivity]
 tags: [ai, claude-code, workflow, project-management, developer-productivity, features-system]
 lang: en
 slug: "025-en"
+thumbnail: /assets/images/posts/025-features-system/thumbnail-en.png
 ---
+
+![The Cheapest Way to Pass Context to AI](/assets/images/posts/025-features-system/thumbnail-en.png){: width="700"}
 
 ## TL;DR
 
