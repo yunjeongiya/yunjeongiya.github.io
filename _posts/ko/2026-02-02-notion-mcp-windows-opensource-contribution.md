@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Notion API 없이 2만 페이지 읽기 - 로컬 캐시 + 오픈소스 기여기"
-date: 2026-02-02 12:00:00 +0900
+date: 2026-02-02 00:00:00 +0900
 categories: [OpenSource, Productivity]
 tags: [notion, mcp, sqlite, opensource, claude, windows]
 lang: ko
