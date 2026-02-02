@@ -224,7 +224,11 @@ Claude Code 재시작 후 사용 가능한 도구들:
 
 ### 2. 원작자에게 알리면 좋다
 
-GPTers 원글 작성자의 Threads에 댓글을 달았다. PR 리뷰가 빨라질 수도 있고, 커뮤니티 내에서 연결되는 계기가 된다.
+GPTers 원글 작성자의 [Threads](https://www.threads.com/@ai.winey_ny/post/DUPG8F_kv6v)에 댓글을 달았다. 바로 다음 날 PR이 머지됐다.
+
+![Threads 대화](/assets/images/posts/026-notion-mcp/threads-conversation.jpg){: width="400"}
+
+PR 리뷰가 빨라질 수도 있고, 커뮤니티 내에서 연결되는 계기가 된다.
 
 ### 3. MIT 라이선스의 자유로움
 
@@ -235,9 +239,10 @@ GPTers 원글 작성자의 Threads에 댓글을 달았다. PR 리뷰가 빨라�
 ## 참고 자료
 
 - [원본 글 (GPTers)](https://www.gpters.org/dev/post/how-read-20000-pages-jvPKBVs7YdLPgiK)
+- [원작자 Threads](https://www.threads.com/@ai.winey_ny/post/DUPG8F_kv6v)
 - [notion-mcp-fast GitHub](https://github.com/chat-prompt/notion-mcp-fast)
 - [내 PR](https://github.com/chat-prompt/notion-mcp-fast/pull/1)
 
 ---
 
-*Windows나 Linux에서 Notion 로컬 캐시를 읽고 싶다면, PR이 머지될 때까지 [내 fork](https://github.com/yunjeongiya/notion-mcp-fast)를 사용해도 된다.*
+*PR이 머지되어 이제 [원본 저장소](https://github.com/chat-prompt/notion-mcp-fast)에서 바로 Windows/Linux를 지원한다.*
