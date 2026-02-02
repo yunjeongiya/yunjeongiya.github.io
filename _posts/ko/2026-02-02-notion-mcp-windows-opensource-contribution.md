@@ -11,10 +11,10 @@ thumbnail: /assets/images/posts/026-notion-mcp/thumbnail-ko.png
 
 ## TL;DR
 
-- Notion API는 rate limit 때문에 대용량 데이터 처리가 어려웠다
-- Notion 데스크톱 앱이 로컬에 SQLite로 캐시를 저장한다는 걸 알게 됐다
-- 직접 읽으면 **3초 만에 2만 페이지**도 로드할 수 있었다
-- 근데 macOS 전용이길래 Windows 지원을 추가해서 PR을 보냈다
+- Notion API rate limit 때문에 수천 페이지 분석이 불가능했다
+- Notion 데스크톱 앱이 로컬 SQLite 캐시를 쓴다는 걸 발견했다
+- **2만 페이지**를 API 없이 **3초** 만에 읽었다
+- macOS 전용 오픈소스에 Windows 지원을 추가해 **첫 PR**을 보냈다
 
 ---
 
@@ -48,6 +48,8 @@ OAuth 연동해서 써봤는데, 내부적으로 API를 쓰기 때문에 같은 
 
 > Notion 데스크톱 앱이 **로컬에 SQLite 데이터베이스**로 캐시를 저장한다.
 > 이걸 직접 읽으면 API 호출 없이 데이터에 접근할 수 있다.
+
+Notion은 오프라인 동기화를 위해 서버 데이터를 로컬 SQLite로 미러링해두고 있었고, 이 캐시는 생각보다 구조화가 잘 되어 있었다.
 
 캐시 위치:
 - **macOS**: `~/Library/Application Support/Notion/notion.db`
@@ -122,7 +124,7 @@ NOTION_DB_PATH = _get_default_notion_db_path()
 3. Linux: `~/.config/Notion/notion.db`
 4. `NOTION_DB_PATH` 환경변수로 커스텀 경로도 지원
 
-Linux 경로는 [Arch Wiki](https://wiki.archlinux.org/title/XDG_Base_Directory)의 XDG Base Directory 표준을 따랐는데, 실제로 Notion 앱이 이 경로를 쓰는지는 확인 못했다. 테스트 환경이 없어서 PR에 피드백을 요청해뒀다.
+Linux 경로는 [Arch Wiki](https://wiki.archlinux.org/title/XDG_Base_Directory)의 XDG Base Directory 표준을 따랐는데, 실제로 Notion 앱이 이 경로를 쓰는지는 확인 못했다. Linux 경로는 추정값이며, 실제 Notion AppImage / Snap 환경에서는 다를 수 있다. 테스트 환경이 없어서 PR에 피드백을 요청해뒀다.
 
 ---
 
