@@ -6,7 +6,7 @@ categories: [OpenSource, Productivity]
 tags: [notion, mcp, sqlite, opensource, claude, windows]
 lang: en
 slug: "026"
-thumbnail: /assets/images/posts/026-notion-mcp/thumbnail-ko.png
+thumbnail: /assets/images/posts/026-notion-mcp/thumbnail-en.png
 ---
 
 ## TL;DR
