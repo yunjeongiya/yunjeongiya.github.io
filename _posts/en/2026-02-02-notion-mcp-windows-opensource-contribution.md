@@ -5,7 +5,7 @@ date: 2026-02-02 00:00:00 +0900
 categories: [OpenSource, Productivity]
 tags: [notion, mcp, sqlite, opensource, claude, windows]
 lang: en
-slug: "026"
+slug: "026-en"
 thumbnail: /assets/images/posts/026-notion-mcp/thumbnail-en.png
 ---
 
