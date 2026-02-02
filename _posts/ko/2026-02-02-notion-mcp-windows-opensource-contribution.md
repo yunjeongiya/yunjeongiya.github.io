@@ -9,6 +9,8 @@ slug: "026"
 thumbnail: /assets/images/posts/026-notion-mcp/thumbnail-ko.png
 ---
 
+![Notion 로컬 캐시로 2만 페이지 읽기](/assets/images/posts/026-notion-mcp/thumbnail-ko.png){: width="700"}
+
 ## TL;DR
 
 - Notion API rate limit 때문에 수천 페이지 분석이 불가능했다

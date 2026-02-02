@@ -9,6 +9,8 @@ slug: "026"
 thumbnail: /assets/images/posts/026-notion-mcp/thumbnail-en.png
 ---
 
+![Reading 20K Notion Pages with Local Cache](/assets/images/posts/026-notion-mcp/thumbnail-en.png){: width="700"}
+
 ## TL;DR
 
 - Notion API rate limits made it impossible to analyze thousands of pages
