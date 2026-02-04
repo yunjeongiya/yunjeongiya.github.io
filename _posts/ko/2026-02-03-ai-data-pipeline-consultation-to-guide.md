@@ -161,7 +161,7 @@ import numpy as np
 # 1. 텍스트 → 벡터 (OpenAI Embedding)
 embeddings = embed_texts(quotes)  # 25,782 x 1536 차원
 
-# 2. 과목별로 먼저 분리
+# 2. 과목별로 먼저 분리 (이유는 아래)
 for subject in ['국어', '영어', '수학', '탐구', '공통']:
     subject_quotes = filter_by_subject(quotes, subject)
     subject_embeddings = get_embeddings(subject_quotes)
@@ -174,6 +174,21 @@ for subject in ['국어', '영어', '수학', '탐구', '공통']:
     )
     labels = clustering.fit_predict(subject_embeddings)
 ```
+
+### 왜 과목별로 먼저 나누나?
+
+위 코드에서 키워드 매칭의 한계를 지적했지만, 과목별 분리는 의도적이다. 전체를 한 번에 클러스터링하면 이런 일이 생긴다:
+
+```
+클러스터 #7: "반복 학습"
+  - "영단어는 짧게 여러 번 보기"
+  - "수학 공식도 매일 반복"
+  - "한국사 연표 반복해서 외우기"
+```
+
+의미적으로는 비슷하지만, **학습 가이드로 만들 때는 과목별로 달라야 한다**. 영단어 암기법과 수학 공식 암기법은 "반복"이라는 공통점이 있어도, 실제 실행 방법이 다르다. 과목 구분 없이 합치면 "반복이 중요합니다" 같은 추상적인 가이드밖에 나오지 않는다.
+
+Step 1에서 GPT가 인용을 추출할 때 `subject` 필드를 함께 태깅해둔 덕분에, 여기서 깔끔하게 분리할 수 있었다.
 
 ### DBSCAN을 선택한 이유
 
