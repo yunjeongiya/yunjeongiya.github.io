@@ -7,7 +7,6 @@ tags: [claude-code, hooks, english, productivity, developer-tools]
 lang: en
 slug: "030"
 thumbnail: /assets/images/posts/030-english-practice/thumbnail-en.png
-draft: true
 ---
 
 # Turning My Coding Tool into an English Tutor — With Claude Code Hooks

@@ -7,7 +7,6 @@ tags: [claude-code, hooks, english, productivity, developer-tools]
 lang: ko
 slug: "030"
 thumbnail: /assets/images/posts/030-english-practice/thumbnail-ko.png
-draft: true
 ---
 
 # 코딩하면서 영어 교정받기 — Claude Code를 영어 튜터로 쓰는 법
