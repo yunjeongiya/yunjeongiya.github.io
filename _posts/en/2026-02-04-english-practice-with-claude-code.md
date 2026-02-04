@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Turning My Coding Tool into an English Tutor — With Claude Code Hooks"
-date: 2026-02-04 12:00:00 +0900
+date: 2026-02-03 12:00:00 +0900
 categories: [Developer Tools, Productivity]
 tags: [claude-code, hooks, english, productivity, developer-tools]
 lang: en
