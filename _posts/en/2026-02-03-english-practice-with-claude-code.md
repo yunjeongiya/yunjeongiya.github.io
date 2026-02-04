@@ -77,7 +77,7 @@ Every time the user sends a message, inject an instruction telling the AI to cor
         "hooks": [
           {
             "type": "command",
-            "command": "echo If the user made any English mistakes in their message, you MUST correct them with a brief grammar explanation. Format: original -> correction (reason). Keep it 1-3 lines max."
+            "command": "echo If the user made any English mistakes in their message, you MUST correct them with a brief grammar explanation. Format: original -> correction (reason). Keep it 1-3 lines max. Also append the correction to ~/.claude/english-practice-log.md under today's date in the Daily Log section."
           }
         ]
       }
@@ -86,7 +86,17 @@ Every time the user sends a message, inject an instruction telling the AI to cor
 }
 ```
 
-That's it. Now every English message gets a correction.
+The instruction does two things: correct mistakes inline, and log them to the practice file. But the AI will ask permission every time it edits a file. To auto-allow edits to the log file, add this to `settings.json`:
+
+```json
+"permissions": {
+  "allow": [
+    "Edit:~/.claude/english-practice-log.md"
+  ]
+}
+```
+
+That's it. Now every English message gets a correction, and the correction is automatically recorded.
 
 ```
 Me:    "i want make new component for login"
@@ -122,7 +132,7 @@ Corrections without tracking are meaningless. You need to see which mistakes rep
 **Pattern observed:** Missing articles is the most common issue.
 ```
 
-The AI appends corrections to this file at the end of each session.
+The AI logs corrections to this file automatically as they happen. (The hook instruction includes a directive to append to the log.)
 
 ### 3. Analyze on Session Start (`SessionStart` hook)
 
@@ -231,10 +241,15 @@ Copy-paste ready. Add this to `~/.claude/settings.json`:
         "hooks": [
           {
             "type": "command",
-            "command": "echo If the user made any English mistakes in their message, you MUST correct them with a brief grammar explanation. Format: original -> correction (reason). Keep it 1-3 lines max."
+            "command": "echo If the user made any English mistakes in their message, you MUST correct them with a brief grammar explanation. Format: original -> correction (reason). Keep it 1-3 lines max. Also append the correction to ~/.claude/english-practice-log.md under today's date in the Daily Log section."
           }
         ]
       }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Edit:~/.claude/english-practice-log.md"
     ]
   }
 }

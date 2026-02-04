@@ -91,12 +91,24 @@ AI가 이 지시를 읽고, 사용자 메시지 처리 시 영어 교정도 함�
         "hooks": [
           {
             "type": "command",
-            "command": "echo If the user made any English mistakes in their message, you MUST correct them with a brief grammar explanation. Format: original -> correction (reason). Keep it 1-3 lines max."
+            "command": "echo If the user made any English mistakes in their message, you MUST correct them with a brief grammar explanation. Format: original -> correction (reason). Keep it 1-3 lines max. Also append the correction to ~/.claude/english-practice-log.md under today's date in the Daily Log section."
           }
         ]
       }
     ]
   }
+}
+```
+
+교정 지시와 로그 기록 지시가 하나의 hook에 들어있다. 교정이 발생하면 AI가 바로 로그 파일에도 기록한다.
+
+단, AI가 파일을 수정하려면 매번 권한 확인을 묻는데, 이걸 자동 허용하려면 `settings.json`의 `permissions.allow`에 추가하면 된다:
+
+```json
+"permissions": {
+  "allow": [
+    "Edit:~/.claude/english-practice-log.md"
+  ]
 }
 ```
 
@@ -136,7 +148,7 @@ Claude: (correction: "i want make" → "I want to make" — need 'to' before inf
 **Pattern observed:** Missing articles is the most common issue.
 ```
 
-세션이 끝날 때 AI가 이 파일에 교정 내역을 추가한다.
+교정이 일어날 때마다 AI가 이 파일에 자동으로 기록한다. (hook 지시문에 로그 기록 명령이 포함되어 있다.)
 
 ### 3. 세션 시작 시 분석 (`SessionStart` hook)
 
@@ -245,10 +257,15 @@ AI에게 원본 데이터를 넘기면 매번 최신 상태를 분석한다. 중
         "hooks": [
           {
             "type": "command",
-            "command": "echo If the user made any English mistakes in their message, you MUST correct them with a brief grammar explanation. Format: original -> correction (reason). Keep it 1-3 lines max."
+            "command": "echo If the user made any English mistakes in their message, you MUST correct them with a brief grammar explanation. Format: original -> correction (reason). Keep it 1-3 lines max. Also append the correction to ~/.claude/english-practice-log.md under today's date in the Daily Log section."
           }
         ]
       }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Edit:~/.claude/english-practice-log.md"
     ]
   }
 }
