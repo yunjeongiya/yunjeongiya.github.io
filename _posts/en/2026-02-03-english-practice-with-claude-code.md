@@ -9,7 +9,7 @@ slug: "030-en"
 thumbnail: /assets/images/posts/030-english-practice/thumbnail-en.png
 ---
 
-# Turning My Coding Tool into an English Tutor — With Claude Code Hooks
+![Turning My Coding Tool into an English Tutor](/assets/images/posts/030-english-practice/thumbnail-en.png){: width="700"}
 
 ## The Problem
 
