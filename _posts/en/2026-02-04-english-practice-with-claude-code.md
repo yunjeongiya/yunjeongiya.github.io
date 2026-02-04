@@ -6,6 +6,7 @@ categories: [Developer Tools, Productivity]
 tags: [claude-code, hooks, english, productivity, developer-tools]
 lang: en
 slug: "030"
+thumbnail: /assets/images/posts/030-english-practice/thumbnail-en.png
 draft: true
 ---
 
@@ -126,16 +127,9 @@ The AI appends corrections to this file at the end of each session.
 
 ### 3. Analyze on Session Start (`SessionStart` hook)
 
-<!-- 📸 Recommended screenshot #1: Session start analysis
-Filename: 01-session-start-analysis.png
-Content: Claude Code terminal showing "English Practice Status" analysis at session start
-How to capture:
-1. Start a new Claude Code session (run claude)
-2. Capture the screen showing the English Practice Status analysis
-3. Make sure the weakness summary is visible
--->
-
 When the next session starts, the hook feeds the entire log file to the AI. The AI reads it, analyzes the current weaknesses, and displays a briefing.
+
+![Session start — weakness analysis from practice log](/assets/images/posts/030-english-practice/01-session-start-analysis.png)
 
 ```json
 {
@@ -198,13 +192,11 @@ Give the AI the raw data and it analyzes the latest state every time. No interme
 
 ## Results
 
-<!-- 📸 Recommended screenshot #2: Actual correction example
-Filename: 02-correction-example.png
-Content: Coding conversation where English correction is naturally inserted
-How to capture:
-1. Send a message with intentional English mistakes in Claude Code
-2. Capture Claude correcting + performing the original task simultaneously
--->
+Here's what it looks like in practice — corrections inline with the actual coding conversation:
+
+![Correction example — articles, subject-verb agreement](/assets/images/posts/030-english-practice/02-correction-example-1.png)
+
+![Correction example — noun modifiers, word order](/assets/images/posts/030-english-practice/03-correction-example-2.png)
 
 After 2 days of use:
 

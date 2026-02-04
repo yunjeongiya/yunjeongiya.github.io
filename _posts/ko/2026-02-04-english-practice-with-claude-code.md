@@ -6,6 +6,7 @@ categories: [Developer Tools, Productivity]
 tags: [claude-code, hooks, english, productivity, developer-tools]
 lang: ko
 slug: "030"
+thumbnail: /assets/images/posts/030-english-practice/thumbnail-ko.png
 draft: true
 ---
 
@@ -140,16 +141,9 @@ Claude: (correction: "i want make" → "I want to make" — need 'to' before inf
 
 ### 3. 세션 시작 시 분석 (`SessionStart` hook)
 
-<!-- 📸 추천 스크린샷 #1: 세션 시작 시 영어 분석 결과
-파일명: 01-session-start-analysis.png
-내용: Claude Code 터미널에서 세션 시작 시 "English Practice Status" 분석이 표시되는 화면
-캡처 방법:
-1. Claude Code 새 세션 시작 (claude 명령어 실행)
-2. 세션 시작 직후 English Practice Status 분석 결과가 표시되는 화면 캡처
-3. 약점 분석 요약이 보이도록
--->
-
 다음 세션이 시작되면 hook이 로그 파일 전체를 AI에게 넘긴다. AI는 그걸 읽고 현재 약점을 분석해서 세션 시작 시 브리핑한다.
+
+![세션 시작 시 영어 약점 분석 결과](/assets/images/posts/030-english-practice/01-session-start-analysis.png)
 
 ```json
 {
@@ -212,13 +206,11 @@ AI에게 원본 데이터를 넘기면 매번 최신 상태를 분석한다. 중
 
 ## 실제 효과
 
-<!-- 📸 추천 스크린샷 #2: 실제 교정 사례
-파일명: 02-correction-example.png
-내용: 코딩 대화 중 영어 교정이 자연스럽게 삽입되는 실제 화면
-캡처 방법:
-1. Claude Code에서 일부러 영어 실수를 포함한 메시지 전송
-2. Claude가 교정 + 원래 작업을 동시에 수행하는 화면 캡처
--->
+실제로 코딩 대화 중에 영어 교정이 자연스럽게 삽입되는 모습:
+
+![실제 교정 사례 — 관사, 주어-동사 일치](/assets/images/posts/030-english-practice/02-correction-example-1.png)
+
+![실제 교정 사례 — 명사 수식어, 어순](/assets/images/posts/030-english-practice/03-correction-example-2.png)
 
 2일간 사용한 결과:
 
