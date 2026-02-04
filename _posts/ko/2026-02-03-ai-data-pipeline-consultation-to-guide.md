@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "3000개 상담에서 33개 학습 가이드 만들기 - AI 데이터 파이프라인"
+published: false
 date: 2026-02-03 19:00:00 +0900
 categories: [Development, AI]
 tags: [openai, embedding, clustering, dbscan, gpt, data-pipeline]
@@ -382,5 +383,3 @@ GPT가 만든 결과물도 문체 혼용, 오타 같은 문제가 있다. 최종
 - [ ] 신입 선생님 교육 자료로 활용
 
 ---
-
-*이 글은 Claude Code와 함께 작성되었습니다.*
