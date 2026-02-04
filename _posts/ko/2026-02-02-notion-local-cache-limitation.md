@@ -7,6 +7,7 @@ tags: [notion, python, asyncio, api, rate-limit]
 lang: ko
 slug: "027"
 thumbnail: /assets/images/posts/027-notion-cache-limit/thumbnail-ko.png
+published: false
 ---
 
 > 이전 글: [Notion API 없이 2만 페이지 읽기 - 로컬 캐시 + 오픈소스 기여기](/posts/026-notion-mcp-windows-opensource-contribution/)

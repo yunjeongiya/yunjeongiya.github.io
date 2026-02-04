@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "코딩하면서 영어 교정받기 — Claude Code를 영어 튜터로 쓰는 법"
-date: 2026-02-04 22:00:00 +0900
+date: 2026-02-04 12:00:00 +0900
 categories: [Developer Tools, Productivity]
 tags: [claude-code, hooks, english, productivity, developer-tools]
 lang: ko
