@@ -5,7 +5,7 @@ date: 2026-02-03 12:00:00 +0900
 categories: [Developer Tools, Productivity]
 tags: [claude-code, hooks, english, productivity, developer-tools]
 lang: en
-slug: "030"
+slug: "030-en"
 thumbnail: /assets/images/posts/030-english-practice/thumbnail-en.png
 ---
 
