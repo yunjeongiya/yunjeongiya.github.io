@@ -5,7 +5,7 @@ date: 2026-02-05 12:00:00 +0900
 categories: [Development, Face Recognition]
 tags: [face-recognition, liveness-detection, ML-Kit, IR-camera, security]
 lang: en
-slug: "031"
+slug: "031-en"
 thumbnail: /assets/images/posts/031-face-recognition-liveness/thumbnail-en.png
 ---
 
