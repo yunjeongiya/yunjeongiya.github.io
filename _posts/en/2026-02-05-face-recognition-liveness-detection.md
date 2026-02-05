@@ -9,6 +9,8 @@ slug: "031-en"
 thumbnail: /assets/images/posts/031-face-recognition-liveness/thumbnail-en.png
 ---
 
+![Face Recognition Is Easy. Liveness Is Not.](/assets/images/posts/031-face-recognition-liveness/thumbnail-en.png){: width="700"}
+
 I'm building an attendance kiosk with face recognition. At first, I bought an IR camera module without much thought. Seeing Apple put a notch and Dynamic Island on iPhones just for Face ID sensors, I figured there must be a good reason. They're sacrificing precious screen real estate for it.
 
 But then a question hit me. **Toss FacePay processes payments using just RGB cameras (on smartphones or store tablets) without IR sensors.** A service where real money is at stake — using just an RGB camera? Does that actually work?

@@ -9,6 +9,8 @@ slug: "031"
 thumbnail: /assets/images/posts/031-face-recognition-liveness/thumbnail-ko.png
 ---
 
+![사진 한 장에 뚫리는 얼굴인식](/assets/images/posts/031-face-recognition-liveness/thumbnail-ko.png){: width="700"}
+
 출결 인식용 키오스크를 만들고 있다. 처음엔 별 고민 없이 IR 카메라 모듈을 샀다. 아이폰이 노치, 다이나믹 아일랜드까지 달아가면서 Face ID용 센서를 넣는 걸 보면 이유가 있겠거니 싶었다. 애플이 그 귀한 화면 공간을 포기하면서까지 넣는 건데.
 
 그런데 문득 의문이 들었다. **토스 페이스페이는 별도의 IR 센서 없이, 일반 RGB 카메라(스마트폰이나 매장 태블릿)만으로 결제 인증을 한다.** 돈이 걸린 서비스를 일반 RGB 카메라로? 되는 건가?
