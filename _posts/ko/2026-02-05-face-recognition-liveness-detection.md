@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "사진 한 장에 뚫리는 얼굴인식 — 왜 토스는 되고, 나는 안 될까?"
-date: 2025-02-05 12:00:00 +0900
+date: 2026-02-05 12:00:00 +0900
 categories: [Development, Face Recognition]
 tags: [face-recognition, liveness-detection, ML-Kit, IR-camera, security]
 lang: ko

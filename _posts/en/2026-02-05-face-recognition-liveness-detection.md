@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Face Recognition Is Easy. Liveness Is Not."
-date: 2025-02-05 12:00:00 +0900
+date: 2026-02-05 12:00:00 +0900
 categories: [Development, Face Recognition]
 tags: [face-recognition, liveness-detection, ML-Kit, IR-camera, security]
 lang: en
