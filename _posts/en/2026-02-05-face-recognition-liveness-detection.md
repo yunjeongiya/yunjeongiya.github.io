@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Face Recognition Is Easy. Liveness Is Not."
+title: "There's a Reason Apple Still Uses a Notch for Face ID"
 date: 2026-02-05 12:00:00 +0900
 categories: [Development, Face Recognition]
 tags: [face-recognition, liveness-detection, ML-Kit, IR-camera, security]
@@ -9,7 +9,7 @@ slug: "031-en"
 thumbnail: /assets/images/posts/031-face-recognition-liveness/thumbnail-en.png
 ---
 
-![Face Recognition Is Easy. Liveness Is Not.](/assets/images/posts/031-face-recognition-liveness/thumbnail-en.png){: width="700"}
+![There's a Reason Apple Still Uses a Notch for Face ID](/assets/images/posts/031-face-recognition-liveness/thumbnail-en.png){: width="700"}
 
 I'm building an attendance kiosk with face recognition. At first, I bought an IR camera module without much thought. Seeing Apple put a notch and Dynamic Island on iPhones just for Face ID sensors, I figured there must be a good reason. They're sacrificing precious screen real estate for it.
 
