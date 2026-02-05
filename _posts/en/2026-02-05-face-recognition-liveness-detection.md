@@ -146,6 +146,19 @@ But **kiosks let you control the hardware**. Just add an IR camera and you're do
 | Ongoing Cost | High (API fees or server costs) | $0 |
 | Best For | Consumer mobile apps | Kiosks, door locks, attendance terminals |
 
+### "But Galaxy Phones Have Face Unlock Too?"
+
+Some might ask, "Don't Galaxy phones do face recognition with just a camera?" Yes, but there's a crucial difference.
+
+**Galaxy unlocks the screen with your face, but Samsung Pay still requires a fingerprint.**
+
+Even Samsung doesn't trust RGB-based face recognition for financial transactions. When you set up face recognition on a Galaxy, you see warnings like:
+
+> "Face recognition is less secure than pattern, PIN, or password."
+> "Your phone could be unlocked by someone who looks like you, or by a photo or video of you."
+
+Meanwhile, iPhones with IR sensors let you use Face ID for App Store purchases, money transfers, and Apple Pay — all with just your face. If my kiosk needs to reliably prevent proxy check-ins, choosing Samsung Pay-level security (IR) is the right call.
+
 ---
 
 Turns out buying the IR camera module was the right call. There's a reason Apple can't abandon the notch.
