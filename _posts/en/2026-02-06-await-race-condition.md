@@ -17,47 +17,49 @@ thumbnail: /assets/images/posts/032-await-race-condition/diagram-en.svg
 NonUniqueResultException: Query did not return a unique result: 2 results were returned
 ```
 
-84 times. Escalating. The entire seat map — a real-time attendance dashboard — was down. The failing endpoint was `GET /attendance/status`.
+84 times. Escalating. The entire meeting room booking dashboard was down. The failing endpoint was `GET /rooms/status`.
 
-A query expecting a single result returned two. That means duplicate data existed in the database that shouldn't have been there. But here's the thing — the service already had overlap validation. Every create and update path checked for time conflicts and threw an exception if one was found.
+A query expecting a single result returned two. That means duplicate data existed in the database that shouldn't have been there. This wasn't just a bug — it meant the system's fundamental invariant, "no overlapping bookings for the same room," had been violated.
+
+But here's the thing — the service already had overlap validation. Every create and update path checked for time conflicts and threw an exception if one was found.
 
 So how did duplicate data get past the validation?
 
 ## Step 1: Finding the Duplicate
 
-First, I queried the database directly for overlapping schedules.
+First, I queried the database directly for overlapping bookings.
 
 ```sql
-SELECT a.id, b.id, a.user_id, a.day_of_week,
+SELECT a.id, b.id, a.room_id, a.day_of_week,
        a.start_time, a.end_time, b.start_time, b.end_time
-FROM weekly_schedule a
-JOIN weekly_schedule b
-  ON a.user_id = b.user_id AND a.campus_id = b.campus_id
+FROM room_booking a
+JOIN room_booking b
+  ON a.room_id = b.room_id
   AND a.day_of_week = b.day_of_week AND a.id < b.id
   AND a.start_time < b.end_time AND b.start_time < a.end_time
-WHERE a.schedule_type = 'CAMPUS_SEAT'
-  AND b.schedule_type = 'CAMPUS_SEAT';
+WHERE a.booking_type = 'MEETING_ROOM'
+  AND b.booking_type = 'MEETING_ROOM';
 ```
 
-Exactly one hit. One student had two overlapping attendance schedules on Friday.
+Exactly one hit. Room 3A had two overlapping bookings on Friday.
 
 | id | Time | Note |
 |----|------|------|
-| 651 | 09:00–22:00 | History exists |
-| 656 | 11:00–18:00 | **No history** |
+| 301 | 09:00–12:00 | History exists |
+| 309 | 10:00–11:30 | **No history** |
 
 ## Step 2: Following the Trail
 
-id 651 had a normal creation history record. id 656 had none at all.
+id 301 had a normal creation history record. id 309 had none at all.
 
 Digging through the history table revealed a clue.
 
 ```
-482 | CREATE | Fri 09:00-22:00        | 05:40:08.684 | schedule_id=651
-484 | CREATE | Mon,Wed,Fri 11:00-18:00 | 05:40:08.690 | schedule_id=652
+201 | CREATE | 3A [Fri] 09:00-12:00           | 05:40:08.684 | booking_id=301
+203 | CREATE | 3A [Mon,Wed,Fri] 10:00-11:30   | 05:40:08.690 | booking_id=305
 ```
 
-History 484 says "Mon, Wed, Fri 11:00–18:00" but only recorded `schedule_id=652` (Monday). The bulk creation API created three schedules at once (Mon/Wed/Fri), but only logged the first one. id 656 (Friday) was the third schedule in that same bulk operation — invisible in the audit trail.
+History 203 says "Mon, Wed, Fri 10:00–11:30" but only recorded `booking_id=305` (Monday). The recurring booking API created three bookings at once (Mon/Wed/Fri), but only logged the first one. id 309 (Friday) was the third booking in that same operation — invisible in the audit trail.
 
 And look at the timestamps. The gap between the two history records is **0.006 seconds**.
 
@@ -68,7 +70,7 @@ No human clicks twice in 0.006 seconds. The code sent parallel requests.
 I checked the frontend code. There it was.
 
 ```typescript
-// WeeklyScheduleDialog.tsx — before fix
+// BookingDialog.tsx — before fix
 for (let i = 0; i < timeSlots.length; i++) {
   onSave(bulkRequest, i === 0 && isEditMode);  // no await
 }
@@ -79,18 +81,18 @@ for (let i = 0; i < timeSlots.length; i++) {
 Here's what happened on the server.
 
 ```
-Thread 1 (Fri 09:00-22:00):
+Thread 1 (Fri 09:00-12:00):
   ① Overlap check → "Any overlap on Friday?" → None ✅
-  ② INSERT (id=651)
+  ② INSERT (id=301)
   ③ COMMIT
 
-Thread 2 (Mon/Wed/Fri 11:00-18:00):
+Thread 2 (Mon/Wed/Fri 10:00-11:30):
   ① Overlap check → "Any overlap on Friday?" → None ✅  ← THE PROBLEM
-  ② INSERT (id=652, 655, 656)
+  ② INSERT (id=305, 308, 309)
   ③ COMMIT
 ```
 
-When Thread 2 ran its overlap check, Thread 1 hadn't committed yet. Under MySQL's default isolation level, REPEATABLE READ, **uncommitted data from other transactions is invisible**. So Thread 2's validation saw "no overlapping schedules" and passed.
+When Thread 2 ran its overlap check, Thread 1 hadn't committed yet. Under MySQL's default isolation level, REPEATABLE READ, **uncommitted data from other transactions is invisible**. More precisely, even data committed after your transaction started remains invisible. So Thread 2's validation saw "no overlapping bookings" and passed.
 
 ```
 Thread 1: [──validate──][──save──][commit]
@@ -101,34 +103,36 @@ Thread 2:    [──validate──][────save────][commit]
 
 The validation logic was correct. Within a single transaction. The problem was cross-transaction visibility.
 
+This was neither a frontend bug nor a backend bug. It was a concurrency bug at the system boundary.
+
 ## Reproducing It
 
 Theory confirmed. Time to reproduce.
 
-On production (before deploying the fix), I opened the schedule dialog for the same student, added two time slots, and hit save. In the browser's Network tab, two requests fired almost simultaneously. Both returned success.
+On production (before deploying the fix), I opened the booking dialog for the same room, added two time slots, and hit save. In the browser's Network tab, two requests fired almost simultaneously. Both returned success.
 
 ```
-PUT  /weekly-schedule/replace  → 200 (Wed,Fri 11:00-18:00)
-POST /weekly-schedule/bulk     → 201 (Fri 09:00-23:00)
+PUT  /bookings/replace  → 200 (Wed,Fri 10:00-12:00)
+POST /bookings/bulk     → 201 (Fri 09:00-13:00)
 ```
 
-Friday 11:00–18:00 and 09:00–23:00 clearly overlap. Both passed validation.
+Friday 10:00–12:00 and 09:00–13:00 clearly overlap. Both passed validation.
 
-I tried again with completely identical schedules — Saturday 09:00–10:00 entered as two separate time slots:
+I tried again with completely identical bookings — Monday 10:00–11:00 entered as two separate time slots:
 
 ```
-POST /weekly-schedule/bulk  → 201 (id=1249, Sat 09:00-10:00)
-POST /weekly-schedule/bulk  → 201 (id=1250, Sat 09:00-10:00)
+POST /bookings/bulk  → 201 (id=451, Mon 10:00-11:00)
+POST /bookings/bulk  → 201 (id=452, Mon 10:00-11:00)
 ```
 
-Two 100% identical schedules created. The validation bypass was not dependent on server speed — it reproduced consistently on EC2 t3.small.
+Two 100% identical bookings created. The validation bypass was not dependent on server speed — it reproduced consistently in any environment.
 
 ## The Fix
 
 ### Root Cause: Sequential Frontend Requests
 
 ```typescript
-// WeeklyScheduleDialog.tsx — after fix
+// BookingDialog.tsx — after fix
 for (let i = 0; i < timeSlots.length; i++) {
   await onSave(bulkRequest, i === 0 && isEditMode);  // await added
 }
@@ -136,43 +140,43 @@ for (let i = 0; i < timeSlots.length; i++) {
 
 One word: `await`. The first request commits before the second one starts. Now the backend overlap validation works as designed.
 
-The same pattern existed elsewhere. A paste-to-create feature used `Promise.allSettled` for parallel execution:
+The same pattern existed elsewhere. A batch registration feature used `Promise.allSettled` for parallel execution:
 
 ```typescript
 // Before — parallel execution
 const results = await Promise.allSettled(
-  schedules.map(s => api.createWeeklySchedule(s))
+  bookings.map(b => api.createBooking(b))
 );
 
 // After — sequential execution
-for (const schedule of schedules) {
-  await api.createWeeklySchedule(schedule);
+for (const booking of bookings) {
+  await api.createBooking(booking);
 }
 ```
 
 ### Defense in Depth: Backend Defensive Query
 
-The frontend fix addresses the root cause, but I also hardened the backend for unexpected scenarios.
+The frontend fix addresses the root cause, but a root cause fix alone isn't enough. You need a safety belt for production resilience.
 
-Changed the crashing query's return type from `Optional<WeeklySchedule>` to `List<WeeklySchedule>`. If duplicates are detected, a Sentry WARNING is sent instead of crashing the service.
+Changed the crashing query's return type from `Optional<RoomBooking>` to `List<RoomBooking>`. If duplicates are detected, a Sentry WARNING is sent instead of crashing the service.
 
 ```java
-List<WeeklySchedule> schedules = repository
-    .findCurrentCampusSeatSchedule(userId, campusId, dayOfWeek, time);
+List<RoomBooking> bookings = repository
+    .findCurrentRoomBooking(roomId, dayOfWeek, time);
 
-if (schedules.size() > 1) {
-    Sentry.captureMessage("Duplicate CAMPUS_SEAT schedule detected - userId: " + userId,
+if (bookings.size() > 1) {
+    Sentry.captureMessage("Duplicate room booking detected - roomId: " + roomId,
                           SentryLevel.WARNING);
 }
 
-return schedules.isEmpty() ? null : schedules.get(0);
+return bookings.isEmpty() ? null : bookings.get(0);
 ```
 
 Now even if duplicate data somehow exists, the service stays up and sends an alert for manual cleanup.
 
-### Side Fix: Bulk History
+### Side Fix: Recurring Booking History
 
-During the investigation, the missing history for id 656 slowed down root cause analysis significantly. Fixed the bulk creation to record history for every schedule, not just the first one.
+During the investigation, the missing history for id 309 slowed down root cause analysis significantly. Fixed the recurring booking creation to record history for every booking, not just the first one.
 
 ## Lessons Learned
 
@@ -191,6 +195,10 @@ Recording history for "just the first item" in a bulk operation makes the rest u
 **4. Defensive queries are insurance.**
 
 Receiving a `List` instead of `Optional` for queries that expect a single result prevents service crashes from unexpected data. Alert instead of crash.
+
+---
+
+**Correct validation logic + parallel requests ≠ safe system.**
 
 ## References
 
