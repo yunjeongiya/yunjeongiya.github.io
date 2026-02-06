@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "84 Production Crashes — From Sentry Alert to Defensive Programming"
+title: "96 Production Crashes — From Sentry Alert to Defensive Programming"
 date: 2026-02-06 11:00:00 +0900
 categories: [Development, Debugging]
 tags: [sentry, defensive-programming, race-condition, mysql, spring-boot, production-incident]
@@ -17,7 +17,7 @@ thumbnail: /assets/images/posts/032-await-race-condition/sentry-dashboard.jpg
 NonUniqueResultException: Query did not return a unique result: 2 results were returned
 ```
 
-84 times. Escalating. The booking status dashboard was completely down. It was coming from the status API (`GET /rooms/status`).
+96 times. Escalating. The booking status dashboard was completely down. It was coming from the status API (`GET /rooms/status`).
 
 Following the stack trace Sentry captured, the culprit was a JPA query called `findCurrentRoomBooking`. Declared with `Optional<RoomBooking>` — meaning it expects 0 or 1 result — but it was returning 2, and crashing.
 
@@ -83,7 +83,7 @@ The validation logic was perfect. Within a single transaction. The problem was v
 
 I understood the cause. But fixing the root cause meant redesigning the API — the architecture of sending multiple time slots as separate requests was the real problem. That would take time.
 
-**What needed to be fixed right now was something else — the dashboard was on its 84th crash.**
+**What needed to be fixed right now was something else — the dashboard was on its 96th crash.**
 
 ## Immediate Response: Turning Crashes into Warnings
 
@@ -118,7 +118,7 @@ Now if the same situation happens again:
 - **Alerts still come.** Sentry WARNING detects duplicate occurrences.
 - **Cleanup is possible.** Receive the alert, clean up duplicate data from DB.
 
-84 crashes become 1 warning.
+96 crashes become 1 warning.
 
 ## Side Fix: The Audit Log Blind Spot
 
@@ -147,7 +147,7 @@ JPA's `Optional` return type throws an exception when the "0 or 1 result" assump
 **3. Sentry is a monitoring tool, not just a discovery tool**
 
 Sentry played two roles here:
-- **Discovery**: Alerted us to the incident with 84 `NonUniqueResultException` events.
+- **Discovery**: Alerted us to the incident with 96 `NonUniqueResultException` events.
 - **Surveillance**: After the fix, `captureMessage(WARNING)` continues monitoring for duplicates.
 
 Catching thrown errors is important, but sending WARNINGs for "not an error but needs attention" situations is an essential Sentry usage pattern.

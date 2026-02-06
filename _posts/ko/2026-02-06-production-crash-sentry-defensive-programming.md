@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "프로덕션 크래시 84건 — Sentry 알림에서 방어적 프로그래밍까지"
+title: "프로덕션 크래시 96건 — Sentry 알림에서 방어적 프로그래밍까지"
 date: 2026-02-06 11:00:00 +0900
 categories: [Development, Debugging]
 tags: [sentry, defensive-programming, race-condition, mysql, spring-boot, production-incident]
@@ -17,7 +17,7 @@ thumbnail: /assets/images/posts/032-await-race-condition/sentry-dashboard.jpg
 NonUniqueResultException: Query did not return a unique result: 2 results were returned
 ```
 
-84회. 그것도 escalating. 예약 현황 대시보드가 통째로 먹통이 됐다. 현황 API(`GET /rooms/status`)에서 터진 거였다.
+96회. 그것도 escalating. 예약 현황 대시보드가 통째로 먹통이 됐다. 현황 API(`GET /rooms/status`)에서 터진 거였다.
 
 Sentry가 잡아준 스택트레이스를 따라가보면, `findCurrentRoomBooking`이라는 JPA 쿼리가 범인이다. `Optional<RoomBooking>`으로 선언된 — 즉 결과가 0 또는 1개여야 하는 — 쿼리가 2개를 반환하면서 터졌다.
 
@@ -83,7 +83,7 @@ id 301은 생성 히스토리가 정상적으로 남아있었다. 문제는 id 3
 
 원인은 파악했다. 그런데 근본 원인을 고치려면 API를 재설계해야 한다. 여러 시간대를 개별 요청으로 보내는 구조 자체가 문제이기 때문이다. 그건 시간이 걸린다.
 
-**지금 당장 해결해야 할 건 다른 거다 — 대시보드가 84번째 크래시 중이다.**
+**지금 당장 해결해야 할 건 다른 거다 — 대시보드가 96번째 크래시 중이다.**
 
 ## 즉시 대응: 크래시를 경고로 바꾸기
 
@@ -118,7 +118,7 @@ return bookings.isEmpty() ? null : bookings.get(0);
 - **알림은 온다.** Sentry WARNING으로 중복 발생을 감지할 수 있다.
 - **사후 정리가 가능하다.** 알림을 받고 DB에서 중복 데이터를 정리하면 된다.
 
-크래시 84건이, 경고 1건으로 바뀌는 거다.
+크래시 96건이, 경고 1건으로 바뀌는 거다.
 
 ## 부수 수정: 감사 로그의 사각지대
 
@@ -147,7 +147,7 @@ JPA에서 `Optional` 반환 타입은 "결과가 0 또는 1개"라는 가정이 
 **3. Sentry는 발견만이 아니라 모니터링 도구다**
 
 이번에 Sentry는 두 번 역할을 했다.
-- **발견**: `NonUniqueResultException` 84건으로 장애를 알려줬다.
+- **발견**: `NonUniqueResultException` 96건으로 장애를 알려줬다.
 - **감시**: 수정 후에도 `captureMessage(WARNING)`으로 중복 발생을 계속 감시한다.
 
 에러가 터졌을 때 잡아주는 것도 중요하지만, "에러는 아닌데 주의가 필요한 상황"을 WARNING으로 보내는 것도 Sentry의 핵심 활용법이다.
