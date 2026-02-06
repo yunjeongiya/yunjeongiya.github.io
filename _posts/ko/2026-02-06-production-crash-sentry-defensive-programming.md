@@ -6,13 +6,10 @@ categories: [Development, Debugging]
 tags: [sentry, defensive-programming, race-condition, mysql, spring-boot, production-incident]
 lang: ko
 slug: "032"
-thumbnail: /assets/images/posts/032-await-race-condition/diagram-ko.svg
+thumbnail: /assets/images/posts/032-await-race-condition/sentry-dashboard.jpg
 ---
 
-<!-- 📸 TODO: Sentry 대시보드 스크린샷을 thumbnail로 교체
-파일명: thumbnail-ko.png
-캡처: https://yunjeong-lee.sentry.io/issues/7246050297/ 이슈 상단
-교체 후 frontmatter thumbnail 경로 업데이트 -->
+![Sentry 이슈 대시보드 — 96건의 NonUniqueResultException](/assets/images/posts/032-await-race-condition/sentry-dashboard.jpg)
 
 오전 11시, Sentry에서 알림이 왔다.
 

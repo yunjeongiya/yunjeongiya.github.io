@@ -6,13 +6,10 @@ categories: [Development, Debugging]
 tags: [sentry, defensive-programming, race-condition, mysql, spring-boot, production-incident]
 lang: en
 slug: "032-en"
-thumbnail: /assets/images/posts/032-await-race-condition/diagram-en.svg
+thumbnail: /assets/images/posts/032-await-race-condition/sentry-dashboard.jpg
 ---
 
-<!-- TODO: Replace thumbnail with Sentry dashboard screenshot
-File: thumbnail-en.png
-Capture: https://yunjeong-lee.sentry.io/issues/7246050297/ issue header
-Update frontmatter thumbnail path after -->
+![Sentry issue dashboard — 96 NonUniqueResultException events](/assets/images/posts/032-await-race-condition/sentry-dashboard.jpg)
 
 11 AM. Sentry alert.
 
