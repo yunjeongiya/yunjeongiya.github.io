@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" font-family="'Inter', 'Segoe UI', sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#64748b"/>
+    </marker>
+    <marker id="arrow-red" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#ef4444"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="520" fill="#fafafa" rx="12"/>
+
+  <!-- Title -->
+  <text x="450" y="36" text-anchor="middle" font-size="18" font-weight="700" fill="#0f172a">Parallel Frontend Requests → Backend Race Condition</text>
+
+  <!-- Frontend section -->
+  <rect x="30" y="56" width="840" height="80" rx="8" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
+  <text x="50" y="78" font-size="13" font-weight="600" fill="#1e40af">Frontend (Browser)</text>
+
+  <!-- Frontend code -->
+  <rect x="50" y="88" width="380" height="38" rx="4" fill="#1e293b"/>
+  <text x="60" y="112" font-size="12" font-family="'Fira Code', 'Consolas', monospace" fill="#f87171">for</text>
+  <text x="82" y="112" font-size="12" font-family="'Fira Code', 'Consolas', monospace" fill="#e2e8f0"> (let i = 0; ...) onSave(req);</text>
+  <text x="370" y="112" font-size="11" font-family="'Fira Code', 'Consolas', monospace" fill="#fbbf24">// no await!</text>
+
+  <!-- Two arrows from frontend -->
+  <rect x="480" y="88" width="160" height="17" rx="3" fill="#3b82f6"/>
+  <text x="490" y="101" font-size="11" font-weight="500" fill="white">Req A: Fri 09:00-22:00</text>
+  <rect x="480" y="109" width="195" height="17" rx="3" fill="#8b5cf6"/>
+  <text x="490" y="122" font-size="11" font-weight="500" fill="white">Req B: Mon/Wed/Fri 11:00-18:00</text>
+  <text x="685" y="122" font-size="10" fill="#6b7280">← 0.006s apart</text>
+
+  <!-- Time axis -->
+  <line x1="50" y1="170" x2="850" y2="170" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="855" y="174" font-size="11" fill="#64748b">time</text>
+
+  <!-- Time markers -->
+  <line x1="150" y1="166" x2="150" y2="174" stroke="#94a3b8" stroke-width="1"/>
+  <text x="150" y="186" text-anchor="middle" font-size="10" fill="#94a3b8">t1</text>
+  <line x1="300" y1="166" x2="300" y2="174" stroke="#94a3b8" stroke-width="1"/>
+  <text x="300" y="186" text-anchor="middle" font-size="10" fill="#94a3b8">t2</text>
+  <line x1="450" y1="166" x2="450" y2="174" stroke="#94a3b8" stroke-width="1"/>
+  <text x="450" y="186" text-anchor="middle" font-size="10" fill="#94a3b8">t3</text>
+  <line x1="560" y1="166" x2="560" y2="174" stroke="#94a3b8" stroke-width="1"/>
+  <text x="560" y="186" text-anchor="middle" font-size="10" fill="#94a3b8">t4</text>
+  <line x1="680" y1="166" x2="680" y2="174" stroke="#94a3b8" stroke-width="1"/>
+  <text x="680" y="186" text-anchor="middle" font-size="10" fill="#94a3b8">t5</text>
+  <line x1="780" y1="166" x2="780" y2="174" stroke="#94a3b8" stroke-width="1"/>
+  <text x="780" y="186" text-anchor="middle" font-size="10" fill="#94a3b8">t6</text>
+
+  <!-- Thread A (Request A) -->
+  <text x="50" y="222" font-size="13" font-weight="600" fill="#1e40af">Thread 1</text>
+  <text x="50" y="238" font-size="11" fill="#64748b">Fri 09:00-22:00</text>
+
+  <!-- Thread A: Validate -->
+  <rect x="150" y="210" width="150" height="36" rx="6" fill="#3b82f6" opacity="0.9"/>
+  <text x="225" y="224" text-anchor="middle" font-size="12" font-weight="500" fill="white">① Overlap check</text>
+  <text x="225" y="239" text-anchor="middle" font-size="11" fill="#dbeafe">→ None ✅</text>
+
+  <!-- Thread A: Save -->
+  <rect x="310" y="210" width="140" height="36" rx="6" fill="#2563eb" opacity="0.9"/>
+  <text x="380" y="232" text-anchor="middle" font-size="12" font-weight="500" fill="white">② INSERT (id=651)</text>
+
+  <!-- Thread A: Commit -->
+  <rect x="460" y="210" width="90" height="36" rx="6" fill="#1d4ed8"/>
+  <text x="505" y="232" text-anchor="middle" font-size="12" font-weight="600" fill="white">③ COMMIT</text>
+
+  <!-- Thread B (Request B) -->
+  <text x="50" y="302" font-size="13" font-weight="600" fill="#7c3aed">Thread 2</text>
+  <text x="50" y="318" font-size="11" fill="#64748b">Mon/Wed/Fri 11:00-18:00</text>
+
+  <!-- Thread B: Validate - THE PROBLEM -->
+  <rect x="200" y="290" width="160" height="36" rx="6" fill="#8b5cf6" opacity="0.9"/>
+  <text x="280" y="304" text-anchor="middle" font-size="12" font-weight="500" fill="white">① Overlap check</text>
+  <text x="280" y="319" text-anchor="middle" font-size="11" fill="#ede9fe">→ None ✅</text>
+
+  <!-- Thread B: Save -->
+  <rect x="370" y="290" width="200" height="36" rx="6" fill="#7c3aed" opacity="0.9"/>
+  <text x="470" y="312" text-anchor="middle" font-size="12" font-weight="500" fill="white">② INSERT (652, 655, 656)</text>
+
+  <!-- Thread B: Commit -->
+  <rect x="580" y="290" width="90" height="36" rx="6" fill="#6d28d9"/>
+  <text x="625" y="312" text-anchor="middle" font-size="12" font-weight="600" fill="white">③ COMMIT</text>
+
+  <!-- Problem indicator - vertical dashed line -->
+  <line x1="280" y1="246" x2="280" y2="290" stroke="#ef4444" stroke-width="2" stroke-dasharray="4,3"/>
+
+  <!-- Problem callout box -->
+  <rect x="520" y="348" width="340" height="70" rx="8" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.5"/>
+  <text x="536" y="370" font-size="12" font-weight="600" fill="#dc2626">REPEATABLE READ</text>
+  <text x="536" y="388" font-size="11" fill="#7f1d1d">Thread 1 not yet committed when Thread 2 validates</text>
+  <text x="536" y="404" font-size="11" fill="#7f1d1d">→ Uncommitted data invisible → Validation passes</text>
+
+  <!-- Arrow from problem to callout -->
+  <path d="M280,326 L280,360 L516,360" fill="none" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-red)"/>
+
+  <!-- "Not committed yet" label -->
+  <rect x="340" y="248" width="110" height="22" rx="4" fill="#fef2f2" stroke="#fca5a5" stroke-width="1"/>
+  <text x="395" y="263" text-anchor="middle" font-size="10" font-weight="600" fill="#dc2626">Not committed yet</text>
+  <path d="M395,270 L395,284 L370,290" fill="none" stroke="#ef4444" stroke-width="1" stroke-dasharray="3,2"/>
+
+  <!-- Result box -->
+  <rect x="50" y="440" width="800" height="60" rx="8" fill="#fefce8" stroke="#fde047" stroke-width="1.5"/>
+  <text x="70" y="462" font-size="13" font-weight="600" fill="#854d0e">Result</text>
+  <text x="130" y="462" font-size="12" fill="#713f12">Both 09:00-22:00 (id=651) and 11:00-18:00 (id=656) exist on Friday</text>
+  <text x="70" y="484" font-size="13" font-weight="600" fill="#854d0e">Impact</text>
+  <text x="130" y="484" font-size="12" fill="#713f12">NonUniqueResultException → Seat map API down (84 occurrences, 38 minutes)</text>
+
+  <!-- Fix hint -->
+  <rect x="50" y="348" width="410" height="70" rx="8" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
+  <text x="66" y="370" font-size="12" font-weight="600" fill="#166534">Fix: Add await for sequential execution</text>
+  <rect x="66" y="378" width="370" height="30" rx="4" fill="#1e293b"/>
+  <text x="76" y="398" font-size="11" font-family="'Fira Code', 'Consolas', monospace" fill="#4ade80">await</text>
+  <text x="118" y="398" font-size="11" font-family="'Fira Code', 'Consolas', monospace" fill="#e2e8f0"> onSave(req); </text>
+  <text x="244" y="398" font-size="10" font-family="'Fira Code', 'Consolas', monospace" fill="#94a3b8">// Req A commits before Req B starts</text>
+</svg>
