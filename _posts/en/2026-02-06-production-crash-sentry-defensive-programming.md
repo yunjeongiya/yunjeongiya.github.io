@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "96 Production Crashes — From Sentry Alert to Defensive Programming"
+title: "The 0.006s Gap — From Sentry Alert to Defensive Programming"
 date: 2026-02-06 11:00:00 +0900
 categories: [Development, Debugging]
 tags: [sentry, defensive-programming, race-condition, mysql, spring-boot, production-incident]

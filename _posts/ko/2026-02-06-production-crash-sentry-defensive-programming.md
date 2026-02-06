@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "프로덕션 크래시 96건 — Sentry 알림에서 방어적 프로그래밍까지"
+title: "0.006초의 간극 — Sentry 알림에서 방어적 프로그래밍까지"
 date: 2026-02-06 11:00:00 +0900
 categories: [Development, Debugging]
 tags: [sentry, defensive-programming, race-condition, mysql, spring-boot, production-incident]
