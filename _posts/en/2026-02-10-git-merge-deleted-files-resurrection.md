@@ -89,11 +89,11 @@ Even without direct commits to main, its **stale state** causes problems during 
 ## When Git Auto-Handles Deletions vs. When It Doesn't
 
 | Scenario | Result |
-|-------------------------------------------|-------------------------|
+|-------------------------------|-------------------------|
 | dev deleted, main unchanged | Auto-keeps deletion |
 | dev deleted, main modified | Conflict (delete/modify) |
 | dev deleted, main also deleted | Auto-keeps deletion |
-| Large branch divergence + complex history | Unpredictable |
+| Old divergence + complex history | Unpredictable |
 
 My case was the last one. The divergence was too long, and there were many changes in between, so Git couldn't auto-resolve.
 
