@@ -9,7 +9,7 @@ slug: "033"
 thumbnail: /assets/images/posts/033-git-merge-deleted-files/thumbnail-ko.png
 ---
 
-![Git 머지 충돌 - 삭제한 파일의 부활](/assets/images/posts/033-git-merge-deleted-files/hero.png)
+![Git 머지 충돌 - 삭제한 파일의 부활](/assets/images/posts/033-git-merge-deleted-files/hero.png){: width="700"}
 
 ## 문제 상황: "main에 아무것도 안 건드렸는데...?"
 
@@ -89,7 +89,7 @@ main에 직접 커밋이 없어도, **오래된 상태**가 머지 시 문제를
 ## Git이 파일 삭제를 자동 처리하는 경우 vs 아닌 경우
 
 | 시나리오 | 결과 |
-|----------|------|
+|----------------------------------------|------------------------|
 | dev 삭제, main 변경 없음 | 자동 삭제 유지 |
 | dev 삭제, main 수정 | 충돌 (delete/modify) |
 | dev 삭제, main에도 삭제 | 자동 삭제 유지 |

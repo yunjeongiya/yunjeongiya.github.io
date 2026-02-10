@@ -9,7 +9,7 @@ slug: "033-en"
 thumbnail: /assets/images/posts/033-git-merge-deleted-files/thumbnail-en.png
 ---
 
-![Git Merge Conflict - Resurrection of Deleted Files](/assets/images/posts/033-git-merge-deleted-files/hero.png)
+![Git Merge Conflict - Resurrection of Deleted Files](/assets/images/posts/033-git-merge-deleted-files/hero.png){: width="700"}
 
 ## The Problem: "I didn't touch main at all...?"
 
@@ -89,7 +89,7 @@ Even without direct commits to main, its **stale state** causes problems during 
 ## When Git Auto-Handles Deletions vs. When It Doesn't
 
 | Scenario | Result |
-|----------|--------|
+|-------------------------------------------|-------------------------|
 | dev deleted, main unchanged | Auto-keeps deletion |
 | dev deleted, main modified | Conflict (delete/modify) |
 | dev deleted, main also deleted | Auto-keeps deletion |
