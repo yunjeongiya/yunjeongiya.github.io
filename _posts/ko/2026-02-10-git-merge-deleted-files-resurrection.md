@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Git 머지할 때 삭제한 파일이 되살아나는 이유"
-date: 2026-02-10 16:00:00 +0900
+date: 2026-02-10 14:00:00 +0900
 categories: [Development, Git]
 tags: [git, merge, conflict, three-way-merge, merge-base]
 lang: ko
