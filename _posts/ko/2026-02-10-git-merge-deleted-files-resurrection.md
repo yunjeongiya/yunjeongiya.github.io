@@ -9,6 +9,8 @@ slug: "033"
 thumbnail: /assets/images/posts/033-git-merge-deleted-files/thumbnail-ko.png
 ---
 
+![Git 머지 충돌 - 삭제한 파일의 부활](/assets/images/posts/033-git-merge-deleted-files/hero.png)
+
 ## 문제 상황: "main에 아무것도 안 건드렸는데...?"
 
 오늘 PR을 만들려다 이상한 상황을 겪었다.

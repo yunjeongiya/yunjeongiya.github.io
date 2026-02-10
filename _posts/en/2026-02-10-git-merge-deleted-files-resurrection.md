@@ -9,6 +9,8 @@ slug: "033-en"
 thumbnail: /assets/images/posts/033-git-merge-deleted-files/thumbnail-en.png
 ---
 
+![Git Merge Conflict - Resurrection of Deleted Files](/assets/images/posts/033-git-merge-deleted-files/hero.png)
+
 ## The Problem: "I didn't touch main at all...?"
 
 Today I tried to create a PR and ran into a strange situation.
