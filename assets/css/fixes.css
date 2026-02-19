@@ -67,6 +67,12 @@ body {
   font-family: 'D2Coding', 'Segoe UI', 'Consolas', monospace !important;
 }
 
+/* Fix: Post images should not exceed content width */
+.post-content img {
+  max-width: 100%;
+  height: auto;
+}
+
 /* Fix: Terminal panel height */
 .vscode-terminal-panel {
   height: 250px;
