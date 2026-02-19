@@ -9,6 +9,8 @@ slug: "034-en"
 thumbnail: /assets/images/posts/034-notification-scheduler-vs-queue/thumbnail-en.png
 ---
 
+![Notification System Architecture — Scheduler vs Queue](/assets/images/posts/034-notification-scheduler-vs-queue/thumbnail-en.png){: width="700"}
+
 > "Is polling the DB every minute really a sin?"
 > "Is event-driven architecture always the right choice?"
 

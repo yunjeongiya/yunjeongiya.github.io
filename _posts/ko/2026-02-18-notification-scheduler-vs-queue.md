@@ -9,6 +9,8 @@ slug: "034"
 thumbnail: /assets/images/posts/034-notification-scheduler-vs-queue/thumbnail-ko.png
 ---
 
+![알림 시스템 아키텍처 — 스케줄러 vs 큐](/assets/images/posts/034-notification-scheduler-vs-queue/thumbnail-ko.png){: width="700"}
+
 > "매분 DB를 조회하는 폴링 방식, 과연 죄악일까?"
 > "이벤트 기반 아키텍처는 언제나 옳은가?"
 
