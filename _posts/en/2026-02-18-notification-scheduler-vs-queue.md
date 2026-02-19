@@ -6,6 +6,7 @@ categories: [Backend, Architecture]
 tags: [notification, scheduler, event-driven, polling, architecture, spring]
 lang: en
 slug: "034-en"
+thumbnail: /assets/images/posts/034-notification-scheduler-vs-queue/thumbnail-en.png
 ---
 
 > "Is polling the DB every minute really a sin?"

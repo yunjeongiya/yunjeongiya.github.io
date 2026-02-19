@@ -6,6 +6,7 @@ categories: [Backend, Architecture]
 tags: [notification, scheduler, event-driven, polling, architecture, spring]
 lang: ko
 slug: "034"
+thumbnail: /assets/images/posts/034-notification-scheduler-vs-queue/thumbnail-ko.png
 ---
 
 > "매분 DB를 조회하는 폴링 방식, 과연 죄악일까?"
