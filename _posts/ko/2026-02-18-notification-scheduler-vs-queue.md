@@ -71,7 +71,7 @@ pendingNotificationService.schedule(
 
 이때 우리가 세운 **판단 기준(Judgment Criteria)**은 다음과 같습니다.
 
-![알림 유형 판단 기준 플로우차트](/assets/images/posts/034-notification-scheduler-vs-queue/diagram1.png)
+<img src="/assets/images/posts/034-notification-scheduler-vs-queue/diagram1.png" alt="알림 유형 판단 기준 플로우차트" style="max-width: 420px; width: 100%;">
 
 ### 1. 상태 기반 (State-based) 알림
 *   **대상:** 정기 결제(Type A), 미션 미수행(Type B)
@@ -138,7 +138,7 @@ WHERE ws.start_time - INTERVAL 10 MINUTE BETWEEN :now AND :now + 1min
 
 ### 하이브리드 아키텍처 (Hybrid Architecture)
 
-![하이브리드 알림 아키텍처](/assets/images/posts/034-notification-scheduler-vs-queue/diagram2.png)
+<img src="/assets/images/posts/034-notification-scheduler-vs-queue/diagram2.png" alt="하이브리드 알림 아키텍처" style="max-width: 700px; width: 100%;">
 
 ### Phase 1: All Scheduler (지금 당장)
 *   모든 알림(Type A, B, C, D)을 **스케줄러 폴링**으로 구현합니다.
