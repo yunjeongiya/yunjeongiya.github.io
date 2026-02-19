@@ -138,7 +138,7 @@ WHERE ws.start_time - INTERVAL 10 MINUTE BETWEEN :now AND :now + 1min
 
 ### 하이브리드 아키텍처 (Hybrid Architecture)
 
-<img src="/assets/images/posts/034-notification-scheduler-vs-queue/diagram2.png" alt="하이브리드 알림 아키텍처" style="max-width: 700px; width: 100%;">
+<img src="/assets/images/posts/034-notification-scheduler-vs-queue/diagram2.png" alt="하이브리드 알림 아키텍처" style="width: 100%;">
 
 ### Phase 1: All Scheduler (지금 당장)
 *   모든 알림(Type A, B, C, D)을 **스케줄러 폴링**으로 구현합니다.
