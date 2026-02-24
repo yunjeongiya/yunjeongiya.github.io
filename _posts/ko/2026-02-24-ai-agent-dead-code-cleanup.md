@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "AI 에이전트로 데드코드 5,000줄을 삭제한 이야기"
+title: "AI에게 데드코드를 맡겼더니 5,156줄을 지웠다"
 date: 2026-02-24 15:00:00 +0900
 categories: [DevOps, Refactoring]
 tags: [dead-code, static-analysis, ai-coding-agent, refactoring, spring-boot, react, clean-code, claude-code]
@@ -9,7 +9,7 @@ slug: "035"
 thumbnail: /assets/images/posts/035-ai-agent-dead-code/thumbnail-ko.png
 ---
 
-![AI 에이전트로 데드코드 5,000줄을 삭제한 이야기](/assets/images/posts/035-ai-agent-dead-code/thumbnail-ko.png){: width="700"}
+![AI에게 데드코드를 맡겼더니 5,156줄을 지웠다](/assets/images/posts/035-ai-agent-dead-code/thumbnail-ko.png){: width="700"}
 
 모든 코드베이스에는 묘지가 있다. 아무도 호출하지 않는 함수, 아무도 매핑하지 않는 DTO, 아무도 import하지 않는 export. 있다는 건 안다. 정리할 시간이 없을 뿐이다.
 
