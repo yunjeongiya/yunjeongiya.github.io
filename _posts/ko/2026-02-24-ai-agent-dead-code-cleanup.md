@@ -9,6 +9,8 @@ slug: "035"
 thumbnail: /assets/images/posts/035-ai-agent-dead-code/thumbnail-ko.png
 ---
 
+![AI 에이전트로 데드코드 5,000줄을 삭제한 이야기](/assets/images/posts/035-ai-agent-dead-code/thumbnail-ko.png){: width="700"}
+
 모든 코드베이스에는 묘지가 있다. 아무도 호출하지 않는 함수, 아무도 매핑하지 않는 DTO, 아무도 import하지 않는 export. 있다는 건 안다. 정리할 시간이 없을 뿐이다.
 
 우리 프로젝트 — Spring Boot 3.4 + React/TypeScript 모노레포, 백엔드 모듈 35개 이상, 프론트엔드 기능 15개 이상 — 에도 상당량이 쌓여 있었다. SonarQube를 설치하거나 Knip을 도입하는 대신, AI 코딩 에이전트에게 프로젝트 전체를 던져주고 "데드코드 찾아"라고 했다. 2시간 뒤, **143개 파일에서 5,156줄이 사라졌고**, 빌드는 여전히 통과했다.

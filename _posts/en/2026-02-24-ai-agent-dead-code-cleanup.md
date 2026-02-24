@@ -9,6 +9,8 @@ slug: "035-en"
 thumbnail: /assets/images/posts/035-ai-agent-dead-code/thumbnail-en.png
 ---
 
+![I Used an AI Agent to Delete 5,000 Lines of Dead Code](/assets/images/posts/035-ai-agent-dead-code/thumbnail-en.png){: width="700"}
+
 Every codebase has a graveyard. Functions nobody calls, DTOs nobody maps, exports nobody imports. You know it's there. You just never have time to clean it up.
 
 Our project — a Spring Boot 3.4 + React/TypeScript monorepo with 35+ backend modules and 15+ frontend features — had accumulated a lot of it. Instead of setting up SonarQube or installing Knip, I pointed an AI coding agent at the whole thing and said "find the dead code." Two hours later, **5,156 lines were gone across 143 files**, and both builds still passed.
