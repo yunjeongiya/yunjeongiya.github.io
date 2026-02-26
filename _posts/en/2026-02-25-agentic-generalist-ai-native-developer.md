@@ -9,6 +9,8 @@ slug: "036-en"
 thumbnail: /assets/images/posts/036-agentic-generalist/thumbnail-en.png
 ---
 
+![I Didn't Know What to Call Myself — Then Job Postings Started Naming It](/assets/images/posts/036-agentic-generalist/thumbnail-en.png){: width="700"}
+
 Around graduation, I had an opportunity to join a startup. It wasn't a typical developer hire. During the interview, I was told: "We're not hiring you purely for your coding ability." When it came time to decide on a title, they deliberated for a while and eventually borrowed "PO" from Toss's Technical Product Owner role.
 
 Starting at a large company or an SI firm would have been the safe bet. Choosing this undefined role at a tiny startup — I agonized over it. I went with it in the end, but there were moments when I wasn't sure I'd made the right call. People around me said "that's going to be the next big thing" and "you're ahead of the curve," but without a name for what I actually did, it wasn't so much anxiety as frustration.
