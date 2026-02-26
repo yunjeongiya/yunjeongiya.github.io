@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "나를 뭐라고 불러야 하나 했는데, 채용 공고에 이름이 붙기 시작했다"
-date: 2026-02-26 18:00:00 +0900
+date: 2026-02-25 18:00:00 +0900
 categories: [Development, AI]
 tags: [ai-native, claude-code, agentic-generalist, developer-career, solo-development, vibe-coding, musinsa-rookie]
 lang: ko
