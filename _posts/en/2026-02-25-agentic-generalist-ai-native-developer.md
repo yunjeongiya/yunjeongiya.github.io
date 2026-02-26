@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "I Didn't Know What to Call Myself — Then Job Postings Started Naming It"
+title: "Job Postings Are Now Hiring for What I've Been Doing Alone"
 date: 2026-02-25 18:00:00 +0900
 categories: [Development, AI]
 tags: [ai-native, claude-code, agentic-generalist, developer-career, solo-development, vibe-coding, musinsa-rookie]
@@ -9,7 +9,7 @@ slug: "036-en"
 thumbnail: /assets/images/posts/036-agentic-generalist/thumbnail-en.png
 ---
 
-![I Didn't Know What to Call Myself — Then Job Postings Started Naming It](/assets/images/posts/036-agentic-generalist/thumbnail-en.png){: width="700"}
+![Job Postings Are Now Hiring for What I've Been Doing Alone](/assets/images/posts/036-agentic-generalist/thumbnail-en.png){: width="700"}
 
 Around graduation, I had an opportunity to join a startup. It wasn't a typical developer hire. During the interview, I was told: "We're not hiring you purely for your coding ability." When it came time to decide on a title, they deliberated for a while and eventually borrowed "PO" from Toss's Technical Product Owner role.
 
