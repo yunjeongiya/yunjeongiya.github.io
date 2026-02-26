@@ -9,7 +9,8 @@ slug: "036-en"
 thumbnail: /assets/images/posts/036-agentic-generalist/thumbnail-en.png
 ---
 
-![Job Postings Are Now Hiring for What I've Been Doing Alone](/assets/images/posts/036-agentic-generalist/thumbnail-en.png){: width="700"}
+![My coding buddy](/assets/images/posts/036-agentic-generalist/thumbnail-en.png){: width="700"}
+*My coding buddy*
 
 Around graduation, I had an opportunity to join a startup. It wasn't a typical developer hire. During the interview, I was told: "We're not hiring you purely for your coding ability." When it came time to decide on a title, they deliberated for a while and eventually borrowed "PO" from Toss's Technical Product Owner role.
 

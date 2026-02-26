@@ -9,7 +9,8 @@ slug: "036"
 thumbnail: /assets/images/posts/036-agentic-generalist/thumbnail-ko.png
 ---
 
-![나를 뭐라고 불러야 하나 했는데, 채용 공고에 이름이 붙기 시작했다](/assets/images/posts/036-agentic-generalist/thumbnail-ko.png){: width="700"}
+![나의 코딩 메이트](/assets/images/posts/036-agentic-generalist/thumbnail-ko.png){: width="700"}
+*나의 코딩 메이트*
 
 졸업 즈음에 스타트업에 합류할 기회가 있었다. 일반적인 개발자 채용은 아니었다. 면접에서 "단순한 개발자로서의 능력을 보고 뽑는 건 아니다"라는 이야기를 들었고, 직함을 정할 때 한참 고민하다 토스의 Technical Product Owner를 참고해 PO라는 이름을 가져오셨다.
 
