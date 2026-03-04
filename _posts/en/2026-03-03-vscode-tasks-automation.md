@@ -19,7 +19,7 @@ This isn't a VS Code Tasks tutorial. It's a record of automating a real vibe cod
 
 One `tasks.json` file makes everything launch the moment VS Code opens.
 
-![9 tasks auto-launched in VS Code — 4 Claude Code instances running in a 4-way split](/assets/images/posts/037-vscode-tasks-automation/01-claude-group.png)
+<img src="/assets/images/posts/037-vscode-tasks-automation/01-claude-group.png" alt="9 tasks auto-launched in VS Code — 4 Claude Code instances running in a 4-way split" style="max-width: 600px; width: 100%;">
 
 ---
 
