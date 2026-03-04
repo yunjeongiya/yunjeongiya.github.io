@@ -5,7 +5,7 @@ date: 2026-03-03 20:00:00 +0900
 categories: [Development, DevEx]
 tags: [vscode, tasks-json, dev-environment, powershell, automation, claude-code]
 lang: en
-slug: "037"
+slug: "037-en"
 thumbnail: /assets/images/posts/037-vscode-tasks-automation/thumbnail-en.png
 ---
 
