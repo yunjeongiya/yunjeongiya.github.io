@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Claude Code 실행하면 VSCode 창이 3개 열리는 버그 해결법"
-date: 2026-03-06 11:00:00 +0900
+date: 2026-03-06 10:00:00 +0900
 categories: [Claude, DevTools]
 tags: [claude, claude-code, bug, workaround, vscode, windows]
 lang: ko

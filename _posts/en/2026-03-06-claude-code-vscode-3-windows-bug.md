@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Fix: Claude Code Opens 3 Blank VSCode Windows on Startup"
-date: 2026-03-06 11:00:00 +0900
+date: 2026-03-06 10:00:00 +0900
 categories: [Claude, DevTools]
 tags: [claude, claude-code, bug, workaround, vscode, windows]
 lang: en
