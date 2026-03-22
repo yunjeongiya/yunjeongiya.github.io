@@ -6,7 +6,7 @@ categories: [Development, DevEx]
 tags: [windows-terminal, 개발환경, 자동화, claude-code, vscode, powershell]
 lang: ko
 slug: "040"
-thumbnail: /assets/images/posts/040-goodbye-vscode-windows-terminal/thumbnail-ko.png
+thumbnail: /assets/images/posts/040-goodbye-vscode-windows-terminal/thumbnail-ko.jpg
 ---
 
 [첫 번째 글](https://yunjeongiya.github.io/development/devex/2026/03/03/vscode-tasks-automation.html)에서 VS Code tasks.json으로 터미널 9개를 자동 실행하는 셋업을 만들었다. [두 번째 글](https://yunjeongiya.github.io/claude/devtools/2026/03/06/claude-code-vscode-3-windows-bug.html)에서 Claude Code가 VS Code 창을 3개씩 여는 버그를 겪었다. [세 번째 글](https://yunjeongiya.github.io/development/devex/2026/03/06/vscode-task-terminal-auto-restart.html)에서 Ctrl+C로 터미널이 죽는 문제를 해결했다.
