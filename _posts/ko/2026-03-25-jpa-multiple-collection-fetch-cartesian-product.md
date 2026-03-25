@@ -6,7 +6,7 @@ categories: [Backend, Spring Boot]
 tags: [JPA, Hibernate, JOIN FETCH, Cartesian Product, BatchSize, Spring Boot, 버그픽스]
 lang: ko
 slug: "042"
-thumbnail: /assets/images/posts/042-jpa-cartesian-product-bug/mock-detail-duplicated.png
+thumbnail: /assets/images/posts/042-jpa-cartesian-product-bug/thumb-ko.png
 ---
 
 Spring Boot + JPA 프로젝트에서 주문서 목록 조회 시 **항목이 2배, 3배로 뻥튀기되는 버그**를 만났다. DB 데이터는 정상인데 API 응답에서만 중복이 발생하는, 디버깅하기 까다로운 유형의 버그였다.

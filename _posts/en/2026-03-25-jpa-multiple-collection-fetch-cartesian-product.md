@@ -6,7 +6,7 @@ categories: [Backend, Spring Boot]
 tags: [JPA, Hibernate, JOIN FETCH, Cartesian Product, BatchSize, Spring Boot, bugfix]
 lang: en
 slug: "042-en"
-thumbnail: /assets/images/posts/042-jpa-cartesian-product-bug/mock-detail-duplicated-en.png
+thumbnail: /assets/images/posts/042-jpa-cartesian-product-bug/thumb-en.png
 ---
 
 In a Spring Boot + JPA project, I encountered a bug where **order line items were duplicated 2x or 3x** in the API response. The DB data was perfectly fine — the duplication only appeared in the API layer. A tricky one to debug.
