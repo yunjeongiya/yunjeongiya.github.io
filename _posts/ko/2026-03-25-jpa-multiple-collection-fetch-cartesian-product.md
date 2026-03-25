@@ -45,10 +45,7 @@ FROM invoice_line_item ili
 WHERE ili.invoice_id = 369;
 ```
 
-| id  | class_name   | base_tuition |
-|-----|-------------|-------------|
-| 385 | 고3 A반      | 520,000     |
-| 386 | 미적분 판서    | 250,000     |
+![DB 조회 결과](/assets/images/posts/042-jpa-cartesian-product-bug/table-db-result.png)
 
 **2개뿐이다.** DB에는 중복이 없다.
 
@@ -92,12 +89,7 @@ WHERE ...
 
 Invoice 369에 lineItem 2개, appliedDiscount 2개가 있으면:
 
-| i.id | ili.id | ili.class_name | iad.id | iad.policy_name |
-|------|--------|---------------|--------|----------------|
-| 369  | 385    | 고3 A반        | 2      | 기존 재원생 할인  |
-| 369  | 385    | 고3 A반        | 3      | 중복수강할인      |
-| 369  | **386**| **미적분 판서**  | 2      | 기존 재원생 할인  |
-| 369  | **386**| **미적분 판서**  | 3      | 중복수강할인      |
+![Cartesian Product SQL 결과](/assets/images/posts/042-jpa-cartesian-product-bug/table-cartesian-product.png)
 
 **2 × 2 = 4행.** 이것이 cartesian product다.
 
@@ -157,12 +149,7 @@ List<Invoice> findAllByCampusAndMonth(...);
 
 ### 대안들
 
-| 방법 | 장점 | 단점 |
-|------|------|------|
-| **`@BatchSize`** (채택) | 기존 코드 변경 최소, N+1 방지 | 쿼리 1개 추가 |
-| `List` → `Set` 전환 | cartesian product 자체 해결 | equals/hashCode 구현 필요, 순서 보장 안 됨 |
-| `@Fetch(SUBSELECT)` | N+1 완전 방지 | 전역 설정이라 세밀 제어 어려움 |
-| 쿼리 분리 (2개 쿼리) | 가장 명시적 | 서비스 계층 코드 복잡도 증가 |
+![대안 비교](/assets/images/posts/042-jpa-cartesian-product-bug/table-alternatives.png)
 
 ## 핵심 정리
 
