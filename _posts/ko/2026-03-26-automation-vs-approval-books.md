@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "시스템이 알아서 해야 할까, 사람이 확인해야 할까 — AI에게 물어본 추천 도서"
-date: 2026-03-26 22:00:00 +0900
+date: 2026-03-26 09:00:00 +0900
 categories: [Design, UX]
 tags: [자동화, UX, 학원관리, SaaS, 추천도서, Human-in-the-Loop, 설계철학]
 lang: ko
