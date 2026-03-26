@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<title>The Order Total Was Doubled — When the Database Did Multiplication</title>
+<style>
+  body { max-width: 680px; margin: 40px auto; font-family: Georgia, serif; font-size: 18px; line-height: 1.7; color: #333; padding: 0 20px; }
+  h1 { font-size: 32px; line-height: 1.3; }
+  h2 { font-size: 24px; margin-top: 40px; }
+  h3 { font-size: 20px; margin-top: 30px; }
+  img { max-width: 100%; margin: 20px 0; }
+  pre { background: #f6f8fa; padding: 16px; overflow-x: auto; font-size: 14px; line-height: 1.5; border-radius: 6px; }
+  code { background: #f6f8fa; padding: 2px 6px; font-size: 15px; border-radius: 3px; }
+  blockquote { border-left: 3px solid #ccc; margin-left: 0; padding-left: 20px; color: #555; }
+  strong { font-weight: 700; }
+  hr { border: none; border-top: 1px solid #ddd; margin: 40px 0; }
+</style>
+</head><body>
+
+<h1>The Order Total Was Doubled — When the Database Did Multiplication</h1>
+
+<p>I'm building a SaaS subscription management system. After generating April orders, something looked very wrong.</p>
+
+<figure><img src="../assets/images/posts/042-jpa-cartesian-product-bug/mock-list-duplicated-en.png" alt="Order list — amounts are doubled"></figure>
+
+<p>Every customer's <strong>total was exactly double</strong> what it should be. A $52.00 subscription became $104.00. A $69.00 order became $146.00.</p>
+
+<p>Opening the detail view was even more baffling:</p>
+
+<figure><img src="../assets/images/posts/042-jpa-cartesian-product-bug/mock-detail-duplicated-en.png" alt="Order detail — same products listed twice"></figure>
+
+<p>"Premium Plan" appears <strong>twice</strong>. "Cloud Storage" appears <strong>twice</strong>. Each product was charged double.</p>
+
+<p>But then I noticed something at the very bottom:</p>
+
+<figure><img src="../assets/images/posts/042-jpa-cartesian-product-bug/mock-detail-billlink-en.png" alt="Payment link shows correct amount"></figure>
+
+<p><strong>The payment link showed $69.00 — the correct amount.</strong> Same screen, $146.00 at the top, $69.00 at the bottom. What on earth happened?</p>
+
+<h2>Narrowing Down the Suspect</h2>
+
+<p>This system has three layers:</p>
+
+<pre>[Database] → [Server (Java)] → [UI (React)]
+  Storage      Processing        Display</pre>
+
+<p><strong>Database</strong> is where the actual data lives. Think of it as spreadsheets.<br>
+<strong>Server</strong> reads the data and processes it. The person reading the spreadsheets.<br>
+<strong>UI</strong> displays the processed data. The printer.</p>
+
+<p>I checked each layer in order.</p>
+
+<h3>Step 1: Check the spreadsheet (Database)</h3>
+
+<p>Opened the database directly.</p>
+
+<figure><img src="../assets/images/posts/042-jpa-cartesian-product-bug/table-b-db-result-en.png" alt="DB query result"></figure>
+
+<p><strong>Only 2 rows.</strong> No duplicates in the database. Not the culprit.</p>
+
+<h3>Step 2: Check the printer (UI)</h3>
+
+<p>Looked at the code. It simply says "print each item in the list." It displays whatever data it receives. The printer is innocent too.</p>
+
+<h3>Step 3: The server did it</h3>
+
+<p>If the database has 2 items but the screen shows 4, <strong>something went wrong when the server fetched the data.</strong></p>
+
+<h2>The Culprit: Merging Two Spreadsheets at Once</h2>
+
+<p>Here's where it gets a bit technical, but I'll keep it simple.</p>
+
+<h3>A database is multiple spreadsheets</h3>
+
+<p>A database isn't one giant table — it's <strong>multiple spreadsheets</strong> linked together.</p>
+
+<p>This order system has sheets like these:</p>
+
+<figure><img src="../assets/images/posts/042-jpa-cartesian-product-bug/table-b-sheet1-en.png" alt="Sheet 1: Order Items"></figure>
+
+<figure><img src="../assets/images/posts/042-jpa-cartesian-product-bug/table-b-sheet2-en.png" alt="Sheet 2: Applied Coupons"></figure>
+
+<h3>"Give me everything at once" was the problem</h3>
+
+<p>The server asked the database:</p>
+
+<blockquote>"Give me order #369's <strong>items</strong> and <strong>coupons</strong> all <strong>at once</strong>."</blockquote>
+
+<p>The database needs to merge two sheets into one. And here's where things go wrong.</p>
+
+<p>Sheet 1 has 2 rows, Sheet 2 has 2 rows. When the database merges them, it creates <strong>every possible combination</strong>:</p>
+
+<figure><img src="../assets/images/posts/042-jpa-cartesian-product-bug/table-b-combined-en.png" alt="Combined result — all combinations"></figure>
+
+<p><strong>2 rows × 2 rows = 4 rows!</strong></p>
+
+<p>In mathematics, this is called a <strong>Cartesian Product</strong> (named after René Descartes). It generates every combination of two sets.</p>
+
+<p>A simple analogy:</p>
+
+<blockquote>If you have 2 tops (white, black) and 2 bottoms (jeans, slacks), the possible outfit combinations are 2 × 2 = <strong>4</strong>.<br><br>
+(white+jeans), (white+slacks), (black+jeans), (black+slacks)</blockquote>
+
+<p>Databases work exactly the same way. Merge two sheets and you get every combination.</p>
+
+<h3>Why coupons were fine but items were duplicated</h3>
+
+<p>The server receives 4 rows and needs to split them back:</p>
+
+<p><strong>Coupon list</strong>: <code>Welcome Discount, VIP Discount, Welcome Discount, VIP Discount</code></p>
+
+<p>Coupons go into a <strong>deduplicating container</strong> (Set). Duplicates are automatically removed.<br>
+→ Result: <code>Welcome Discount, VIP Discount</code> ✅ Correct!</p>
+
+<p><strong>Item list</strong>: <code>Premium Plan, Premium Plan, Cloud Storage, Cloud Storage</code></p>
+
+<p>Items go into an <strong>ordered list</strong> (List). It just stacks everything in order. No dedup.<br>
+→ Result: <code>Premium Plan, Premium Plan, Cloud Storage, Cloud Storage</code> ❌ Duplicated!</p>
+
+<h3>Why was the payment link correct?</h3>
+
+<p>The $69.00 in the payment link was <strong>calculated and saved when the order was first created.</strong> At that time, the database correctly returned only 2 items.</p>
+
+<p>The $146.00 shown on screen is <strong>recalculated from the database every time the page loads.</strong> And every time, the multiplication bug kicks in.</p>
+
+<h2>The Fix: "Don't fetch everything at once"</h2>
+
+<p>Once the cause was clear, the fix was simple.</p>
+
+<p><strong>Before</strong> (fetch together):</p>
+<blockquote>"Give me items and coupons <strong>at the same time</strong>"<br>
+→ 2 × 2 = 4 rows (multiplication)</blockquote>
+
+<p><strong>After</strong> (fetch separately):</p>
+<blockquote>Request 1: "Give me items" → 2 rows<br>
+Request 2: "Give me coupons" → 2 rows<br>
+→ 4 rows total, but each is accurate</blockquote>
+
+<p>We now send 2 requests to the database instead of 1, but <strong>getting accurate data</strong> is far more important.</p>
+
+<h2>Lessons Learned</h2>
+
+<ol>
+<li><strong>When the screen looks wrong, don't just look at the screen.</strong> Trace where the data gets corrupted.</li>
+<li><strong>"Fetching everything at once is faster" is a trap.</strong> Merging unrelated data simultaneously causes multiplication.</li>
+<li><strong>"Payment amount is correct but display amount is wrong"</strong> was the decisive clue. Understanding "stored value vs. recalculated value" helps pinpoint the bug's location quickly.</li>
+</ol>
+
+<p>This bug could have caused customers to be charged double. Glad we caught it before the orders were sent out.</p>
+
+<hr>
+
+<p><em>The "merging two spreadsheets" analogy in this post is actually an SQL <strong>Cartesian Product</strong>. If you're curious about why this happens in JPA, why <code>DISTINCT</code> doesn't help, and how the actual code fix works, read the next post in this series.</em></p>
+
+</body></html>

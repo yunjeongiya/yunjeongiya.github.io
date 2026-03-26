@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<title>Why You Should Never JOIN FETCH Multiple Collections in JPA — A Cartesian Product Bug in Practice</title>
+<style>
+  body { max-width: 680px; margin: 40px auto; font-family: Georgia, serif; font-size: 18px; line-height: 1.7; color: #333; padding: 0 20px; }
+  h1 { font-size: 32px; line-height: 1.3; }
+  h2 { font-size: 24px; margin-top: 40px; }
+  h3 { font-size: 20px; margin-top: 30px; }
+  img { max-width: 100%; margin: 20px 0; }
+  pre { background: #f6f8fa; padding: 16px; overflow-x: auto; font-size: 14px; line-height: 1.5; border-radius: 6px; }
+  code { background: #f6f8fa; padding: 2px 6px; font-size: 15px; border-radius: 3px; }
+  blockquote { border-left: 3px solid #ccc; margin-left: 0; padding-left: 20px; color: #555; }
+  strong { font-weight: 700; }
+  ul, ol { padding-left: 24px; }
+  li { margin-bottom: 8px; }
+</style>
+</head><body>
+
+<h1>Why You Should Never JOIN FETCH Multiple Collections in JPA — A Cartesian Product Bug in Practice</h1>
+
+<p><em>This is Part 2. Part 1 (<strong>The Order Total Was Doubled — When the Database Did Multiplication</strong>) explained this bug using a "merging two spreadsheets" analogy. This post dives into the JPA/Hibernate internals.</em></p>
+
+<p>To recap: the DB had only 2 order line items, but the API response returned 4. The root cause was <strong>two <code>@OneToMany</code> collections <code>JOIN FETCH</code>ed in a single JPQL query</strong>.</p>
+
+<h2>Root Cause: Cartesian Product from Two Collections</h2>
+
+<p>The problematic query:</p>
+
+<pre>@Query("SELECT o FROM Order o " +
+       "LEFT JOIN FETCH o.lineItems " +        // @OneToMany List
+       "LEFT JOIN FETCH o.appliedDiscounts " +  // @OneToMany Set
+       "JOIN FETCH o.customer c " +
+       "WHERE o.billingYear = :year AND o.billingMonth = :month " +
+       "ORDER BY c.name")
+List&lt;Order&gt; findAllByMonth(...);</pre>
+
+<p><code>lineItems</code> (<code>List</code>) and <code>appliedDiscounts</code> (<code>Set</code>) are <strong>JOIN FETCHed simultaneously</strong>.</p>
+
+<h3>The SQL Result</h3>
+
+<p>The generated SQL looks like:</p>
+
+<pre>SELECT o.*, oli.*, oad.*
+FROM orders o
+LEFT JOIN order_line_item oli ON oli.order_id = o.id
+LEFT JOIN order_applied_discount oad ON oad.order_id = o.id
+WHERE ...</pre>
+
+<p>With 2 lineItems and 2 appliedDiscounts for Order 369:</p>
+
+<figure><img src="../assets/images/posts/042-jpa-cartesian-product-bug/table-cartesian-product-en.png" alt="Cartesian Product SQL result"></figure>
+
+<p><strong>2 × 2 = 4 rows.</strong> This is a cartesian product.</p>
+
+<h3>How Hibernate Handles the Collections</h3>
+
+<p>When Hibernate maps these 4 rows back to entities:</p>
+
+<ul>
+<li><strong><code>Set</code> (appliedDiscounts)</strong>: Auto-deduplicates via <code>equals</code>/<code>hashCode</code> → 2 entries (correct)</li>
+<li><strong><code>List</code> (lineItems)</strong>: Bag semantics — <strong>no deduplication</strong> → 4 entries (oli.id 385, 385, 386, 386)</li>
+</ul>
+
+<p><code>List</code> is an ordered collection. Hibernate adds each SQL row's line item to the List as-is. When the same entity appears in multiple rows, the same object gets added multiple times.</p>
+
+<h2><code>DISTINCT</code> Doesn't Fix It</h2>
+
+<p>First attempt — add <code>SELECT DISTINCT</code>:</p>
+
+<pre>@Query("SELECT DISTINCT o FROM Order o " +
+       "LEFT JOIN FETCH o.lineItems " +
+       "LEFT JOIN FETCH o.appliedDiscounts " + ...)</pre>
+
+<p><strong>No effect.</strong> Here's why:</p>
+
+<p>In Hibernate 6, JPQL <code>DISTINCT</code> deduplicates the <strong>root entity (Order)</strong> in the result list. It prevents the same Order object from appearing multiple times.</p>
+
+<p>But it doesn't touch the <strong>lineItems <code>List</code> inside each Order</strong>. Order 369 appears once in the result, but its lineItems collection already has 4 entries.</p>
+
+<h2>Solution: Separate the Collection Fetches</h2>
+
+<p><strong>Core principle: Never JOIN FETCH multiple <code>@OneToMany</code> collections in a single query.</strong></p>
+
+<h3>The Fix: <code>@BatchSize</code></h3>
+
+<pre>// Order.java
+@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+@BatchSize(size = 50)  // Loaded via separate IN query
+private Set&lt;OrderAppliedDiscount&gt; appliedDiscounts = new LinkedHashSet&lt;&gt;();</pre>
+
+<pre>// OrderRepository.java — removed appliedDiscounts JOIN FETCH
+@Query("SELECT DISTINCT o FROM Order o " +
+       "LEFT JOIN FETCH o.lineItems " +
+       // LEFT JOIN FETCH o.appliedDiscounts — removed!
+       "JOIN FETCH o.customer c " +
+       "WHERE o.billingYear = :year AND o.billingMonth = :month ...")
+List&lt;Order&gt; findAllByMonth(...);</pre>
+
+<p>Now the execution flow:</p>
+
+<ol>
+<li><strong>Query 1</strong>: Order + lineItems JOIN FETCH → rows = number of lineItems (no duplication)</li>
+<li><strong>Query 2</strong> (automatic): <code>SELECT * FROM order_applied_discount WHERE order_id IN (?, ?, ..., ?)</code> → batches of 50</li>
+</ol>
+
+<p>One query became two, but the cartesian product is eliminated and <strong>data is accurate</strong>.</p>
+
+<h3>Alternatives</h3>
+
+<figure><img src="../assets/images/posts/042-jpa-cartesian-product-bug/table-alternatives-en.png" alt="Comparison of approaches"></figure>
+
+<h2>Key Takeaways</h2>
+
+<pre>JOIN FETCHing multiple @OneToMany collections in one query
+→ SQL Cartesian Product → List(bag) duplication → inflated data</pre>
+
+<ul>
+<li><strong>DB is fine, API is wrong</strong> → Check JPA collection fetch strategy</li>
+<li><strong><code>DISTINCT</code> only deduplicates root entities</strong>, not List contents</li>
+<li><strong><code>Set</code> auto-deduplicates</strong>, <code>List</code> (bag) does not</li>
+<li><strong>Fix</strong>: Fetch one collection per query + <code>@BatchSize</code> for the rest</li>
+</ul>
+
+<h2>References</h2>
+
+<ul>
+<li><a href="https://docs.jboss.org/hibernate/orm/6.4/userguide/html_single/Hibernate_User_Guide.html#fetching">Hibernate User Guide — Fetching</a></li>
+<li><a href="https://vladmihalcea.com/hibernate-multiplebagfetchexception/">Vlad Mihalcea — MultipleBagFetchException</a></li>
+<li><a href="https://www.baeldung.com/hibernate-fetchtype-eager-lazy">Baeldung — JPA and Hibernate FetchType</a></li>
+</ul>
+
+</body></html>
