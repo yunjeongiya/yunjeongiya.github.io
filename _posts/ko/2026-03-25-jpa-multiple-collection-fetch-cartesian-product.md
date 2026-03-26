@@ -9,53 +9,9 @@ slug: "042"
 thumbnail: /assets/images/posts/042-jpa-cartesian-product-bug/thumb-ko.png
 ---
 
-Spring Boot + JPA 프로젝트에서 주문서 목록 조회 시 **항목이 2배, 3배로 뻥튀기되는 버그**를 만났다. DB 데이터는 정상인데 API 응답에서만 중복이 발생하는, 디버깅하기 까다로운 유형의 버그였다.
+> **이전 글**: [청구서 금액이 2배로 나왔다 — 데이터베이스가 곱셈을 해버린 이야기](/ko/jpa-cartesian-product-for-beginners)에서 "두 장의 엑셀 시트를 동시에 합치면 곱셈이 일어난다"는 비유로 이 버그를 설명했다. 이번 글에서는 JPA/Hibernate 관점에서 정확히 왜 이런 일이 생기는지, `DISTINCT`로는 왜 안 되는지, 올바른 해결법은 무엇인지를 다룬다.
 
-원인은 하나의 JPQL 쿼리에서 **두 개의 `@OneToMany` 컬렉션을 동시에 `JOIN FETCH`**한 것이었다. 이 글에서는 문제의 원인, 왜 `DISTINCT`로도 해결되지 않는지, 그리고 올바른 해결법을 정리한다.
-
-## 증상: "데이터는 맞는데 화면이 이상해요"
-
-SaaS 구독 관리 시스템에서 4월 주문서를 생성한 후, 목록에서 이상한 점이 발견됐다.
-
-![주문서 목록 — 상품명이 2번씩 표시되고, 금액이 2배](/assets/images/posts/042-jpa-cartesian-product-bug/mock-list-duplicated.png)
-
-모든 고객의 상품명이 2번씩 반복되고, 금액도 정확히 2배였다. 상세 화면을 열어보면 더 명확했다:
-
-![주문서 상세 — 같은 상품이 2개씩 표시됨](/assets/images/posts/042-jpa-cartesian-product-bug/mock-detail-duplicated.png)
-
-- 프리미엄 구독 ₩52,000 × **2개**
-- 클라우드 스토리지 ₩25,000 × **2개**
-- 청구 금액: ₩146,000 (뻥튀기된 금액)
-
-그런데 흥미로운 단서가 하나 있었다:
-
-![결제 링크 금액은 정상 (₩69,000)](/assets/images/posts/042-jpa-cartesian-product-bug/mock-detail-billlink.png)
-
-**결제 링크 금액은 ₩69,000으로 정상**이었다. 이건 DB에 저장된 실제 값이다.
-
-## 디버깅 과정
-
-### 1단계: DB 데이터 확인
-
-DB를 직접 조회했다.
-
-```sql
-SELECT oli.id, oli.product_name, oli.price
-FROM order_line_item oli
-WHERE oli.order_id = 369;
-```
-
-![DB 조회 결과](/assets/images/posts/042-jpa-cartesian-product-bug/table-db-result.png)
-
-**2개뿐이다.** DB에는 중복이 없다.
-
-### 2단계: 프론트엔드 확인
-
-React 컴포넌트를 확인했다. 단순히 `order.lineItems.map()`으로 렌더링하고 있었다. 프론트엔드 문제가 아니다.
-
-### 3단계: API 응답이 문제
-
-DB → API 응답 사이에서 중복이 발생한다는 뜻이다. JPA 쿼리를 확인했다.
+증상을 요약하면: DB에는 주문 항목이 2개뿐인데 API 응답에서 4개로 뻥튀기됐다. 원인은 하나의 JPQL 쿼리에서 **두 개의 `@OneToMany` 컬렉션을 동시에 `JOIN FETCH`**한 것이다.
 
 ## 원인: 두 컬렉션의 Cartesian Product
 

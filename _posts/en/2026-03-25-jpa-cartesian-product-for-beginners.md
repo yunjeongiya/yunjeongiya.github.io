@@ -130,16 +130,6 @@ Once the cause was clear, the fix was simple.
 > Request 2: "Give me coupons" → 2 rows
 > → 4 rows total, but each is accurate
 
-The code change was just **two lines**:
-
-```java
-// Don't fetch coupons together — load them separately later
-@BatchSize(size = 50)  // "Fetch in batches of 50 via separate query"
-private Set<OrderAppliedDiscount> appliedDiscounts;
-```
-
-And the "give me everything" request was modified to exclude the coupons part.
-
 We now send 2 requests to the database instead of 1, but **getting accurate data** is far more important.
 
 ## Lessons Learned
@@ -149,3 +139,9 @@ We now send 2 requests to the database instead of 1, but **getting accurate data
 3. **"Payment amount is correct but display amount is wrong"** was the decisive clue. Understanding "stored value vs. recalculated value" helps pinpoint the bug's location quickly.
 
 This bug could have caused customers to be charged double. Glad we caught it before the orders were sent out.
+
+---
+
+> The "merging two spreadsheets" analogy in this post is actually an SQL **Cartesian Product**. If you're curious about why this happens in JPA, why `DISTINCT` doesn't help, and how the actual code fix works, read the next post.
+>
+> **Next**: [Why You Should Never JOIN FETCH Multiple Collections in JPA — A Cartesian Product Bug in Practice](/en/jpa-multiple-collection-fetch-cartesian-product)

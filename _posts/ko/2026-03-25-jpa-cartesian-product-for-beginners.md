@@ -130,16 +130,6 @@ SaaS 구독 관리 시스템을 만들고 있다. 4월 주문서를 생성했는
 > 요청 2: "쿠폰 줘" → 2줄
 > → 총 4줄이지만 각각 정확함
 
-코드로는 딱 **두 줄** 바꿨다:
-
-```java
-// 쿠폰을 한꺼번에 가져오지 말고, 나중에 따로 가져오도록 설정
-@BatchSize(size = 50)  // "50개씩 묶어서 따로 가져와라"
-private Set<OrderAppliedDiscount> appliedDiscounts;
-```
-
-그리고 "한꺼번에 줘"라고 하던 요청에서 쿠폰 부분을 제거했다.
-
 데이터베이스에 요청을 1번 대신 2번 보내게 됐지만, **정확한 데이터**를 받는 게 더 중요하다.
 
 ## 교훈
@@ -149,3 +139,9 @@ private Set<OrderAppliedDiscount> appliedDiscounts;
 3. **결제 금액은 맞는데 표시 금액이 틀리다**는 단서가 결정적이었다. "저장된 값 vs 매번 계산하는 값"의 차이를 알면 버그 위치를 빠르게 좁힐 수 있다.
 
 이 버그 때문에 구독료가 2배로 청구될 뻔했다. 발행 전에 발견해서 다행이다.
+
+---
+
+> 이 글에서 사용한 "엑셀 시트 합치기"라는 비유의 정체는 SQL의 **Cartesian Product**다. JPA에서 이 문제가 왜 발생하는지, `DISTINCT`로는 왜 해결이 안 되는지, 실제 코드에서 어떻게 고쳤는지 궁금하다면 다음 글을 읽어보자.
+>
+> **다음 글**: [JPA에서 여러 컬렉션을 JOIN FETCH하면 안 되는 이유 — Cartesian Product 버그 실전 사례](/ko/jpa-multiple-collection-fetch-cartesian-product)

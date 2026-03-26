@@ -9,53 +9,9 @@ slug: "042-en"
 thumbnail: /assets/images/posts/042-jpa-cartesian-product-bug/thumb-en.png
 ---
 
-In a Spring Boot + JPA project, I encountered a bug where **order line items were duplicated 2x or 3x** in the API response. The DB data was perfectly fine — the duplication only appeared in the API layer. A tricky one to debug.
+> **Previous post**: [The Order Total Was Doubled — When the Database Did Multiplication](/en/jpa-cartesian-product-for-beginners) explained this bug using a "merging two spreadsheets" analogy. This post dives into the JPA/Hibernate internals: exactly why it happens, why `DISTINCT` doesn't help, and the proper fix.
 
-The root cause: **two `@OneToMany` collections were `JOIN FETCH`ed in a single JPQL query**. This post covers why it happens, why `DISTINCT` doesn't fix it, and the proper solution.
-
-## Symptoms: "The data is correct, but the UI is wrong"
-
-After generating April orders in a SaaS subscription management system, something was off in the list view:
-
-![Order list — product names duplicated, amounts doubled](/assets/images/posts/042-jpa-cartesian-product-bug/mock-list-duplicated-en.png)
-
-Every customer's product names appeared twice, and amounts were exactly doubled. The detail view made it even clearer:
-
-![Order detail — same products listed twice](/assets/images/posts/042-jpa-cartesian-product-bug/mock-detail-duplicated-en.png)
-
-- Premium Plan $52.00 × **2**
-- Cloud Storage $25.00 × **2**
-- Total: $146.00 (inflated)
-
-But here's the interesting clue:
-
-![Payment link shows correct amount ($69.00)](/assets/images/posts/042-jpa-cartesian-product-bug/mock-detail-billlink-en.png)
-
-**The payment link showed $69.00 — the correct amount.** This value was stored directly in the DB.
-
-## Debugging
-
-### Step 1: Check the DB
-
-Queried the database directly.
-
-```sql
-SELECT oli.id, oli.product_name, oli.price
-FROM order_line_item oli
-WHERE oli.order_id = 369;
-```
-
-![DB query result](/assets/images/posts/042-jpa-cartesian-product-bug/table-db-result-en.png)
-
-**Only 2 rows.** No duplicates in the DB.
-
-### Step 2: Check the frontend
-
-The React component was simply doing `order.lineItems.map()`. It renders whatever data it receives. Not the culprit.
-
-### Step 3: The API response is the problem
-
-Duplication happens between DB and API response. Time to check the JPA query.
+To recap: the DB had only 2 order line items, but the API response returned 4. The root cause was **two `@OneToMany` collections `JOIN FETCH`ed in a single JPQL query**.
 
 ## Root Cause: Cartesian Product from Two Collections
 
