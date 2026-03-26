@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "청구서 금액이 2배로 나왔다 — 데이터베이스가 곱셈을 해버린 이야기"
+title: "청구서 금액이 2배로 나왔다 — 비개발자도 이해할 수 있는 데이터베이스 곱셈 버그"
 date: 2026-03-25 09:00:00 +0900
 categories: [Backend, Database]
 tags: [JPA, Hibernate, 데이터베이스, SQL, 버그, 학원관리]

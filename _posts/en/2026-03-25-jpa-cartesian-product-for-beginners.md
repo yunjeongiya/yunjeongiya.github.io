@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "The Order Total Was Doubled — When the Database Did Multiplication"
+title: "The Order Total Was Doubled — A Database Multiplication Bug, Explained for Non-Engineers"
 date: 2026-03-25 09:00:00 +0900
 categories: [Backend, Database]
 tags: [JPA, Hibernate, Database, SQL, Bug, SaaS]
