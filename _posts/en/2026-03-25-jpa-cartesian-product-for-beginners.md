@@ -95,7 +95,7 @@ A simple analogy:
 >
 > (white+jeans), (white+slacks), (black+jeans), (black+slacks)
 
-Databases work exactly the same way. Merge two sheets and you get every combination.
+Databases work exactly the same way. Merge two sheets and you get every combination. The database isn't lying — it faithfully produced every combination, exactly as asked.
 
 ### Why coupons were fine but items were duplicated
 

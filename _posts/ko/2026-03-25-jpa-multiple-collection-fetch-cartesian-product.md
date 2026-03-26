@@ -57,6 +57,12 @@ Hibernate는 이 4행을 엔티티로 변환할 때:
 
 `List`는 순서가 있는 컬렉션이고, Hibernate는 SQL 결과의 각 행을 List에 그대로 추가한다. 같은 엔티티가 여러 행에 걸쳐 나타나면, 같은 객체가 List에 여러 번 들어간다.
 
+"그럼 `List` 대신 `Set`으로 바꾸면 되지 않나?" 주문 항목은 **입력 순서대로 표시**해야 한다. `Set`은 순서를 보장하지 않기 때문에 `List`를 쓸 수밖에 없었다. 올바른 자료구조 선택이 cartesian product와 만나면서 예상치 못한 버그가 된 것이다.
+
+### MultipleBagFetchException은 왜 안 터졌나?
+
+Hibernate 5 이전 버전이었다면, 두 개의 `List` 컬렉션을 동시에 FETCH할 때 `MultipleBagFetchException`을 던지며 서버가 시작되지 않았을 것이다. 하지만 이 코드에서는 하나가 `List`, 다른 하나가 `Set`이기 때문에 예외 없이 통과한다. 에러 없이 데이터만 뻥튀기되므로 오히려 더 위험하다.
+
 ## `DISTINCT`로는 해결되지 않는다
 
 첫 번째 시도로 `SELECT DISTINCT`를 추가해봤다:
@@ -101,6 +107,16 @@ List<Order> findAllByMonth(...);
 2. **쿼리 2** (자동): `SELECT * FROM order_applied_discount WHERE order_id IN (?, ?, ..., ?)` → 최대 50개씩 배치
 
 쿼리가 1개에서 2개로 늘었지만, cartesian product가 사라져 **정확한 데이터**가 반환된다.
+
+매번 엔티티마다 `@BatchSize`를 붙이기 번거롭다면, `application.yml`에서 프로젝트 전체에 기본값을 설정할 수도 있다:
+
+```yaml
+spring:
+  jpa:
+    properties:
+      hibernate:
+        default_batch_fetch_size: 100
+```
 
 ### 대안들
 

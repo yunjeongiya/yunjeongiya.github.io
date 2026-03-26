@@ -64,6 +64,12 @@ WHERE ...</pre>
 
 <p><code>List</code> is an ordered collection. Hibernate adds each SQL row's line item to the List as-is. When the same entity appears in multiple rows, the same object gets added multiple times.</p>
 
+<p>"Why not just use <code>Set</code> for everything?" Order line items need to be <strong>displayed in insertion order</strong>. <code>Set</code> doesn't guarantee ordering, so <code>List</code> was the correct choice. The right data structure choice became an unexpected bug when it met a cartesian product.</p>
+
+<h3>Why No MultipleBagFetchException?</h3>
+
+<p>In Hibernate 5 and earlier, fetching two <code>List</code> collections simultaneously would throw <code>MultipleBagFetchException</code> and block startup. But here, one collection is a <code>List</code> and the other is a <code>Set</code>, so no exception is thrown. The data silently inflates without any error — which makes it arguably more dangerous.</p>
+
 <h2><code>DISTINCT</code> Doesn't Fix It</h2>
 
 <p>First attempt — add <code>SELECT DISTINCT</code>:</p>
@@ -105,6 +111,14 @@ List&lt;Order&gt; findAllByMonth(...);</pre>
 </ol>
 
 <p>One query became two, but the cartesian product is eliminated and <strong>data is accurate</strong>.</p>
+
+<p>If annotating every entity gets tedious, you can set a project-wide default in <code>application.yml</code>:</p>
+
+<pre>spring:
+  jpa:
+    properties:
+      hibernate:
+        default_batch_fetch_size: 100</pre>
 
 <h3>Alternatives</h3>
 
