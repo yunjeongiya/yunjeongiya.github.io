@@ -146,4 +146,4 @@ SaaS 구독 관리 시스템을 만들고 있다. 4월 주문서를 생성했는
 
 > 이 글에서 사용한 "엑셀 시트 합치기"라는 비유의 정체는 SQL의 **Cartesian Product**다. JPA에서 이 문제가 왜 발생하는지, `DISTINCT`로는 왜 해결이 안 되는지, 실제 코드에서 어떻게 고쳤는지 궁금하다면 다음 글을 읽어보자.
 >
-> **다음 글**: [JPA에서 여러 컬렉션을 JOIN FETCH하면 안 되는 이유 — Cartesian Product 버그 실전 사례](/ko/jpa-multiple-collection-fetch-cartesian-product)
+> **다음 글**: [JPA에서 여러 컬렉션을 JOIN FETCH하면 안 되는 이유 — Cartesian Product 버그 실전 사례](/posts/042/)

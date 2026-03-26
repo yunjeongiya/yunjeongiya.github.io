@@ -9,7 +9,7 @@ slug: "042-en"
 thumbnail: /assets/images/posts/042-jpa-cartesian-product-bug/thumb-en.png
 ---
 
-> **Previous post**: [The Order Total Was Doubled — When the Database Did Multiplication](/en/jpa-cartesian-product-for-beginners) explained this bug using a "merging two spreadsheets" analogy. This post dives into the JPA/Hibernate internals: exactly why it happens, why `DISTINCT` doesn't help, and the proper fix.
+> **Previous post**: [The Order Total Was Doubled — When the Database Did Multiplication](/posts/043-en/) explained this bug using a "merging two spreadsheets" analogy. This post dives into the JPA/Hibernate internals: exactly why it happens, why `DISTINCT` doesn't help, and the proper fix.
 
 To recap: the DB had only 2 order line items, but the API response returned 4. The root cause was **two `@OneToMany` collections `JOIN FETCH`ed in a single JPQL query**.
 

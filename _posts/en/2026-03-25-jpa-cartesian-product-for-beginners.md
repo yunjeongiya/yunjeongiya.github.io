@@ -146,4 +146,4 @@ This bug could have caused customers to be charged double. Glad we caught it bef
 
 > The "merging two spreadsheets" analogy in this post is actually an SQL **Cartesian Product**. If you're curious about why this happens in JPA, why `DISTINCT` doesn't help, and how the actual code fix works, read the next post.
 >
-> **Next**: [Why You Should Never JOIN FETCH Multiple Collections in JPA — A Cartesian Product Bug in Practice](/en/jpa-multiple-collection-fetch-cartesian-product)
+> **Next**: [Why You Should Never JOIN FETCH Multiple Collections in JPA — A Cartesian Product Bug in Practice](/posts/042-en/)
