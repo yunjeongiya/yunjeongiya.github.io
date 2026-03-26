@@ -84,6 +84,8 @@ SaaS 구독 관리 시스템을 만들고 있다. 4월 주문서를 생성했는
 
 ![합쳐진 결과 — 모든 조합](/assets/images/posts/042-jpa-cartesian-product-bug/table-b-combined.png)
 
+![합쳐진 결과 — 유령 행 발생](/assets/images/posts/042-jpa-cartesian-product-bug/table-ghost-rows.png)
+
 **2줄 × 2줄 = 4줄**이 됐다!
 
 이걸 수학에서는 **곱집합(Cartesian Product)**이라고 부른다. 르네 데카르트(Descartes)의 이름을 딴 것인데, 두 집합의 모든 조합을 만드는 것이다.

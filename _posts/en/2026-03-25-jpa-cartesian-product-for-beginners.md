@@ -84,6 +84,8 @@ Sheet 1 has 2 rows, Sheet 2 has 2 rows. When the database merges them, it create
 
 ![Combined result — all combinations](/assets/images/posts/042-jpa-cartesian-product-bug/table-b-combined-en.png)
 
+![Ghost rows — every combination of items × coupons](/assets/images/posts/042-jpa-cartesian-product-bug/table-ghost-rows-en.png)
+
 **2 rows × 2 rows = 4 rows!**
 
 In mathematics, this is called a **Cartesian Product** (named after René Descartes). It generates every combination of two sets.
