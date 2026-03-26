@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<title>Should the System Decide, or Should a Human Confirm? — Books an AI Recommended</title>
+<style>
+  body { max-width: 680px; margin: 40px auto; font-family: Georgia, serif; font-size: 18px; line-height: 1.7; color: #333; padding: 0 20px; }
+  h1 { font-size: 32px; line-height: 1.3; }
+  h2 { font-size: 24px; margin-top: 40px; }
+  h3 { font-size: 20px; margin-top: 30px; }
+  img { max-width: 100%; margin: 20px 0; }
+  pre { background: #f6f8fa; padding: 16px; overflow-x: auto; font-size: 14px; line-height: 1.5; border-radius: 6px; }
+  code { background: #f6f8fa; padding: 2px 6px; font-size: 15px; border-radius: 3px; }
+  blockquote { border-left: 3px solid #ccc; margin-left: 0; padding-left: 20px; color: #555; }
+  strong { font-weight: 700; }
+  hr { border: none; border-top: 1px solid #ddd; margin: 40px 0; }
+</style>
+</head><body>
+
+<h1>Should the System Decide, or Should a Human Confirm? — Books an AI Recommended</h1>
+
+<p>I'm building a SaaS for managing after-school academies (학원) in Korea. One question keeps haunting every feature I build:</p>
+
+<blockquote><strong>"Should the system handle this automatically, or should the teacher confirm it first?"</strong></blockquote>
+
+<p>For example:</p>
+<ul>
+<li>Should invoices be generated automatically each month, or should a teacher review and approve them first?</li>
+<li>When a student is late, should the system immediately notify the parent, or should the teacher decide whether to send the notification?</li>
+<li>When a sibling withdraws, should the sibling discount be removed automatically, or should we ask the teacher first?</li>
+</ul>
+
+<p>This question follows every single feature. Automate too much, and a wrong notification goes to a parent. Add too many confirmations, and teachers drown in approval fatigue.</p>
+
+<p>I'd been making these decisions by gut feeling — "this one should be automatic," "this one needs confirmation." No consistent framework. So I asked Claude (AI): <strong>"Are there any books I should read about this?"</strong></p>
+
+<h2>Books the AI Recommended</h2>
+
+<h3>Directly Relevant</h3>
+
+<p><strong>1. Humans and Automation — Thomas Sheridan</strong></p>
+<p>The foundational text on automation research. Famous for the "10 levels of automation" model, ranging from Level 1 (human decides everything) to Level 10 (system does everything, ignores human). Instead of thinking "automatic or manual?" as a binary choice, this framework lets you ask: <strong>"Where on the 10-level spectrum should this feature sit?"</strong></p>
+
+<p><strong>2. About Face: The Essentials of Interaction Design — Alan Cooper</strong></p>
+<p>Often called the bible of interaction design. Covers user control, approval flows, and modal vs. modeless design systematically. Essential reference when debating whether to add a confirmation dialog.</p>
+
+<p><strong>3. Don't Make Me Think — Steve Krug</strong></p>
+<p>Short and practical. Every approval step you add is another moment where the user has to <em>think</em>. This book helps distinguish between confirmations that genuinely protect the user and ones that just add friction.</p>
+
+<h3>Indirectly Relevant</h3>
+
+<p><strong>4. The Design of Everyday Things — Don Norman</strong></p>
+<p>The textbook on affordances, feedback, and error prevention. The foundation for "let the system act, but design it to prevent mistakes."</p>
+
+<p><strong>5. Designing with the Mind in Mind — Jeff Johnson</strong></p>
+<p>Cognitive psychology-based UI design. Helps understand <em>why</em> users experience approval fatigue and what kinds of automation feel reassuring vs. threatening.</p>
+
+<h3>Key Paper (Free)</h3>
+
+<p><strong>Parasuraman, Sheridan & Wickens (2000) — "A Model for Types and Levels of Human Interaction with Automation"</strong></p>
+<p>Published in IEEE Transactions. Splits automation into four functions (information acquisition → analysis → decision selection → action implementation) and defines 10 levels for each. The most practical and directly applicable framework. Available at <a href="https://philpapers.org/rec/PARAMF-3">PhilPapers</a>.</p>
+
+<h2>A Decision Tree We Made Along the Way</h2>
+
+<p>I haven't read these books yet. But while discussing with the AI, we built a decision tree tailored to our system:</p>
+
+<pre>
+Does it send something directly to a parent?
+  → YES → Preview + teacher confirmation before sending
+  → NO ↓
+
+Does it affect money? (invoices, discounts, refunds)
+  → YES → Teacher confirmation required (at least 1-click approval)
+  → NO ↓
+
+Is it easily reversible?
+  → NO → Teacher confirmation required
+  → YES ↓
+
+Is it a high-frequency routine task?
+  → YES → Auto-execute + post-hoc review
+  → NO → Teacher executes manually
+</pre>
+
+<p>And at every level: <strong>provide a per-campus override option.</strong> Different academies have different management styles. Some principals want "just handle everything for me." Others want "I'll check everything myself."</p>
+
+<h2>What's Next</h2>
+
+<p>I'll read these books one by one and write follow-up posts about how I actually applied them to our system's features. I'm especially looking forward to mapping our existing features onto Parasuraman's automation level model.</p>
+
+<hr>
+
+<p><em>The book recommendations and analysis framework in this post came from a conversation with Claude (AI). Actual book reviews and application notes will follow in future posts.</em></p>
+
+</body></html>

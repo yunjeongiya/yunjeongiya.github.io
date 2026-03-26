@@ -73,6 +73,24 @@ body {
   height: auto;
 }
 
+/* Fix: Mobile image scrolling — wide images (mock UIs, tables) stay readable */
+@media (max-width: 768px) {
+  .post-content img {
+    max-width: none;
+    width: auto;
+    max-height: 70vh;
+  }
+
+  .post-content p:has(img) {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-left: -12px;
+    margin-right: -12px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
+
 /* Fix: Terminal panel height */
 .vscode-terminal-panel {
   height: 250px;

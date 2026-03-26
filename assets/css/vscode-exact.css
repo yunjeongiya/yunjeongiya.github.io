@@ -977,6 +977,20 @@ body {
     display: block;
     overflow-x: auto;
   }
+
+  /* Images: scrollable on mobile instead of squeezing */
+  .post-content img {
+    max-width: none;
+    width: auto;
+    max-height: 70vh;
+    display: block;
+  }
+
+  .post-content p:has(img),
+  .post-content figure {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 /* Extra small devices */
