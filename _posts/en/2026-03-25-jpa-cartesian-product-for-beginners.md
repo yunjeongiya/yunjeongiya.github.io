@@ -6,7 +6,7 @@ categories: [Backend, Database]
 tags: [JPA, Hibernate, Database, SQL, Bug, SaaS]
 lang: en
 slug: "043-en"
-thumbnail: /assets/images/posts/042-jpa-cartesian-product-bug/thumb-en.png
+thumbnail: /assets/images/posts/042-jpa-cartesian-product-bug/thumb-043-en.png
 ---
 
 I'm building a SaaS subscription management system. After generating April orders, something looked very wrong.

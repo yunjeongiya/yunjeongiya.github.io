@@ -6,7 +6,7 @@ categories: [Backend, Database]
 tags: [JPA, Hibernate, 데이터베이스, SQL, 버그, 학원관리]
 lang: ko
 slug: "043"
-thumbnail: /assets/images/posts/042-jpa-cartesian-product-bug/thumb-ko.png
+thumbnail: /assets/images/posts/042-jpa-cartesian-product-bug/thumb-043-ko.png
 ---
 
 SaaS 구독 관리 시스템을 만들고 있다. 4월 주문서를 생성했는데, 뭔가 이상하다.
