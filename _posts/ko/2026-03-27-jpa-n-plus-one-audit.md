@@ -20,7 +20,7 @@ slug: "045"
 
 학생 목록에서 상태 뱃지(등록예정, 재원 등)를 클릭하면 팝오버가 열리면서 등퇴원 관련 정보를 보여준다. 그런데 클릭 후 약 1초간 **아무 내용 없는 빈 흰 박스**가 표시되고 있었다.
 
-![Before vs After: 빈 흰 박스 → 즉시 렌더링](/assets/images/posts/045-jpa-n-plus-one-audit/01-white-box.png)
+<img src="/assets/images/posts/045-jpa-n-plus-one-audit/01-white-box.png" alt="Before vs After: 빈 흰 박스 → 즉시 렌더링" width="900">
 
 이 팝오버는 의도적으로 **lazy fetch** 방식을 사용하고 있었다. 학생 목록에서 학생 수만큼 API를 호출하면 N+1 문제가 생기니까, 팝오버를 열 때만 해당 학생의 등퇴원 기록을 가져오는 것이다. 합리적인 설계였지만, 부작용으로 로딩 중 빈 UI가 노출되는 문제가 있었다.
 
@@ -96,7 +96,7 @@ public static TransitionResponse from(Transition transition) {
 
 `Transition` → `StudentCampusProfile` → `StudentProfile` → `User`까지 3단계 LAZY 연관을 순차적으로 접근하고 있었다. 데이터가 N건이면 최대 3N개의 추가 쿼리가 발생한다.
 
-![N+1 쿼리 로그 vs FETCH JOIN 쿼리 로그](/assets/images/posts/045-jpa-n-plus-one-audit/02-query-log.png)
+<img src="/assets/images/posts/045-jpa-n-plus-one-audit/02-query-log.png" alt="N+1 쿼리 로그 vs FETCH JOIN 쿼리 로그" width="900">
 
 ## 3단계: FETCH JOIN 적용
 
@@ -184,7 +184,7 @@ class FetchJoinQueryCountTest {
 
 ## 결과
 
-![감사 결과 — 쿼리 수 비교 차트](/assets/images/posts/045-jpa-n-plus-one-audit/03-audit-result.png)
+<img src="/assets/images/posts/045-jpa-n-plus-one-audit/03-audit-result.png" alt="감사 결과 — 쿼리 수 비교 차트" width="900">
 
 | 대상 | 수정 전 | 수정 후 | 절감률 |
 |------|---------|---------|-------|
