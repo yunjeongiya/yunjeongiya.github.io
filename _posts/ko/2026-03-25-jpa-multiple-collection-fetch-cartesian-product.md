@@ -9,6 +9,8 @@ slug: "042"
 thumbnail: /assets/images/posts/042-jpa-cartesian-product-bug/thumb-ko.png
 ---
 
+![JPA에서 여러 컬렉션을 JOIN FETCH하면 안 되는 이유](/assets/images/posts/042-jpa-cartesian-product-bug/thumb-ko.png){: width="700"}
+
 > **이전 글**: [청구서 금액이 2배로 나왔다 — 비개발자도 이해할 수 있는 데이터베이스 곱셈 버그](/posts/043/)에서 "두 장의 엑셀 시트를 동시에 합치면 곱셈이 일어난다"는 비유로 이 버그를 설명했다. 이번 글에서는 JPA/Hibernate 관점에서 정확히 왜 이런 일이 생기는지, `DISTINCT`로는 왜 안 되는지, 올바른 해결법은 무엇인지를 다룬다.
 
 증상을 요약하면: DB에는 주문 항목이 2개뿐인데 API 응답에서 4개로 뻥튀기됐다. 원인은 하나의 JPQL 쿼리에서 **두 개의 `@OneToMany` 컬렉션을 동시에 `JOIN FETCH`**한 것이다.

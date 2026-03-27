@@ -9,6 +9,8 @@ slug: "043"
 thumbnail: /assets/images/posts/042-jpa-cartesian-product-bug/thumb-043-ko.png
 ---
 
+![청구서 금액이 2배로 나왔다](/assets/images/posts/042-jpa-cartesian-product-bug/thumb-043-ko.png){: width="700"}
+
 SaaS 구독 관리 시스템을 만들고 있다. 4월 주문서를 생성했는데, 뭔가 이상하다.
 
 ![주문서 목록 — 금액이 2배](/assets/images/posts/042-jpa-cartesian-product-bug/mock-list-duplicated.png)

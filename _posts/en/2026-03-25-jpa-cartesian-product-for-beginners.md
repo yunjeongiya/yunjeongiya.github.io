@@ -9,6 +9,8 @@ slug: "043-en"
 thumbnail: /assets/images/posts/042-jpa-cartesian-product-bug/thumb-043-en.png
 ---
 
+![The Order Total Was Doubled](/assets/images/posts/042-jpa-cartesian-product-bug/thumb-043-en.png){: width="700"}
+
 I'm building a SaaS subscription management system. After generating April orders, something looked very wrong.
 
 ![Order list — amounts are doubled](/assets/images/posts/042-jpa-cartesian-product-bug/mock-list-duplicated-en.png)
