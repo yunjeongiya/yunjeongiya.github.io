@@ -6,6 +6,7 @@ categories: [Backend, Performance]
 tags: [Spring Boot, JPA, Hibernate, FETCH JOIN, N+1, React, TanStack Query, 성능최적화]
 lang: ko
 slug: "045"
+thumbnail: /assets/images/posts/045-jpa-n-plus-one-audit/thumbnail-ko.png
 ---
 
 학원 관리 시스템을 개발하면서, 학생 상태 뱃지를 클릭했을 때 팝오버가 1초간 빈 흰 박스로 보이는 UX 문제를 발견했다. 단순한 프론트엔드 로딩 처리 누락으로 시작한 조사가, 서버 전체 56개 Response DTO를 감사하고 4건의 CRITICAL한 N+1 문제를 수정하는 작업으로 확장된 이야기다.
@@ -20,7 +21,7 @@ slug: "045"
 
 학생 목록에서 상태 뱃지(등록예정, 재원 등)를 클릭하면 팝오버가 열리면서 등퇴원 관련 정보를 보여준다. 그런데 클릭 후 약 1초간 **아무 내용 없는 빈 흰 박스**가 표시되고 있었다.
 
-<img src="/assets/images/posts/045-jpa-n-plus-one-audit/01-white-box.png" alt="Before vs After: 빈 흰 박스 → 즉시 렌더링" style="width:100%">
+<img src="/assets/images/posts/045-jpa-n-plus-one-audit/01-white-box.png" alt="Before vs After: 빈 흰 박스 → 즉시 렌더링" style="width:70%">
 
 이 팝오버는 의도적으로 **lazy fetch** 방식을 사용하고 있었다. 학생 목록에서 학생 수만큼 API를 호출하면 N+1 문제가 생기니까, 팝오버를 열 때만 해당 학생의 등퇴원 기록을 가져오는 것이다. 합리적인 설계였지만, 부작용으로 로딩 중 빈 UI가 노출되는 문제가 있었다.
 
@@ -96,7 +97,7 @@ public static TransitionResponse from(Transition transition) {
 
 `Transition` → `StudentCampusProfile` → `StudentProfile` → `User`까지 3단계 LAZY 연관을 순차적으로 접근하고 있었다. 데이터가 N건이면 최대 3N개의 추가 쿼리가 발생한다.
 
-<img src="/assets/images/posts/045-jpa-n-plus-one-audit/02-query-log.png" alt="N+1 쿼리 로그 vs FETCH JOIN 쿼리 로그" style="width:100%">
+<img src="/assets/images/posts/045-jpa-n-plus-one-audit/02-query-log.png" alt="N+1 쿼리 로그 vs FETCH JOIN 쿼리 로그" style="width:70%">
 
 ## 3단계: FETCH JOIN 적용
 
@@ -177,8 +178,8 @@ class FetchJoinQueryCountTest {
 
 ## 결과
 
-<img src="/assets/images/posts/045-jpa-n-plus-one-audit/03-audit-result.png" alt="감사 결과 — 쿼리 수 비교 차트" style="width:100%">
-<img src="/assets/images/posts/045-jpa-n-plus-one-audit/04-result-table.png" alt="쿼리 수 비교 테이블" style="width:100%">
+<img src="/assets/images/posts/045-jpa-n-plus-one-audit/03-audit-result.png" alt="감사 결과 — 쿼리 수 비교 차트" style="width:70%">
+<img src="/assets/images/posts/045-jpa-n-plus-one-audit/04-result-table.png" alt="쿼리 수 비교 테이블" style="width:70%">
 
 데이터가 늘어날수록 차이는 더 벌어진다. 대기 학생이 30명이면 수정 전에는 약 100개의 쿼리가 나갔을 것이다.
 

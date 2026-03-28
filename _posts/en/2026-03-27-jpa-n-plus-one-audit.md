@@ -6,6 +6,7 @@ categories: [Backend, Performance]
 tags: [Spring Boot, JPA, Hibernate, FETCH JOIN, N+1, React, TanStack Query, Performance]
 lang: en
 slug: "045-en"
+thumbnail: /assets/images/posts/045-jpa-n-plus-one-audit/thumbnail-ko.png
 ---
 
 While building a learning management system, I noticed a popover showing a blank white box for about a second when clicking a student's status badge. What started as a simple frontend loading state fix escalated into auditing all 56 Response DTOs across the server and fixing 4 CRITICAL N+1 query issues.
@@ -20,7 +21,7 @@ This post covers:
 
 In the student list, clicking a status badge (e.g., "Enrolling", "Active") opens a popover with enrollment details. But after clicking, a **completely empty white box** appeared for about a second before content loaded.
 
-<img src="/assets/images/posts/045-jpa-n-plus-one-audit/01-white-box.png" alt="Before vs After: blank white box → instant render" style="width:100%">
+<img src="/assets/images/posts/045-jpa-n-plus-one-audit/01-white-box.png" alt="Before vs After: blank white box → instant render" style="width:70%">
 
 The popover was intentionally using **lazy fetch** — to avoid an N+1 problem where each student row would trigger its own API call, the design only fetched enrollment records when the popover opened. A reasonable design, but it left users staring at a blank box during loading.
 
@@ -96,7 +97,7 @@ public static TransitionResponse from(Transition transition) {
 
 Three levels of LAZY associations: `Transition` → `StudentCampusProfile` → `StudentProfile` → `User`. For N records, up to 3N additional queries fire.
 
-<img src="/assets/images/posts/045-jpa-n-plus-one-audit/02-query-log.png" alt="N+1 query log vs FETCH JOIN query log" style="width:100%">
+<img src="/assets/images/posts/045-jpa-n-plus-one-audit/02-query-log.png" alt="N+1 query log vs FETCH JOIN query log" style="width:70%">
 
 ## Step 3: Applying FETCH JOIN
 
@@ -177,8 +178,8 @@ class FetchJoinQueryCountTest {
 
 ## Results
 
-<img src="/assets/images/posts/045-jpa-n-plus-one-audit/03-audit-result.png" alt="Audit results — query count comparison chart" style="width:100%">
-<img src="/assets/images/posts/045-jpa-n-plus-one-audit/04-result-table.png" alt="Query count comparison table" style="width:100%">
+<img src="/assets/images/posts/045-jpa-n-plus-one-audit/03-audit-result.png" alt="Audit results — query count comparison chart" style="width:70%">
+<img src="/assets/images/posts/045-jpa-n-plus-one-audit/04-result-table.png" alt="Query count comparison table" style="width:70%">
 
 The gap widens with more data. With 30 students on the waitlist, the pre-fix version would have fired roughly 100 queries.
 
