@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<title>How a Blank White Box Led to a Full JPA N+1 Audit</title>
+<style>
+  body { max-width: 680px; margin: 40px auto; font-family: Georgia, serif; font-size: 18px; line-height: 1.7; color: #333; padding: 0 20px; }
+  h1 { font-size: 32px; line-height: 1.3; }
+  h2 { font-size: 24px; margin-top: 40px; }
+  h3 { font-size: 20px; margin-top: 30px; }
+  img { max-width: 100%; margin: 20px 0; }
+  pre { background: #f6f8fa; padding: 16px; overflow-x: auto; font-size: 14px; line-height: 1.5; border-radius: 6px; }
+  code { background: #f6f8fa; padding: 2px 6px; font-size: 15px; border-radius: 3px; }
+  blockquote { border-left: 3px solid #ccc; margin-left: 0; padding-left: 20px; color: #555; }
+  strong { font-weight: 700; }
+  hr { border: none; border-top: 1px solid #ddd; margin: 40px 0; }
+</style>
+</head><body>
+
+<h1>How a Blank White Box Led to a Full JPA N+1 Audit</h1>
+
+<p>While building a learning management system, I noticed a popover showing a blank white box for about a second when clicking a student's status badge. What started as a simple frontend loading state fix escalated into auditing all 56 Response DTOs across the server and fixing 4 CRITICAL N+1 query issues.</p>
+
+<p>This post covers:</p>
+<ul>
+<li>Tracing a server query problem from a frontend UX issue</li>
+<li>The pattern where JPA LAZY Loading causes N+1 in Response DTO conversions</li>
+<li>How to audit an entire project for this pattern</li>
+<li>Writing query count regression tests with Hibernate Statistics</li>
+</ul>
+
+<h2>Discovering the Problem</h2>
+
+<p>In the student list, clicking a status badge (e.g., "Enrolling", "Active") opens a popover with enrollment details. But after clicking, a <strong>completely empty white box</strong> appeared for about a second before content loaded.</p>
+
+<img src="https://yunjeongiya.github.io/assets/images/posts/045-jpa-n-plus-one-audit/01-white-box.png" alt="Before vs After: blank white box to instant render">
+
+<p>The popover was intentionally using <strong>lazy fetch</strong> — to avoid an N+1 problem where each student row would trigger its own API call, the design only fetched enrollment records when the popover opened. A reasonable design, but it left users staring at a blank box during loading.</p>
+
+<h2>Step 1: Frontend Quick Fix</h2>
+
+<p>Two changes to address the blank box immediately.</p>
+
+<p><strong>Loading spinner</strong>: Show a spinner instead of an empty box while data loads.</p>
+
+<pre><code>{isLoadingRecord && (
+  &lt;div className="flex items-center justify-center py-3"&gt;
+    &lt;Loader2 className="h-5 w-5 animate-spin text-gray-400" /&gt;
+  &lt;/div&gt;
+)}</code></pre>
+
+<p><strong>Hover prefetch</strong>: Start fetching data the moment the user hovers over the badge. By the time they click (~200–500ms later), the data is already cached and the popover renders instantly.</p>
+
+<pre><code>const handleMouseEnter = useCallback(() =&gt; {
+  if (isPending) {
+    prefetchRecordsByUser(queryClient, studentId);
+  }
+}, [isPending, queryClient, studentId]);</code></pre>
+
+<pre><code>export const prefetchRecordsByUser = (
+  queryClient: QueryClient, userId: number
+) =&gt; {
+  queryClient.prefetchQuery({
+    queryKey: keys.byUser(userId),
+    queryFn: () =&gt; api.getRecordsByUser(userId),
+    staleTime: 30_000, // prevent duplicate requests within 30s
+  });
+};</code></pre>
+
+<p>Setting <code>staleTime: 30_000</code> ensures that hovering over the same student again within 30 seconds won't trigger another request.</p>
+
+<h2>Step 2: Server Query Analysis</h2>
+
+<p>The frontend was fixed, but could the server response time itself be reduced?</p>
+
+<p>Looking at the server code for this API:</p>
+
+<pre><code>public List&lt;TransitionResponse&gt; getTransitionsByUserId(Long targetUserId) {
+    StudentCampusProfile scp = scpRepository
+            .findByUserIdAndCampusId(targetUserId, campusId)
+            .orElseThrow(...);
+
+    return transitionRepository
+            .findByScpIdOrderByCreatedAtDesc(scp.getId())
+            .stream()
+            .map(TransitionResponse::from)  // problem here
+            .collect(Collectors.toList());
+}</code></pre>
+
+<p><code>findByScpIdOrderByCreatedAtDesc</code> is a Spring Data JPA derived query — no FETCH JOIN. But <code>TransitionResponse.from()</code> accesses:</p>
+
+<pre><code>public static TransitionResponse from(Transition transition) {
+    // LAZY association access → additional queries!
+    var scp = transition.getStudentCampusProfile();   // query 1
+    var sp = scp.getStudentProfile();                 // query 2
+    var user = sp.getUser();                          // query 3
+    builder.studentName(user.getName());
+}</code></pre>
+
+<p>Three levels of LAZY associations: <code>Transition</code> → <code>StudentCampusProfile</code> → <code>StudentProfile</code> → <code>User</code>. For N records, up to 3N additional queries fire.</p>
+
+<img src="https://yunjeongiya.github.io/assets/images/posts/045-jpa-n-plus-one-audit/02-query-log.png" alt="N+1 query log vs FETCH JOIN query log">
+
+<h2>Step 3: Applying FETCH JOIN</h2>
+
+<p>The fix is straightforward — add FETCH JOIN to the repository query.</p>
+
+<pre><code>// Before: derived query (no FETCH JOIN)
+List&lt;Transition&gt; findByScpIdOrderByCreatedAtDesc(Long scpId);
+
+// After: FETCH JOIN loads all associated entities in one query
+@Query("SELECT t FROM Transition t " +
+       "JOIN FETCH t.studentCampusProfile scp " +
+       "JOIN FETCH scp.studentProfile sp " +
+       "JOIN FETCH sp.user " +
+       "WHERE scp.id = :scpId " +
+       "ORDER BY t.createdAt DESC")
+List&lt;Transition&gt; findByScpIdWithProfileOrderByCreatedAtDesc(
+    @Param("scpId") Long scpId);</code></pre>
+
+<h2>Step 4: Full Project Audit</h2>
+
+<p>If this pattern existed here, it likely existed elsewhere. I audited all 56 Response DTOs' <code>from()</code> methods across the project.</p>
+
+<p><strong>Audit criteria:</strong></p>
+<ol>
+<li>Does the Response DTO have a <code>from()</code> / <code>toDto()</code> conversion method?</li>
+<li>Does that method access LAZY associations (<code>@ManyToOne(fetch = LAZY)</code>, etc.)?</li>
+<li>Does the calling Repository query include FETCH JOIN for those associations?</li>
+</ol>
+
+<p><strong>Result: 4 CRITICAL issues found</strong></p>
+
+<img src="https://yunjeongiya.github.io/assets/images/posts/045-jpa-n-plus-one-audit/03-audit-result.png" alt="Audit results — query count comparison chart">
+
+<p>InquiryResponse lands at 7 instead of 1 because <code>@OneToMany</code> collection FETCH JOINs don't always resolve to a single query. Still, 17 → 7 is a significant improvement.</p>
+
+<h2>Step 5: Regression Tests</h2>
+
+<p>Adding FETCH JOIN isn't the end. Someone could later modify a query and accidentally drop the FETCH JOIN. I wrote query count tests using Hibernate's <code>Statistics</code>.</p>
+
+<pre><code>@DataJpaTest
+@ActiveProfiles("test")
+class FetchJoinQueryCountTest {
+
+    private Statistics statistics;
+
+    @BeforeEach
+    void setUp() {
+        EntityManager em = testEntityManager.getEntityManager();
+        SessionFactory sf = em.unwrap(Session.class).getSessionFactory();
+        statistics = sf.getStatistics();
+        statistics.setStatisticsEnabled(true);
+    }
+
+    @Test
+    void waitingRequest_findActiveByClassId_singleQuery() {
+        // Given: 3 students waiting
+        // ... create test data ...
+
+        testEntityManager.flush();
+        testEntityManager.clear();  // clear first-level cache
+        statistics.clear();         // reset counters
+
+        // When: execute repository query + access LAZY associations
+        List&lt;WaitingRequest&gt; results = repository.findActiveByClassId(classId);
+        results.forEach(wr -&gt; {
+            wr.getProfile().getStudentProfile().getUser().getName();
+        });
+
+        // Then: FETCH JOIN means only 1 query should execute
+        assertThat(statistics.getPrepareStatementCount()).isEqualTo(1);
+    }
+}</code></pre>
+
+<p><strong>Key gotchas:</strong></p>
+<ul>
+<li>Always call <code>entityManager.clear()</code> before <code>statistics.clear()</code>. Otherwise, entities are served from the first-level cache and no queries fire — giving a false "no N+1" result.</li>
+<li>Use <strong><code>getPrepareStatementCount()</code></strong>, not <code>getQueryExecutionCount()</code>. The latter only counts JPQL executions. Lazy loading triggers SQL through prepared statements, which <code>getQueryExecutionCount()</code> misses entirely.</li>
+<li>You need <code>hibernate.generate_statistics: true</code> in your test configuration.</li>
+</ul>
+
+<h2>Lessons Learned</h2>
+
+<h3>1. Server problems hide behind UX issues</h3>
+
+<p>"It's loading slow" could be a frontend issue, a server issue, or both. In this case, both sides had room for improvement. Looking at only one side solves only half the problem.</p>
+
+<h3>2. The derived query trap</h3>
+
+<p>Spring Data JPA's derived queries (<code>findByXxxOrderByYyy</code>) are convenient but don't support FETCH JOIN. If your DTO conversion accesses LAZY associations, you must use <code>@Query</code> with explicit FETCH JOIN.</p>
+
+<h3>3. Use getPrepareStatementCount()</h3>
+
+<p>When verifying N+1 with Hibernate Statistics, <code>getQueryExecutionCount()</code> only counts JPQL executions. Lazy loading executes SQL via prepared statements internally, so you need <code>getPrepareStatementCount()</code> for accurate numbers. Using the wrong counter can lead to a false "no N+1" conclusion.</p>
+
+<h3>4. One finding means audit everything</h3>
+
+<p>If you find an N+1 pattern in one place, the same pattern likely exists elsewhere. Auditing all 56 DTOs uncovered 4 additional CRITICAL issues. Codifying the check criteria as a rule prevents the same mistake going forward.</p>
+
+</body></html>
