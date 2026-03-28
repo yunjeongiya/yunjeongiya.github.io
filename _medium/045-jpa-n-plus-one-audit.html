@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head>
 <meta charset="utf-8">
-<title>How a Blank White Box Led to a Full JPA N+1 Audit</title>
+<title>One Click, 17 Hidden Queries — How a Blank Popover Exposed Our N+1 Problem</title>
 <style>
   body { max-width: 680px; margin: 40px auto; font-family: Georgia, serif; font-size: 18px; line-height: 1.7; color: #333; padding: 0 20px; }
   h1 { font-size: 32px; line-height: 1.3; }
@@ -16,7 +16,7 @@
 </style>
 </head><body>
 
-<h1>How a Blank White Box Led to a Full JPA N+1 Audit</h1>
+<h1>One Click, 17 Hidden Queries — How a Blank Popover Exposed Our N+1 Problem</h1>
 
 <p>While building a learning management system, I noticed a popover showing a blank white box for about a second when clicking a student's status badge. What started as a simple frontend loading state fix escalated into auditing all 56 Response DTOs across the server and fixing 4 CRITICAL N+1 query issues.</p>
 

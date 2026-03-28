@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "빈 흰 박스 하나에서 시작된 JPA N+1 전체 감사기"
+title: "팝오버 1초 멈춤, 알고 보니 쿼리 17개가 나가고 있었다"
 date: 2026-03-27 09:00:00 +0900
 categories: [Backend, Performance]
 tags: [Spring Boot, JPA, Hibernate, FETCH JOIN, N+1, React, TanStack Query, 성능최적화]

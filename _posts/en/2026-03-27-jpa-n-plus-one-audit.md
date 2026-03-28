@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "How a Blank White Box Led to a Full JPA N+1 Audit"
+title: "One Click, 17 Hidden Queries — How a Blank Popover Exposed Our N+1 Problem"
 date: 2026-03-27 09:00:00 +0900
 categories: [Backend, Performance]
 tags: [Spring Boot, JPA, Hibernate, FETCH JOIN, N+1, React, TanStack Query, Performance]
