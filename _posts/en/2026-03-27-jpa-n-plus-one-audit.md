@@ -20,7 +20,7 @@ This post covers:
 
 In the student list, clicking a status badge (e.g., "Enrolling", "Active") opens a popover with enrollment details. But after clicking, a **completely empty white box** appeared for about a second before content loaded.
 
-<img src="/assets/images/posts/045-jpa-n-plus-one-audit/01-white-box.png" alt="Before vs After: blank white box → instant render" width="900">
+<img src="/assets/images/posts/045-jpa-n-plus-one-audit/01-white-box.png" alt="Before vs After: blank white box → instant render" style="width:100%">
 
 The popover was intentionally using **lazy fetch** — to avoid an N+1 problem where each student row would trigger its own API call, the design only fetched enrollment records when the popover opened. A reasonable design, but it left users staring at a blank box during loading.
 
@@ -96,7 +96,7 @@ public static TransitionResponse from(Transition transition) {
 
 Three levels of LAZY associations: `Transition` → `StudentCampusProfile` → `StudentProfile` → `User`. For N records, up to 3N additional queries fire.
 
-<img src="/assets/images/posts/045-jpa-n-plus-one-audit/02-query-log.png" alt="N+1 query log vs FETCH JOIN query log" width="900">
+<img src="/assets/images/posts/045-jpa-n-plus-one-audit/02-query-log.png" alt="N+1 query log vs FETCH JOIN query log" style="width:100%">
 
 ## Step 3: Applying FETCH JOIN
 
@@ -184,7 +184,7 @@ class FetchJoinQueryCountTest {
 
 ## Results
 
-<img src="/assets/images/posts/045-jpa-n-plus-one-audit/03-audit-result.png" alt="Audit results — query count comparison chart" width="900">
+<img src="/assets/images/posts/045-jpa-n-plus-one-audit/03-audit-result.png" alt="Audit results — query count comparison chart" style="width:100%">
 
 | Target | Before | After | Reduction |
 |--------|--------|-------|-----------|
