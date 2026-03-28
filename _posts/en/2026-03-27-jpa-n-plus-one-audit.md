@@ -6,7 +6,7 @@ categories: [Backend, Performance]
 tags: [Spring Boot, JPA, Hibernate, FETCH JOIN, N+1, React, TanStack Query, Performance]
 lang: en
 slug: "045-en"
-thumbnail: /assets/images/posts/045-jpa-n-plus-one-audit/thumbnail-ko.png
+thumbnail: /assets/images/posts/045-jpa-n-plus-one-audit/thumbnail-en.png
 ---
 
 While building a learning management system, I noticed a popover showing a blank white box for about a second when clicking a student's status badge. What started as a simple frontend loading state fix escalated into auditing all 56 Response DTOs across the server and fixing 4 CRITICAL N+1 query issues.
