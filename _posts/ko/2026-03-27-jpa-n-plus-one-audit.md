@@ -178,7 +178,6 @@ class FetchJoinQueryCountTest {
 ## 결과
 
 <img src="/assets/images/posts/045-jpa-n-plus-one-audit/03-audit-result.png" alt="감사 결과 — 쿼리 수 비교 차트" style="width:100%">
-
 <img src="/assets/images/posts/045-jpa-n-plus-one-audit/04-result-table.png" alt="쿼리 수 비교 테이블" style="width:100%">
 
 데이터가 늘어날수록 차이는 더 벌어진다. 대기 학생이 30명이면 수정 전에는 약 100개의 쿼리가 나갔을 것이다.

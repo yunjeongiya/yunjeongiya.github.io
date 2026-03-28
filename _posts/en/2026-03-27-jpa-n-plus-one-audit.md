@@ -178,7 +178,6 @@ class FetchJoinQueryCountTest {
 ## Results
 
 <img src="/assets/images/posts/045-jpa-n-plus-one-audit/03-audit-result.png" alt="Audit results — query count comparison chart" style="width:100%">
-
 <img src="/assets/images/posts/045-jpa-n-plus-one-audit/04-result-table.png" alt="Query count comparison table" style="width:100%">
 
 The gap widens with more data. With 30 students on the waitlist, the pre-fix version would have fired roughly 100 queries.
