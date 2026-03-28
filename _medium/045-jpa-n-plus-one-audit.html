@@ -32,7 +32,7 @@
 
 <p>In the student list, clicking a status badge (e.g., "Enrolling", "Active") opens a popover with enrollment details. But after clicking, a <strong>completely empty white box</strong> appeared for about a second before content loaded.</p>
 
-<img src="https://yunjeongiya.github.io/assets/images/posts/045-jpa-n-plus-one-audit/01-white-box.png" alt="Before vs After: blank white box to instant render">
+<img src="https://yunjeongiya.github.io/assets/images/posts/045-jpa-n-plus-one-audit/01-white-box-light.png" alt="Before vs After: blank white box to instant render">
 
 <p>The popover was intentionally using <strong>lazy fetch</strong> — to avoid an N+1 problem where each student row would trigger its own API call, the design only fetched enrollment records when the popover opened. A reasonable design, but it left users staring at a blank box during loading.</p>
 
@@ -98,7 +98,7 @@
 
 <p>Three levels of LAZY associations: <code>Transition</code> → <code>StudentCampusProfile</code> → <code>StudentProfile</code> → <code>User</code>. For N records, up to 3N additional queries fire.</p>
 
-<img src="https://yunjeongiya.github.io/assets/images/posts/045-jpa-n-plus-one-audit/02-query-log.png" alt="N+1 query log vs FETCH JOIN query log">
+<img src="https://yunjeongiya.github.io/assets/images/posts/045-jpa-n-plus-one-audit/02-query-log-light.png" alt="N+1 query log vs FETCH JOIN query log">
 
 <h2>Step 3: Applying FETCH JOIN</h2>
 
@@ -130,7 +130,9 @@ List&lt;Transition&gt; findByScpIdWithProfileOrderByCreatedAtDesc(
 
 <p><strong>Result: 4 CRITICAL issues found</strong></p>
 
-<img src="https://yunjeongiya.github.io/assets/images/posts/045-jpa-n-plus-one-audit/03-audit-result.png" alt="Audit results — query count comparison chart">
+<img src="https://yunjeongiya.github.io/assets/images/posts/045-jpa-n-plus-one-audit/03-audit-result-light.png" alt="Audit results — query count comparison chart">
+
+<img src="https://yunjeongiya.github.io/assets/images/posts/045-jpa-n-plus-one-audit/04-result-table-light.png" alt="Query count comparison table">
 
 <p>InquiryResponse lands at 7 instead of 1 because <code>@OneToMany</code> collection FETCH JOINs don't always resolve to a single query. Still, 17 → 7 is a significant improvement.</p>
 

@@ -126,14 +126,7 @@ If this pattern existed here, it likely existed elsewhere. I audited all 56 Resp
 2. Does that method access LAZY associations (`@ManyToOne(fetch = LAZY)`, etc.)?
 3. Does the calling Repository query include FETCH JOIN for those associations?
 
-**Result: 4 CRITICAL issues found**
-
-| Response DTO | LAZY access chain | Before (5 rows) | After |
-|---|---|---|---|
-| WaitingRequestResponse | SCP → StudentProfile → User | 17 | 1 |
-| TransitionResponse | SCP → StudentProfile → User | 16 | 1 |
-| InquiryResponse | targets(OneToMany) → User, Campus | 17 | 7 |
-| SeatReservationResponse | SeatGroup → Room, User, NextUser | 8 | 1 |
+**Result: 4 CRITICAL issues found** (detailed numbers in the Results section below)
 
 InquiryResponse lands at 7 instead of 1 because `@OneToMany` collection FETCH JOINs don't always resolve to a single query. Still, 17 → 7 is a significant improvement.
 
@@ -186,12 +179,7 @@ class FetchJoinQueryCountTest {
 
 <img src="/assets/images/posts/045-jpa-n-plus-one-audit/03-audit-result.png" alt="Audit results — query count comparison chart" style="width:100%">
 
-| Target | Before | After | Reduction |
-|--------|--------|-------|-----------|
-| WaitingRequest | 17 queries | 1 query | **17x** |
-| Transition | 16 queries | 1 query | **16x** |
-| Inquiry | 17 queries | 7 queries | **2.4x** |
-| Seat | 8 queries | 1 query | **8x** |
+<img src="/assets/images/posts/045-jpa-n-plus-one-audit/04-result-table.png" alt="Query count comparison table" style="width:100%">
 
 The gap widens with more data. With 30 students on the waitlist, the pre-fix version would have fired roughly 100 queries.
 

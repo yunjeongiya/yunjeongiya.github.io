@@ -126,14 +126,7 @@ List<Transition> findByScpIdWithProfileOrderByCreatedAtDesc(
 2. 그 메서드에서 LAZY 연관(`@ManyToOne(fetch = LAZY)` 등)을 접근하는가?
 3. 호출부의 Repository 쿼리가 해당 연관에 FETCH JOIN을 사용하는가?
 
-**결과: CRITICAL 4건 발견**
-
-| Response DTO | LAZY 접근 체인 | 수정 전 (5건) | 수정 후 |
-|---|---|---|---|
-| WaitingRequestResponse | SCP → StudentProfile → User | 17 | 1 |
-| TransitionResponse | SCP → StudentProfile → User | 16 | 1 |
-| InquiryResponse | targets(OneToMany) → User, Campus | 17 | 7 |
-| SeatReservationResponse | SeatGroup → Room, User, NextUser | 8 | 1 |
+**결과: CRITICAL 4건 발견** (상세 수치는 아래 결과 섹션 참조)
 
 InquiryResponse가 1이 아닌 7인 이유는 `@OneToMany` 컬렉션(`targets`)의 특성 때문이다. 컬렉션 FETCH JOIN은 메인 쿼리 1개로 완전히 해결되지 않는 경우가 있다. 그래도 17 → 7로 크게 개선되었다.
 
@@ -186,12 +179,7 @@ class FetchJoinQueryCountTest {
 
 <img src="/assets/images/posts/045-jpa-n-plus-one-audit/03-audit-result.png" alt="감사 결과 — 쿼리 수 비교 차트" style="width:100%">
 
-| 대상 | 수정 전 | 수정 후 | 절감률 |
-|------|---------|---------|-------|
-| WaitingRequest | 17 queries | 1 query | **17x** |
-| Transition | 16 queries | 1 query | **16x** |
-| Inquiry | 17 queries | 7 queries | **2.4x** |
-| Seat | 8 queries | 1 query | **8x** |
+<img src="/assets/images/posts/045-jpa-n-plus-one-audit/04-result-table.png" alt="쿼리 수 비교 테이블" style="width:100%">
 
 데이터가 늘어날수록 차이는 더 벌어진다. 대기 학생이 30명이면 수정 전에는 약 100개의 쿼리가 나갔을 것이다.
 
