@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<title>Automating Daily Slack Briefings with Claude Code Scheduled Agents (+ Network Restriction Workaround)</title>
+<style>
+  body { max-width: 680px; margin: 40px auto; font-family: Georgia, serif; font-size: 18px; line-height: 1.7; color: #333; padding: 0 20px; }
+  h1 { font-size: 32px; line-height: 1.3; }
+  h2 { font-size: 24px; margin-top: 40px; }
+  h3 { font-size: 20px; margin-top: 30px; }
+  img { max-width: 100%; margin: 20px 0; }
+  pre { background: #f6f8fa; padding: 16px; overflow-x: auto; font-size: 14px; line-height: 1.5; border-radius: 6px; }
+  code { background: #f6f8fa; padding: 2px 6px; font-size: 15px; border-radius: 3px; }
+  blockquote { border-left: 3px solid #ccc; margin-left: 0; padding-left: 20px; color: #555; }
+  strong { font-weight: 700; }
+  hr { border: none; border-top: 1px solid #ddd; margin: 40px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+  th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: center; }
+  th { background: #f6f8fa; }
+</style>
+</head><body>
+
+<h1>Automating Daily Slack Briefings with Claude Code Scheduled Agents</h1>
+
+<img src="https://yunjeongiya.github.io/assets/images/posts/046-claude-code-slack-briefing/thumbnail-en.png" alt="Claude Code Agent → GitHub Actions → Slack">
+
+<p>You leave work. The automation keeps running.</p>
+
+<p>Next morning, you open Slack and find a neatly organized summary of everything you did yesterday. You can build this with Claude Code.</p>
+
+<p>I came across a post in a developer community:</p>
+
+<blockquote>Did you know? Claude Code can run automated tasks even when your computer is off. I think this is actually more flexible than other tools, but it doesn't seem widely known yet.</blockquote>
+
+<p>The key point: <strong>an agent runs on Anthropic's cloud infrastructure, regardless of whether your machine is on or off.</strong></p>
+
+<p>I'm a solo developer running an attendance management system. I typically have 7–8 Claude Code sessions open simultaneously — one for the server, one for frontend, one for docs, one for bug fixes.</p>
+
+<p>The problem? <strong>I'd come back the next morning and have no idea what I was working on.</strong> The context-switching cost kept piling up every single morning. Running <code>claude -r</code> (resume) shows a list of sessions, but unnamed sessions appear as a wall of UUIDs. Naming sessions? One of those things you know you should do but never bother with. Hundreds of sessions pile up, and even search becomes useless.</p>
+
+<h2>The Goal: A Slack Briefing Every Morning</h2>
+
+<p>Here's what I envisioned:</p>
+<ol>
+<li><strong>5:50 PM</strong> — "Time to wrap up" reminder</li>
+<li><strong>Before leaving</strong> — Run <code>/wrap-up</code> locally → summarize sessions + notes → git push</li>
+<li><strong>9:00 AM</strong> — Yesterday's commits + wrap-up analysis → Slack briefing</li>
+</ol>
+
+<h2>Design: Why "Evening Briefing" Became a "Wrap-Up Reminder"</h2>
+
+<p>At first I thought simply: send briefings twice a day — morning and evening. But the evening briefing would just be a duplicate of the next morning's. So the evening slot became <strong>a reminder, not a report</strong> — "It's 10 minutes before you leave, time to wrap up."</p>
+
+<h3>The Problem: Remote Agents Can't See Your Local Machine</h3>
+
+<p>I wanted the morning briefing to include a list of yesterday's active sessions, with resume commands like <code>claude -r a4b86b4b</code>. But the remote agent runs on Anthropic's cloud — it can't access my local session files (<code>~/.claude/sessions/</code>).</p>
+
+<h3>The Solution: Local Wrap-Up → Git → Cloud Reads It</h3>
+
+<ol>
+<li><strong>Evening reminder</strong> sends a Slack message: "Run wrap-up"</li>
+<li>I run <code>/wrap-up</code> in local Claude Code — where it CAN read session files</li>
+<li><code>/wrap-up</code> saves session summary + notes to <code>sessions/YYYY-MM-DD.md</code> and pushes</li>
+<li><strong>Next morning</strong>, the remote agent reads this file and includes it in the briefing</li>
+</ol>
+
+<p>The git repo becomes a <strong>shared store</strong> between local and cloud.</p>
+
+<h3>"What to do tomorrow" Requires Human Input</h3>
+
+<p>Commit analysis can be automated, but "what should I work on tomorrow" can't. So <code>/wrap-up</code> asks exactly one question:</p>
+
+<blockquote>"Anything to note for tomorrow?"</blockquote>
+
+<p>This answer appears as the first section of the next morning's briefing. Takes about a minute, but saves the "what was I going to do?" moment every morning.</p>
+
+<h2>Creating the Scheduled Agent</h2>
+
+<p>You can create triggers via the Claude Code CLI (<code>/schedule</code>) or the <a href="https://claude.ai/code/scheduled">web UI</a>.</p>
+
+<pre><code>Remote Trigger (Anthropic Cloud)
+├── cron_expression: "0 0 * * *"  (daily 9:00 AM KST = 00:00 UTC)
+├── git_repository: your-org/your-repo
+├── model: claude-sonnet-4-6
+├── allowed_tools: [Bash, Read, Write, Glob, Grep]
+└── prompt: "Analyze yesterday's commits and send a Slack briefing"</code></pre>
+
+<p>The agent fresh-clones the repo each run, executes the prompt, and terminates. It has zero context, so <strong>the prompt is everything</strong> — be specific.</p>
+
+<h3>The Submodule Trap</h3>
+
+<p>If your project uses git submodules, the remote agent won't auto-init them. Add this to the top of your prompt:</p>
+
+<pre><code>git submodule update --init --recursive</code></pre>
+
+<p>Skip this, and you'll get a sad "no commits yesterday" briefing.</p>
+
+<h2>The Rabbit Hole: Slack Notifications Won't Work</h2>
+
+<p>This is where the real story begins. Three attempts, three different failures.</p>
+
+<h3>Attempt 1: Slack MCP Connector → No Notifications</h3>
+
+<p>Claude Code can connect to Slack via MCP. Messages send fine. <strong>Problem:</strong> Slack MCP sends messages <strong>as your own account</strong>. Slack doesn't notify you about your own messages. Even <code>@mentions</code> of yourself don't trigger notifications.</p>
+
+<h3>Attempt 2: curl + Slack Incoming Webhook → Network Blocked</h3>
+
+<pre><code>curl -X POST -H 'Content-type: application/json' \
+  --data '{"text":"message"}' \
+  https://hooks.slack.com/services/T.../B.../xxx</code></pre>
+
+<p><strong>Problem:</strong> Outbound HTTP requests from the remote agent environment are <strong>blocked with a 403</strong>. The Anthropic cloud environment restricts external HTTP calls.</p>
+
+<h3>Attempt 3: Git → GitHub Actions → Webhook ✅</h3>
+
+<p>This was never a "Slack" problem. It was a <strong>"how do you send a signal to the outside world from a network-restricted environment"</strong> problem.</p>
+
+<p>The answer was hiding in plain sight: <strong>using Git as a message queue.</strong></p>
+
+<pre><code>Remote Agent          GitHub Actions         Slack
+    │                      │                   │
+    ├─ Write message JSON  │                   │
+    ├─ git commit & push ──→                   │
+    │                      ├─ Detect push      │
+    │                      ├─ Read JSON        │
+    │                      ├─ curl webhook ────→│
+    │                      ├─ Delete file & push│ ✅ Bot notification!
+    │                      │                   │</code></pre>
+
+<p>The remote agent writes its analysis as a JSON file and pushes. GitHub Actions detects the push and forwards it via webhook. <strong>GitHub Actions has no network restrictions</strong>, so it works perfectly.</p>
+
+<h2>Implementation</h2>
+
+<h3>GitHub Actions Workflow</h3>
+
+<pre><code>name: Send Slack Briefing
+
+on:
+  push:
+    paths:
+      - 'slack-messages/*.json'
+
+jobs:
+  send-slack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Send pending messages to Slack
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_BRIEFING_WEBHOOK_URL }}
+        run: |
+          for file in slack-messages/*.json; do
+            [ -f "$file" ] || continue
+            response=$(curl -s -o /dev/null -w "%{http_code}" \
+              -X POST -H 'Content-type: application/json' \
+              -d @"$file" "$SLACK_WEBHOOK_URL")
+            if [ "$response" = "200" ]; then
+              git rm "$file"
+            fi
+          done
+      - name: Cleanup sent messages
+        run: |
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git commit -m "chore: cleanup sent slack messages"
+            git push
+          fi</code></pre>
+
+<p>When a JSON file is pushed to <code>slack-messages/</code>, the workflow fires → sends to Slack → deletes the file.</p>
+
+<h2>Full Architecture</h2>
+
+<pre><code>[Daily 5:50 PM KST]
+Remote Agent → Analyze commits → Push evening JSON → GitHub Actions → Slack bot
+                                                                        │
+[User]                                                          "Time to wrap up!"
+  └─ Run /wrap-up in Claude Code
+       └─ Session summary + memo → Push sessions/YYYY-MM-DD.md
+
+[Daily 9:00 AM KST]
+Remote Agent → Analyze commits + sessions → Push morning JSON → GitHub Actions → Slack bot
+                                                                                    │
+[User]                                                                      "Morning briefing!"</code></pre>
+
+<h2>Cost</h2>
+
+<ul>
+<li><strong>Remote Trigger:</strong> Included in Claude Code Max subscription (no extra cost)</li>
+<li><strong>GitHub Actions:</strong> 2,000 minutes/month free even for private repos (this workflow takes under 30 seconds)</li>
+<li><strong>Slack Incoming Webhook:</strong> Free</li>
+</ul>
+
+<h2>Summary</h2>
+
+<table>
+<tr><th>Method</th><th>Sends</th><th>Notification</th><th>Network</th><th>Result</th></tr>
+<tr><td>Slack MCP</td><td>✅</td><td>❌ (self→self)</td><td>✅</td><td>Failed</td></tr>
+<tr><td>curl webhook</td><td>✅</td><td>✅ (bot)</td><td>❌ (403)</td><td>Failed</td></tr>
+<tr><td>Git + GitHub Actions</td><td>✅</td><td>✅ (bot)</td><td>✅</td><td><strong>Success</strong></td></tr>
+</table>
+
+<p>The network restriction on Claude Code Remote Triggers is the current default. But since git push works, <strong>using GitHub Actions as a bridge</strong> lets you integrate with virtually any external service. Slack, Discord, Telegram, email — if it has a webhook, it works.</p>
+
+<p>As a solo developer, there's no one to ask "what did we do yesterday?" Now a bot tells me every morning. Pretty satisfying.</p>
+
+</body></html>
