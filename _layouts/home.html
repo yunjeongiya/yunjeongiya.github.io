@@ -30,6 +30,7 @@ layout: default
                   {% if post.categories.size > 0 %}
                     • {{ post.categories | join: ", " }}
                   {% endif %}
+                  • <i class="codicon codicon-eye" style="font-size: 11px;"></i> <span class="goatcounter-views" data-path="{{ post.url | relative_url }}">-</span> views
                   {% if page_lang == 'ko' %}
                     {% assign alt_post = site.posts | where: "lang", "en" | where: "date", post.date | first %}
                     {% if alt_post %}
@@ -61,3 +62,15 @@ layout: default
     {% endif %}
   {% endif %}
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.goatcounter-views').forEach(function(el) {
+    var path = el.dataset.path.replace(/\/$/, '') || '/';
+    fetch('https://yunjeongiya.goatcounter.com/counter/' + path + '.json')
+      .then(function(r) { return r.json(); })
+      .then(function(data) { el.textContent = data.count_unique || data.count || '0'; })
+      .catch(function() { el.textContent = '0'; });
+  });
+});
+</script>
