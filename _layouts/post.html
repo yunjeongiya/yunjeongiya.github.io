@@ -15,6 +15,7 @@ layout: default
       {% if page.tags.size > 0 %}
         • Tags: {{ page.tags | join: ", " }}
       {% endif %}
+      • <i class="codicon codicon-eye" style="font-size: 11px;"></i> <span id="goatcounter-views">-</span> views
     </div>
   </div>
 
@@ -30,6 +31,19 @@ layout: default
     <div id="comments-list"></div>
   </div>
 </article>
+
+<!-- GoatCounter View Count -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var el = document.getElementById('goatcounter-views');
+  if (!el) return;
+  var path = location.pathname;
+  fetch('https://yunjeongiya.goatcounter.com/counter/' + encodeURIComponent(path) + '.json')
+    .then(function(r) { return r.json(); })
+    .then(function(data) { el.textContent = data.count_unique || data.count || '0'; })
+    .catch(function() { el.textContent = '0'; });
+});
+</script>
 
 <!-- Right Panel Data (Outline + Minimap) -->
 <script>

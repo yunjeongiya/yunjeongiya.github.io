@@ -12,6 +12,17 @@
   <script src="{{ "/assets/js/git-graph.js" | relative_url }}"></script>
   {% feed_meta %}
   {% seo %}
+  <!-- Google Analytics 4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MT049TBLZ0"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-MT049TBLZ0');
+  </script>
+  <!-- GoatCounter -->
+  <script data-goatcounter="https://yunjeongiya.goatcounter.com/count"
+          async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
   {% if site.data.git_graph %}
