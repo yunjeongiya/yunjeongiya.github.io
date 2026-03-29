@@ -9,6 +9,8 @@ slug: "046-en"
 thumbnail: /assets/images/posts/046-claude-code-slack-briefing/thumbnail-en.png
 ---
 
+![Get Daily Slack Briefings with Claude Code Agent Automation](/assets/images/posts/046-claude-code-slack-briefing/thumbnail-en.png)
+
 You leave work. The automation keeps running.
 
 Next morning, you open Slack and find a neatly organized summary of everything you did yesterday. You can build this with Claude Code.

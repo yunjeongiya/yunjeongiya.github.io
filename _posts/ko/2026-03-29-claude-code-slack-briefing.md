@@ -9,6 +9,8 @@ slug: "046"
 thumbnail: /assets/images/posts/046-claude-code-slack-briefing/thumbnail-ko.png
 ---
 
+![Claude Code 에이전트 자동화로 매일 Slack 브리핑 받기](/assets/images/posts/046-claude-code-slack-briefing/thumbnail-ko.png)
+
 퇴근했는데도 작업이 돌아간다.
 
 다음 날 출근해서 Slack을 열면, 어제 내가 뭘 했는지 정리된 메시지가 와 있다. 이걸 Claude Code로 만들 수 있다.
