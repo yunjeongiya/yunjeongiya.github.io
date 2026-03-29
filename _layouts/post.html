@@ -37,8 +37,8 @@ layout: default
 document.addEventListener('DOMContentLoaded', function() {
   var el = document.getElementById('goatcounter-views');
   if (!el) return;
-  var path = location.pathname;
-  fetch('https://yunjeongiya.goatcounter.com/counter/' + encodeURIComponent(path) + '.json')
+  var path = location.pathname.replace(/\/$/, '') || '/';
+  fetch('https://yunjeongiya.goatcounter.com/counter/' + path + '.json')
     .then(function(r) { return r.json(); })
     .then(function(data) { el.textContent = data.count_unique || data.count || '0'; })
     .catch(function() { el.textContent = '0'; });
