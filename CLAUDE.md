@@ -51,6 +51,12 @@ git add . && git commit -m "msg" && git push  # 배포: 1-2분 후 반영
 - [ ] 다크/라이트 테마 전환
 - [ ] 영어 블로그, 포스트 시리즈
 
+## 📊 Analytics
+
+- **GA4**: `G-MT049TBLZ0` (스크립트: `_layouts/default.html`)
+- **GoatCounter**: `yunjeongiya.goatcounter.com` (대시보드 + 조회수 API)
+  - 조회수 표시: `_layouts/post.html`, `_layouts/home.html`
+
 ## 📞 링크
 
 **블로그**: https://yunjeongiya.github.io
