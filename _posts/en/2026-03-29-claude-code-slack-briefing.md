@@ -90,6 +90,8 @@ Commit analysis can be automated, but "what should I work on tomorrow" can't. So
 
 > "Anything to note for tomorrow?"
 
+![/wrap-up memo input screen](/assets/images/posts/046-claude-code-slack-briefing/wrap-up-memo.png)
+
 This answer appears as the first section of the next morning's briefing ("Last night's memo"). Takes about a minute, but saves the "what was I going to do?" moment every morning.
 
 ## Creating the Scheduled Agent
@@ -162,6 +164,10 @@ Remote Agent          GitHub Actions         Slack
 ```
 
 The remote agent writes its analysis as a JSON file and pushes. GitHub Actions detects the push and forwards it via webhook. **GitHub Actions has no network restrictions**, so it works perfectly.
+
+The actual evening reminder that arrived on Slack:
+
+![Evening reminder Slack message](/assets/images/posts/046-claude-code-slack-briefing/evening-reminder.png)
 
 ## Implementation
 
@@ -248,6 +254,12 @@ Remote Agent → Analyze commits + sessions file → Push morning JSON → GitHu
                                                                                         │
 [User]                                                                          "Morning briefing!"
 ```
+
+The actual morning briefing on Slack:
+
+![Morning briefing — commit summary](/assets/images/posts/046-claude-code-slack-briefing/morning-briefing-1.png)
+
+![Morning briefing — session list + feature status](/assets/images/posts/046-claude-code-slack-briefing/morning-briefing-2.png)
 
 ## Cost
 

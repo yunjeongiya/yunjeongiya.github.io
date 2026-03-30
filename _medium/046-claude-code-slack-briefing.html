@@ -71,6 +71,8 @@
 
 <blockquote>"Anything to note for tomorrow?"</blockquote>
 
+<img src="https://yunjeongiya.github.io/assets/images/posts/046-claude-code-slack-briefing/wrap-up-memo.png" alt="/wrap-up memo input screen">
+
 <p>This answer appears as the first section of the next morning's briefing. Takes about a minute, but saves the "what was I going to do?" moment every morning.</p>
 
 <h2>Creating the Scheduled Agent</h2>
@@ -128,6 +130,10 @@
 
 <p>The remote agent writes its analysis as a JSON file and pushes. GitHub Actions detects the push and forwards it via webhook. <strong>GitHub Actions has no network restrictions</strong>, so it works perfectly.</p>
 
+<p>The actual evening reminder that arrived on Slack:</p>
+
+<img src="https://yunjeongiya.github.io/assets/images/posts/046-claude-code-slack-briefing/evening-reminder.png" alt="Evening reminder Slack message">
+
 <h2>Implementation</h2>
 
 <h3>GitHub Actions Workflow</h3>
@@ -181,6 +187,12 @@ Remote Agent → Analyze commits → Push evening JSON → GitHub Actions → Sl
 Remote Agent → Analyze commits + sessions → Push morning JSON → GitHub Actions → Slack bot
                                                                                     │
 [User]                                                                      "Morning briefing!"</code></pre>
+
+<p>The actual morning briefing on Slack:</p>
+
+<img src="https://yunjeongiya.github.io/assets/images/posts/046-claude-code-slack-briefing/morning-briefing-1.png" alt="Morning briefing — commit summary">
+
+<img src="https://yunjeongiya.github.io/assets/images/posts/046-claude-code-slack-briefing/morning-briefing-2.png" alt="Morning briefing — session list + feature status">
 
 <h2>Cost</h2>
 
