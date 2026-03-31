@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "인앱 피드백 위젯 만들기 — 스크린샷 캡처부터 Slack 알림까지"
+title: "QA팀이 없어서 앱 안에 피드백 버튼을 만들었다"
 date: 2026-03-31 11:00:00 +0900
 categories: [FullStack, Automation]
 tags: [React, GitHub Actions, Slack, Feedback, Automation, TypeScript, Vibe Coding]

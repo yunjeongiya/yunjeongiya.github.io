@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Building an In-App Feedback Widget — From Screenshot Capture to Slack Notifications"
+title: "I Had No QA Team, So I Built a Feedback Button Into the App"
 date: 2026-03-31 11:00:00 +0900
 categories: [FullStack, Automation]
 tags: [React, GitHub Actions, Slack, Feedback, Automation, TypeScript, Vibe Coding]
