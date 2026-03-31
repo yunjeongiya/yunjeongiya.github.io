@@ -215,15 +215,7 @@ I've been running this system for about two months now. Three noticeable changes
 
 Here's the full architecture at a glance:
 
-| Component | Details |
-|-----------|---------|
-| Trigger | Push to main branch |
-| Build | Server: Gradle + Docker, Frontend: npm + Cloudflare Pages |
-| Notifications | Slack Incoming Webhook (start/complete/fail) |
-| Release Notes | `[release-note]` tag extraction -> commit subject fallback |
-| Health Check | curl loop (60 attempts x 5 seconds) |
-| JSON Escaping | Python `json.dumps` |
-| Convention | 1 summary commit per submodule, 5 lines max |
+![Architecture Summary](/assets/images/posts/049-slack-deploy-notification/summary-table-en.png)
 
 Nothing technically complex here. Bash scripts, curl, grep, one line of Python. If you're already using GitHub Actions, you can set this up in 30 minutes.
 
