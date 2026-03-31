@@ -1,9 +1,9 @@
 ---
 layout: post
-title: "1인 개발자의 Slack 기반 개발 자동화 생태계"
+title: "Slack 자동화 3개를 바이브 코딩했더니 월 $100 SaaS가 필요 없어졌다"
 date: 2026-03-31 09:00:00 +0900
 categories: [DevOps, Automation]
-tags: [Slack, Automation, DevOps, Claude Code, Solo Developer, GitHub Actions]
+tags: [Slack, Automation, DevOps, Claude Code, Solo Developer, GitHub Actions, Vibe Coding]
 lang: ko
 slug: "048"
 thumbnail: /assets/images/posts/048-slack-dev-automation/thumbnail-ko.png

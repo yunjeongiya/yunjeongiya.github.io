@@ -3,7 +3,7 @@ layout: post
 title: "인앱 피드백 위젯 만들기 — 스크린샷 캡처부터 Slack 알림까지"
 date: 2026-03-31 11:00:00 +0900
 categories: [FullStack, Automation]
-tags: [React, GitHub Actions, Slack, Feedback, Automation, TypeScript]
+tags: [React, GitHub Actions, Slack, Feedback, Automation, TypeScript, Vibe Coding]
 lang: ko
 slug: "050"
 thumbnail: /assets/images/posts/050-dev-feedback-widget/thumbnail-ko.png

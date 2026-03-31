@@ -3,7 +3,7 @@ layout: post
 title: "CI/CD 배포 Slack 알림 + Release Note 자동 추출 — 비개발자도 읽는 배포 알림 만들기"
 date: 2026-03-31 10:00:00 +0900
 categories: [DevOps, CI/CD]
-tags: [GitHub Actions, CI/CD, Slack, Automation, DevOps]
+tags: [GitHub Actions, CI/CD, Slack, Automation, DevOps, Vibe Coding]
 lang: ko
 slug: "049"
 thumbnail: /assets/images/posts/049-slack-deploy-notification/thumbnail-ko.png

@@ -3,10 +3,10 @@ layout: post
 title: "Building an In-App Feedback Widget — From Screenshot Capture to Slack Notifications"
 date: 2026-03-31 11:00:00 +0900
 categories: [FullStack, Automation]
-tags: [React, GitHub Actions, Slack, Feedback, Automation, TypeScript]
+tags: [React, GitHub Actions, Slack, Feedback, Automation, TypeScript, Vibe Coding]
 lang: en
 slug: "050-en"
-thumbnail: /assets/images/posts/050-dev-feedback-widget/thumbnail-ko.png
+thumbnail: /assets/images/posts/050-dev-feedback-widget/thumbnail-en.png
 published: true
 ---
 

@@ -1,12 +1,12 @@
 ---
 layout: post
-title: "A Solo Developer's Slack-Based Development Automation Ecosystem"
+title: "I Vibe-Coded 3 Slack Automations — They Replaced $100/mo in SaaS"
 date: 2026-03-31 09:00:00 +0900
 categories: [DevOps, Automation]
 tags: [Slack, Automation, DevOps, Claude Code, Solo Developer, GitHub Actions]
 lang: en
 slug: "048-en"
-thumbnail: /assets/images/posts/048-slack-dev-automation/thumbnail-ko.png
+thumbnail: /assets/images/posts/048-slack-dev-automation/thumbnail-en.png
 published: true
 ---
 

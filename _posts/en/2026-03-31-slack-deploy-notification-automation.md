@@ -3,10 +3,10 @@ layout: post
 title: "CI/CD Deploy Slack Notifications + Auto-Extracted Release Notes — Making Deploy Alerts That Non-Developers Actually Read"
 date: 2026-03-31 10:00:00 +0900
 categories: [DevOps, CI/CD]
-tags: [GitHub Actions, CI/CD, Slack, Automation, DevOps]
+tags: [GitHub Actions, CI/CD, Slack, Automation, DevOps, Vibe Coding]
 lang: en
 slug: "049-en"
-thumbnail: /assets/images/posts/049-slack-deploy-notification/thumbnail-ko.png
+thumbnail: /assets/images/posts/049-slack-deploy-notification/thumbnail-en.png
 published: true
 ---
 
