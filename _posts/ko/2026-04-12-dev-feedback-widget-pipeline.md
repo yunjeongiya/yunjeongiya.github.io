@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "QA팀이 없어서 앱 안에 피드백 버튼을 만들었다"
-date: 2026-03-31 11:00:00 +0900
+date: 2026-04-12 11:00:00 +0900
 categories: [FullStack, Automation]
 tags: [React, GitHub Actions, Slack, Feedback, Automation, TypeScript, Vibe Coding]
 lang: ko
