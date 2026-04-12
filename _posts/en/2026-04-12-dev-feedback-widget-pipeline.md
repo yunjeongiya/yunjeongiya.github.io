@@ -10,7 +10,7 @@ thumbnail: /assets/images/posts/050-dev-feedback-widget/thumbnail-en.png
 published: true
 ---
 
-![Building an In-App Feedback Widget](/assets/images/posts/050-dev-feedback-widget/thumbnail-ko.png)
+![Building an In-App Feedback Widget](/assets/images/posts/050-dev-feedback-widget/thumbnail-en.png)
 
 ## The Problem: Bug Reports Come via KakaoTalk
 
