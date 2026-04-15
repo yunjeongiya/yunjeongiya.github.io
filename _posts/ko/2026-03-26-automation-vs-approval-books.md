@@ -29,21 +29,23 @@ slug: "044"
 
 자동화 연구의 원조 격인 책이다. "자동화 10단계 모델"이 유명한데, Level 1(인간이 전부 결정)부터 Level 10(시스템이 전부 처리, 인간은 무시)까지의 스펙트럼을 정의한다. 모든 기능을 "자동이냐 수동이냐"의 이분법이 아니라, **10단계 중 어디에 놓을지** 생각하게 해주는 프레임워크다.
 
-**2. About Face: The Essentials of Interaction Design — Alan Cooper**
+> 국내 번역판은 없다. 원서만 존재하며 학술 서적이라 접근성이 높지 않지만, 자동화 설계의 근본 프레임워크를 다루는 유일한 책이다.
+
+**2. [About Face 4: 인터랙션 디자인의 본질](https://product.kyobobook.co.kr/detail/S000000935737) — Alan Cooper**
 
 인터랙션 디자인의 바이블이라 불리는 책. 사용자 제어권, 승인 흐름, 모달과 비모달 설계를 체계적으로 다룬다. "확인 다이얼로그를 넣을지 말지"를 고민할 때 참고할 원칙들이 있다.
 
-**3. Don't Make Me Think — Steve Krug**
+**3. [(사용자를) 생각하게 하지 마!](https://product.kyobobook.co.kr/detail/S000001033002) — Steve Krug**
 
 짧고 실용적인 웹 사용성 책. 승인 단계를 추가할 때마다 사용자가 "생각해야 하는 순간"이 늘어난다는 관점에서, 정말 필요한 확인과 불필요한 확인을 구분하는 감각을 준다.
 
 ### 간접적으로 관련된 책
 
-**4. The Design of Everyday Things — Don Norman**
+**4. [도널드 노먼의 디자인 심리학](https://product.kyobobook.co.kr/detail/S000001912962) — Don Norman**
 
 어포던스, 피드백, 에러 방지 원칙의 교과서. "시스템이 알아서 하되 실수를 방지하는 설계"의 기초가 되는 책이다.
 
-**5. Designing with the Mind in Mind — Jeff Johnson**
+**5. [마음을 생각하는 디자인](http://www.kyobobook.co.kr/product/detailViewKor.laf?mallGb=KOR&ejkGb=KOR&barcode=9788993827507) — Jeff Johnson**
 
 인지심리학 기반 UI 설계. 사용자가 왜 승인 피로(approval fatigue)를 느끼는지, 어떤 종류의 자동화가 안심감을 주는지 이해하는 데 도움이 된다.
 

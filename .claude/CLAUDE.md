@@ -80,3 +80,51 @@ lang: ko
 - **포스트 위치**: `_posts/ko/YYYY-MM-DD-title.md`
 - **언어**: `lang: ko`
 - **날짜 형식**: `2025-10-19 14:00:00 +0900`
+
+## Blog System
+
+**URL**: https://yunjeongiya.github.io
+
+### Folder Structure
+```
+yunjeongiya.github.io/
+├── _posts/
+│   ├── ko/YYYY-MM-DD-title.md    # Korean posts
+│   └── en/YYYY-MM-DD-title.md    # English posts
+└── assets/images/posts/
+    └── {slug}-{name}/            # Per-post image folder
+        └── thumbnail-ko.png      # Thumbnail
+```
+
+### Slug System
+- Format: 3-digit number (e.g., "025", "026")
+- **Check auto memory (MEMORY.md) for current latest slug**
+- Update MEMORY.md slug number after publishing
+
+### Frontmatter Template
+```yaml
+---
+layout: post
+title: "Title"
+date: YYYY-MM-DD HH:MM:SS +0900
+categories: [Category1, Category2]
+tags: [tag1, tag2, tag3]
+lang: ko
+slug: "026"
+thumbnail: /assets/images/posts/026-slug-name/thumbnail-ko.png
+---
+```
+
+### Publishing Process
+1. Write post file
+2. Add thumbnail image (optional)
+3. **Tables → always convert to image** (HTML mockup → Playwright 2x screenshot → `<img>`)
+   - Blog post AND Medium export both use images, never `<table>` markdown
+4. Generate Medium HTML: `_medium/{slug}-{title}.html` (from template.html, markdown body → HTML)
+5. Commit & push in blog repository
+6. Update slug number in MEMORY.md
+
+### Medium Export
+- Template: `_medium/template.html`
+- Output: `_medium/{slug}-{title}.html`
+- User opens HTML in browser → Ctrl+A → Ctrl+C → paste into Medium editor
