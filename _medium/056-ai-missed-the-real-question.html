@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI가 4번 고쳐도 못 고친 버그, 사람이 한 질문으로 해결한 이야기</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #1a1a2e; color: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; font-size: 18px; line-height: 1.8; }
+.container { max-width: 720px; margin: 0 auto; padding: 40px 20px; }
+h1 { font-size: 36px; font-weight: bold; color: #fff; margin-bottom: 24px; line-height: 1.3; }
+h2 { font-size: 28px; font-weight: bold; color: #fff; margin-top: 48px; margin-bottom: 16px; }
+h3 { font-size: 22px; font-weight: bold; color: #fff; margin-top: 36px; margin-bottom: 12px; }
+p { margin-bottom: 16px; }
+strong { color: #f0f6fc; }
+em { font-style: italic; }
+a { color: #58a6ff; text-decoration: none; }
+a:hover { text-decoration: underline; }
+img { max-width: 100%; border-radius: 8px; margin: 32px auto; display: block; }
+blockquote { border-left: 3px solid #58a6ff; padding-left: 16px; color: #8b949e; font-style: italic; margin: 16px 0; }
+ul, ol { margin-left: 24px; margin-bottom: 16px; }
+li { margin-bottom: 8px; }
+code { background: #2d333b; padding: 2px 6px; border-radius: 4px; color: #e6edf3; font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 15px; }
+pre { position: relative; background: #0d1117; border-radius: 8px; padding: 20px; overflow-x: auto; margin: 16px 0; }
+pre code { background: none; padding: 0; font-size: 14px; }
+pre .lang-label { position: absolute; top: 8px; right: 12px; font-size: 12px; color: #6e7681; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+hr { border: none; border-top: 1px solid #30363d; margin: 32px 0; }
+.tags { margin-bottom: 32px; }
+.tag { display: inline-block; padding: 4px 12px; border-radius: 16px; font-size: 13px; font-weight: 500; margin-right: 8px; margin-bottom: 8px; }
+.tag-ai { background: #2D1B4E; color: #BB86FC; }
+.tag-architecture { background: #1B3A2D; color: #81C784; }
+.tag-api { background: #1A3050; color: #64B5F6; }
+.tag-claude { background: #3B2E1A; color: #FFD54F; }
+.tag-meta { background: #21262D; color: #C9D1D9; }
+table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+th, td { border: 1px solid #30363d; padding: 10px 14px; text-align: left; }
+th { background: #161b22; color: #f0f6fc; font-weight: 600; }
+td { color: #c9d1d9; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>AI가 4번 고쳐도 못 고친 버그, 사람이 한 질문으로 해결한 이야기</h1>
+
+<p><em>이 글은 <a href="https://yunjeongiya.github.io/posts/056/">블로그</a>에서도 읽을 수 있습니다.</em></p>
+
+<div class="tags">
+<span class="tag tag-ai">AI Coding</span>
+<span class="tag tag-claude">Claude Code</span>
+<span class="tag tag-architecture">Architecture</span>
+<span class="tag tag-api">API Design</span>
+<span class="tag tag-meta">Meta-cognition</span>
+</div>
+
+<p>AI 코딩 어시스턴트와 함께 기능을 개발하고 있었다. 코드 리뷰를 4차례 반복했는데, 매번 새로운 edge case가 나왔다. AI는 매 라운드마다 "이번엔 해결했다"고 했지만, 다음 라운드에서 같은 부류의 다른 변종이 튀어나왔다.</p>
+
+<p>5번째 리뷰를 돌리기 직전, 한 가지 질문을 던졌다:</p>
+
+<blockquote>"애초에 이 문제가 발생하지 않게 할 순 없는 거야?"</blockquote>
+
+<p>그 한 질문으로 접근 방식 자체가 바뀌었고, 4번의 패치 동안 쌓인 보정 코드가 전부 불필요해졌다.</p>
+
+<h2>상황</h2>
+
+<p>학습 관리 앱에서, 학생의 공부 시간 기록을 10분 단위 히트맵으로 보여주는 화면이 있다. 여기서 "기록된 시간의 할당 과목을 변경하는" 기능을 만들고 있었다.</p>
+
+<pre><code>┌──────┬────┬────┬────┬────┬────┬────┐
+│      │ :00│ :10│ :20│ :30│ :40│ :50│
+├──────┼────┼────┼────┼────┼────┼────┤
+│ 15시 │████│████│████│████│    │    │  ← 영어 (파랑)
+│ 16시 │▓▓▓▓│▓▓▓▓│▓▓▓▓│    │    │    │  ← 수학 (노랑)
+└──────┴────┴────┴────┴────┴────┴────┘
+         ↑ 학생이 이 범위를 선택해서 과목을 변경</code></pre>
+
+<p>핵심 문제: <strong>UI는 10분 단위(슬롯)로 표시하지만, 서버의 실제 데이터는 임의의 초 단위 시각이다.</strong></p>
+
+<table>
+<tr><th></th><th>히트맵 (UI)</th><th>서버 데이터</th></tr>
+<tr><td>시작</td><td>15:<strong>00</strong>:00</td><td>15:<strong>02</strong>:15</td></tr>
+<tr><td>종료</td><td>16:<strong>10</strong>:00</td><td>16:<strong>07</strong>:30</td></tr>
+<tr><td>정밀도</td><td>10분</td><td>초</td></tr>
+</table>
+
+<p>프론트엔드에서 슬롯을 선택하면, 이걸 다시 정확한 시각으로 변환해서 서버에 보내야 했다. 여기서 문제가 시작됐다.</p>
+
+<h2>AI가 만든 것</h2>
+
+<p>AI가 설계한 구조:</p>
+
+<pre><code>프론트: 정확한 시각 → 10분 슬롯(표시용) → 다시 시각으로 역변환 → 서버에 전송</code></pre>
+
+<p>이건 <strong>JPEG 압축</strong>과 같다. 15:02:15를 10분 슬롯으로 바꾸면 15:00이 된다. 이걸 다시 시각으로 되돌리면 15:00:00이 나온다. 원래의 2분 15초는 영원히 유실된다.</p>
+
+<p>이 간극에서 4가지 버그가 연쇄적으로 발생했다.</p>
+
+<h2>4번의 패치, 같은 부류의 버그</h2>
+
+<h3>1차: UTC 오프셋</h3>
+
+<p>슬롯을 시각으로 변환할 때 KST(+9)를 수동으로 계산했다. 자정을 넘어가는 경우 날짜가 하루 밀렸다.</p>
+
+<p>AI의 수정: timezone 라이브러리를 도입해서 변환.</p>
+
+<h3>2차: 문자열 포맷</h3>
+
+<p>서버가 <code>15:02:15</code>를 보내는데 프론트가 <code>15:02:15.000</code>과 비교했다. 불일치로 매칭 실패.</p>
+
+<p>AI의 수정: 비교 전 normalize 함수 추가.</p>
+
+<h3>3차: 경계 검증</h3>
+
+<p>10분 슬롯의 바깥 경계(시작/끝)에서 서버의 validation이 reject했다. 슬롯 15:00~15:10이 실제 데이터 15:02:15~16:07:30의 범위를 벗어났기 때문.</p>
+
+<p>AI의 수정: clamping 로직 추가 — 범위 밖이면 실제 데이터의 경계로 보정.</p>
+
+<h3>4차: 서버 검증 실패</h3>
+
+<p>보정된 시각이 서버의 정밀한 validation에 걸렸다. 서버는 원본 데이터의 정확한 시각을 알고 있으니, 프론트가 보낸 "보정된" 시각이 어정쩡하게 어긋났다.</p>
+
+<p>AI의 수정: 더 정교한 clamping + 엣지케이스 처리.</p>
+
+<hr>
+
+<p>4차 수정이 끝났을 때 AI는 이렇게 정리했다:</p>
+
+<blockquote>"slot index ↔ 실제 시각 변환 레이어가 본질적으로 lossy하기 때문입니다. clamping으로 해결했으니 이제 그 간극은 닫혔습니다."</blockquote>
+
+<p>동작은 했다. 하지만 코드에는 <code>slotToUtcTime()</code>, <code>normalizeTimestamp()</code>, <code>clampToWorkLogBoundary()</code> 같은 보정 함수가 켜켜이 쌓여 있었다.</p>
+
+<h2>한 가지 질문</h2>
+
+<p>나는 물었다:</p>
+
+<blockquote>"애초에 lossy하지 않게 할 순 없는 거야?"</blockquote>
+
+<p>AI가 멈춰서 처음부터 다시 생각하더니, 이런 답을 내놨다:</p>
+
+<blockquote>"프론트에서 서버로 보내는 데이터가 슬롯의 역변환이 아니라, 원본 데이터의 ID + 분할 지점이면 됩니다. 역변환 자체가 없어지니 lossy 문제가 소멸합니다."</blockquote>
+
+<pre><code>Before: 프론트가 시각을 계산해서 보냄 (lossy)
+  → slotToUtcTime(69) → "15:30:00" → 서버에 전송 → 서버 reject
+
+After: 프론트가 의도만 보냄 (lossless)
+  → { workLogId: 42, splitPoints: ["15:30"] } → 서버가 원본으로 구성</code></pre>
+
+<p>프론트는 "여기서 잘라줘"라고만 말하고, 서버가 자기가 갖고 있는 정확한 시각을 기준으로 처리한다. <code>slotToUtcTime</code>, <code>normalizeTimestamp</code>, <code>clampToWorkLogBoundary</code> — 전부 삭제.</p>
+
+<h2>AI는 왜 이 질문을 못 했나</h2>
+
+<p>4번의 리뷰 동안 AI가 한 일:</p>
+
+<ol>
+<li>버그를 정확히 진단했다</li>
+<li>해당 버그를 정확히 고쳤다</li>
+<li>"이번엔 해결됐다"고 보고했다</li>
+<li>다음 버그가 나오면 1로 돌아갔다</li>
+</ol>
+
+<p>매 단계가 올바른 행동이었다. 하지만 <strong>한 단계 위로 올라가서 "이 레이어가 왜 필요하지?"라고 묻는 행위</strong>가 없었다.</p>
+
+<p>이건 AI의 한계라기보다, 패턴의 함정이다. 코드 리뷰에서 "이 함수에 버그가 있다"고 하면, 자연스러운 반응은 "그 함수를 고치자"이지 "그 함수가 존재해야 하나?"가 아니다. 사람도 같은 함정에 빠진다. 다만 사람은 <strong>짜증</strong>이라는 신호가 있다. "또야?"라는 감정이 "뭔가 근본적으로 잘못된 건 아닌가?"라는 의문으로 이어진다.</p>
+
+<p>AI에게는 짜증이 없다. 10번째 패치도 1번째 패치와 같은 태도로 수행한다.</p>
+
+<h2>이 경험에서 가져간 원칙</h2>
+
+<h3>1. 패치가 반복되면 레이어를 의심하라</h3>
+
+<blockquote>복잡성을 추가해서 간극을 메우고 있다면, 그 간극이 존재해야 하는지 먼저 확인하라.</blockquote>
+
+<table>
+<tr><th>증상</th><th>물어야 할 질문</th></tr>
+<tr><td>validation fix가 반복된다</td><td>이 데이터가 이 validation을 통과해야 하는가?</td></tr>
+<tr><td>format 변환 버그가 반복된다</td><td>이 변환이 존재해야 하는가?</td></tr>
+<tr><td>null check가 반복된다</td><td>이 null이 가능해야 하는가?</td></tr>
+</table>
+
+<p>"가설을 바꿔라"는 좋은 규칙이지만, 같은 층위에서 맴돌 수 있다. 진짜 필요한 건 <strong>아키텍처를 재검토하는 것</strong>이다.</p>
+
+<h3>2. 클라이언트는 의도를, 서버는 정확한 값을</h3>
+
+<p>소프트웨어 아키텍처에서 이 패턴은 이미 이름이 있다:</p>
+
+<ul>
+<li><strong>Task-Based UI</strong>: 클라이언트가 변경된 상태를 보내는 게 아니라, 작업 의도를 보낸다</li>
+<li><strong>Intent-Based API</strong>: <code>PUT /resource {fields}</code> 대신 <code>POST /resource/action {intent}</code></li>
+<li><strong>CQRS Command</strong>: 유저 의도를 표현하는 Command 객체. 서버가 상태 전이를 결정</li>
+</ul>
+
+<p>핵심 원리: <strong>권위 있는 데이터를 가진 쪽이 계산을 수행한다.</strong> 클라이언트가 서버의 데이터를 추측해서 재구성하는 순간, lossy 변환이 시작된다.</p>
+
+<h3>3. AI와 일할 때는 메타인지를 사람이 담당하라</h3>
+
+<p>AI는 "이 코드에 버그가 있다 → 고치자"를 매우 잘 한다. 하지만 "이 코드가 존재해야 하나?"는 잘 못 묻는다. 이건 지시를 충실히 따르는 것과, 지시 자체를 의심하는 것의 차이다.</p>
+
+<p>AI 코딩 어시스턴트와 협업할 때, <strong>"한 발짝 물러서서 전체 그림을 보는 역할"은 아직 사람의 몫</strong>이다. AI가 3번째 패치를 제안할 때, "잠깐, 왜 이걸 3번이나 고치고 있지?"라고 끼어드는 것. 그게 가장 값비싼 기여다.</p>
+
+<hr>
+
+<p>이 경험 이후, 나는 AI 코딩 어시스턴트의 설정에 이런 규칙을 추가했다:</p>
+
+<blockquote><strong>2회 수정 실패 시 아키텍처 재검토</strong>: 같은 영역 수정 2번 실패하면, 가설이 아니라 아키텍처를 의심. "이 변환/레이어/검증이 존재해야 하는가?"</blockquote>
+
+<p>그리고 디버깅 키워드가 감지되면 "이 레이어가 존재해야 하는가?"를 자동으로 리마인드하는 훅도 만들었다. AI에게 "짜증"을 시뮬레이션해주는 셈이다.</p>
+
+<h2>References</h2>
+
+<ul>
+<li><a href="https://blog.mithril.be/posts/task-based-vs-crud-based-in-api/">Task-Based vs CRUD-Based API</a></li>
+<li><a href="https://codeopinion.com/decomposing-crud-to-a-task-based-ui/">Decomposing CRUD to a Task-Based UI (CodeOpinion)</a></li>
+<li><a href="https://martinfowler.com/bliki/CQRS.html">CQRS Pattern (Martin Fowler)</a></li>
+</ul>
+
+</div>
+</body>
+</html>
