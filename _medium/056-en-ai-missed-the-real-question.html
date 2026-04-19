@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Bug AI Fixed 4 Times But Never Solved — Until a Human Asked One Question</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #1a1a2e; color: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; font-size: 18px; line-height: 1.8; }
+.container { max-width: 720px; margin: 0 auto; padding: 40px 20px; }
+h1 { font-size: 36px; font-weight: bold; color: #fff; margin-bottom: 24px; line-height: 1.3; }
+h2 { font-size: 28px; font-weight: bold; color: #fff; margin-top: 48px; margin-bottom: 16px; }
+h3 { font-size: 22px; font-weight: bold; color: #fff; margin-top: 36px; margin-bottom: 12px; }
+p { margin-bottom: 16px; }
+strong { color: #f0f6fc; }
+em { font-style: italic; }
+a { color: #58a6ff; text-decoration: none; }
+a:hover { text-decoration: underline; }
+img { max-width: 100%; border-radius: 8px; margin: 32px auto; display: block; }
+blockquote { border-left: 3px solid #58a6ff; padding-left: 16px; color: #8b949e; font-style: italic; margin: 16px 0; }
+ul, ol { margin-left: 24px; margin-bottom: 16px; }
+li { margin-bottom: 8px; }
+code { background: #2d333b; padding: 2px 6px; border-radius: 4px; color: #e6edf3; font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 15px; }
+pre { position: relative; background: #0d1117; border-radius: 8px; padding: 20px; overflow-x: auto; margin: 16px 0; }
+pre code { background: none; padding: 0; font-size: 14px; }
+pre .lang-label { position: absolute; top: 8px; right: 12px; font-size: 12px; color: #6e7681; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+hr { border: none; border-top: 1px solid #30363d; margin: 32px 0; }
+.tags { margin-bottom: 32px; }
+.tag { display: inline-block; padding: 4px 12px; border-radius: 16px; font-size: 13px; font-weight: 500; margin-right: 8px; margin-bottom: 8px; }
+.tag-ai { background: #2D1B4E; color: #BB86FC; }
+.tag-architecture { background: #1B3A2D; color: #81C784; }
+.tag-api { background: #1A3050; color: #64B5F6; }
+.tag-claude { background: #3B2E1A; color: #FFD54F; }
+.tag-meta { background: #21262D; color: #C9D1D9; }
+table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+th, td { border: 1px solid #30363d; padding: 10px 14px; text-align: left; }
+th { background: #161b22; color: #f0f6fc; font-weight: 600; }
+td { color: #c9d1d9; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>The Bug AI Fixed 4 Times But Never Solved — Until a Human Asked One Question</h1>
+
+<p><em>This post is also available on my <a href="https://yunjeongiya.github.io/posts/056/">blog</a>. (<a href="https://yunjeongiya.github.io/posts/056/">Korean version here</a>)</em></p>
+
+<div class="tags">
+<span class="tag tag-ai">AI Coding</span>
+<span class="tag tag-claude">Claude Code</span>
+<span class="tag tag-architecture">Architecture</span>
+<span class="tag tag-api">API Design</span>
+<span class="tag tag-meta">Meta-cognition</span>
+</div>
+
+<p>I was building a feature with an AI coding assistant. We went through four rounds of code review, and each round surfaced a new edge case. Every time, the AI said "fixed it." Every time, a different variant of the same class of bug popped up in the next round.</p>
+
+<p>Right before kicking off the fifth review, I asked one question:</p>
+
+<blockquote>"Can't we just make this problem impossible in the first place?"</blockquote>
+
+<p>That single question changed the entire approach. All the patching code accumulated over four rounds became unnecessary.</p>
+
+<h2>The Setup</h2>
+
+<p>I run a learning management app for a tutoring center. Students log their study hours, and the app displays them on a 10-minute heatmap grid:</p>
+
+<pre><code>┌──────┬────┬────┬────┬────┬────┬────┐
+│      │ :00│ :10│ :20│ :30│ :40│ :50│
+├──────┼────┼────┼────┼────┼────┼────┤
+│ 3 PM │████│████│████│████│    │    │  ← English (blue)
+│ 4 PM │▓▓▓▓│▓▓▓▓│▓▓▓▓│    │    │    │  ← Math (yellow)
+└──────┴────┴────┴────┴────┴────┴────┘
+         ↑ student selects this range to reassign the subject</code></pre>
+
+<p>The feature: let students select a time range on the heatmap and change which subject it's assigned to.</p>
+
+<p>The core problem: <strong>the UI displays in 10-minute slots, but the server stores exact timestamps down to the second.</strong></p>
+
+<table>
+<tr><th></th><th>Heatmap (UI)</th><th>Server Data</th></tr>
+<tr><td>Start</td><td>3:<strong>00</strong>:00 PM</td><td>3:<strong>02</strong>:15 PM</td></tr>
+<tr><td>End</td><td>4:<strong>10</strong>:00 PM</td><td>4:<strong>07</strong>:30 PM</td></tr>
+<tr><td>Precision</td><td>10 min</td><td>seconds</td></tr>
+</table>
+
+<p>When the frontend picks a slot, it has to convert it back to an exact timestamp to send to the server. That's where the trouble started.</p>
+
+<h2>What the AI Built</h2>
+
+<p>The AI designed this data flow:</p>
+
+<pre><code>Frontend: exact time → 10-min slot (for display) → back to exact time → send to server</code></pre>
+
+<p>This is <strong>JPEG compression</strong>. Converting 3:02:15 PM to a 10-minute slot gives you 3:00. Converting back gives 3:00:00. The original 2 minutes and 15 seconds are gone forever.</p>
+
+<p>Four bugs cascaded from this gap.</p>
+
+<h2>Four Patches, Same Class of Bug</h2>
+
+<h3>Round 1: UTC Offset</h3>
+
+<p>When converting slots to timestamps, KST (+9) was calculated manually. Crossing midnight shifted the date by a day.</p>
+
+<p>AI's fix: import a timezone library for conversion.</p>
+
+<h3>Round 2: String Format</h3>
+
+<p>The server returned <code>15:02:15</code>, but the frontend compared it against <code>15:02:15.000</code>. Mismatch. Matching failed.</p>
+
+<p>AI's fix: add a normalize function before comparison.</p>
+
+<h3>Round 3: Boundary Validation</h3>
+
+<p>The outer boundaries of a 10-minute slot fell outside the actual data range. Slot 15:00-15:10 didn't cover actual data starting at 15:02:15. Server rejected.</p>
+
+<p>AI's fix: add clamping logic — if out of range, snap to the actual data boundary.</p>
+
+<h3>Round 4: Server Validation Failure</h3>
+
+<p>The clamped timestamps didn't match the server's precise expectations. The server knows the exact original time, and the "corrected" value from the frontend was awkwardly off.</p>
+
+<p>AI's fix: more sophisticated clamping + edge case handling.</p>
+
+<hr>
+
+<p>After the fourth fix, the AI summarized:</p>
+
+<blockquote>"The slot index ↔ actual time conversion layer is inherently lossy. Clamping has closed the gap."</blockquote>
+
+<p>It worked. But the code was now layered with correction functions: <code>slotToUtcTime()</code>, <code>normalizeTimestamp()</code>, <code>clampToWorkLogBoundary()</code>.</p>
+
+<h2>One Question</h2>
+
+<p>I asked:</p>
+
+<blockquote>"Can't we just make it not lossy in the first place?"</blockquote>
+
+<p>The AI paused, rethought from scratch, and came back with:</p>
+
+<blockquote>"If what the frontend sends isn't a reverse-converted slot time, but the original record's ID plus split points, the reverse conversion simply doesn't exist. No lossy conversion, no lossy bugs."</blockquote>
+
+<pre><code>Before: frontend calculates timestamps and sends them (lossy)
+  → slotToUtcTime(69) → "15:30:00" → send to server → server rejects
+
+After: frontend sends intent only (lossless)
+  → { workLogId: 42, splitPoints: ["15:30"] } → server builds from originals</code></pre>
+
+<p>The frontend just says "split here." The server uses its own exact timestamps to do the rest. <code>slotToUtcTime</code>, <code>normalizeTimestamp</code>, <code>clampToWorkLogBoundary</code> — all deleted.</p>
+
+<h2>Why the AI Never Asked This Question</h2>
+
+<p>Across four review rounds, here's what the AI did:</p>
+
+<ol>
+<li>Accurately diagnosed the bug</li>
+<li>Accurately fixed that bug</li>
+<li>Reported "it's resolved now"</li>
+<li>When the next bug appeared, went back to step 1</li>
+</ol>
+
+<p>Every step was correct. But <strong>stepping up one level to ask "why does this layer need to exist?"</strong> never happened.</p>
+
+<p>This isn't so much an AI limitation as it is a pattern trap. When code review says "this function has a bug," the natural response is "let's fix that function" — not "should this function exist?" Humans fall into the same trap. The difference is that humans have <strong>frustration</strong> as a signal. The feeling of "again?!" leads to "is something fundamentally wrong here?"</p>
+
+<p>AI doesn't get frustrated. It approaches the tenth patch with the same attitude as the first.</p>
+
+<h2>Principles From This Experience</h2>
+
+<h3>1. When Patches Repeat, Question the Layer</h3>
+
+<blockquote>If you're adding complexity to bridge a gap, first check whether that gap needs to exist.</blockquote>
+
+<table>
+<tr><th>Symptom</th><th>Question to Ask</th></tr>
+<tr><td>Validation fixes keep recurring</td><td>Should this data go through this validation at all?</td></tr>
+<tr><td>Format conversion bugs keep recurring</td><td>Should this conversion exist?</td></tr>
+<tr><td>Null checks keep recurring</td><td>Should this null be possible?</td></tr>
+</table>
+
+<p>"Change your hypothesis" is a good rule, but you can circle at the same level. What you really need is to <strong>question the architecture</strong>.</p>
+
+<h3>2. Clients Send Intent, Servers Own the Data</h3>
+
+<p>This pattern already has names in software architecture:</p>
+
+<ul>
+<li><strong>Task-Based UI</strong>: the client sends work intent, not mutated state</li>
+<li><strong>Intent-Based API</strong>: <code>POST /resource/action {intent}</code> instead of <code>PUT /resource {fields}</code></li>
+<li><strong>CQRS Command</strong>: a Command object expressing user intent; the server decides state transitions</li>
+</ul>
+
+<p>Core principle: <strong>the side that owns the authoritative data should perform the computation.</strong> The moment the client guesses and reconstructs the server's data, lossy conversion begins.</p>
+
+<h3>3. When Working With AI, Humans Own the Meta-cognition</h3>
+
+<p>AI excels at "this code has a bug → fix it." But it rarely asks "should this code exist?" That's the difference between faithfully following instructions and questioning the instructions themselves.</p>
+
+<p>When collaborating with AI coding assistants, <strong>the role of stepping back to see the whole picture is still the human's job</strong>. When the AI proposes a third patch, interrupting with "wait, why are we fixing this for the third time?" — that's the most valuable contribution you can make.</p>
+
+<hr>
+
+<p>After this experience, I added a rule to my AI coding assistant's configuration:</p>
+
+<blockquote><strong>After 2 failed fixes in the same area, review the architecture</strong>: If you fail twice in the same area, question the architecture, not the hypothesis. "Should this conversion/layer/validation exist at all?"</blockquote>
+
+<p>I also created a hook that auto-reminds "should this layer exist?" when debugging keywords are detected. Think of it as simulating "frustration" for the AI.</p>
+
+<h2>References</h2>
+
+<ul>
+<li><a href="https://blog.mithril.be/posts/task-based-vs-crud-based-in-api/">Task-Based vs CRUD-Based API</a></li>
+<li><a href="https://codeopinion.com/decomposing-crud-to-a-task-based-ui/">Decomposing CRUD to a Task-Based UI (CodeOpinion)</a></li>
+<li><a href="https://martinfowler.com/bliki/CQRS.html">CQRS Pattern (Martin Fowler)</a></li>
+</ul>
+
+</div>
+</body>
+</html>
