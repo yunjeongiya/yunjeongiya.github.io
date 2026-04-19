@@ -117,17 +117,20 @@ if (typeof Node === 'function' && Node.prototype) {
 
 `insertBefore`가 호출되는 주요 원인 중 하나는 **조건부 렌더링**이다:
 
+{% raw %}
 ```tsx
 // Before: 조건부 렌더링 — React가 DOM 노드를 삽입/제거함
 {currentTimePosition !== null && (
   <div className="time-indicator" style={{ left: `${position}px` }} />
 )}
 ```
+{% endraw %}
 
 이 패턴에서 `currentTimePosition`이 `null` ↔ 값 사이를 오갈 때마다 React는 `insertBefore`로 노드를 삽입하거나 `removeChild`로 제거한다.
 
 CSS 기반으로 전환하면 DOM 삽입/제거 자체가 사라진다:
 
+{% raw %}
 ```tsx
 // After: 항상 렌더링, CSS로 숨김 — DOM 구조가 안정적
 <div
@@ -138,6 +141,7 @@ CSS 기반으로 전환하면 DOM 삽입/제거 자체가 사라진다:
   }}
 />
 ```
+{% endraw %}
 
 모든 조건부 렌더링을 CSS로 바꿀 필요는 없다. `insertBefore` crash가 실제로 발생하는 지점, 특히 **빈번하게 업데이트되는 동적 컨텐츠 내부의 조건부 요소**에만 적용하면 된다.
 
