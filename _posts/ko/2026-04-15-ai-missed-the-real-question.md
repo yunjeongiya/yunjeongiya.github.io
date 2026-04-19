@@ -7,6 +7,7 @@ tags: [Claude Code, AI Coding, Architecture, API Design, Task-Based UI, Meta-cog
 lang: ko
 slug: "056"
 published: true
+thumbnail: /assets/images/posts/056-ai-missed-the-real-question/thumbnail-ko.png
 ---
 
 AI 코딩 어시스턴트와 함께 기능을 개발하고 있었다. 코드 리뷰를 4차례 반복했는데, 매번 새로운 edge case가 나왔다. AI는 매 라운드마다 "이번엔 해결했다"고 했지만, 다음 라운드에서 같은 부류의 다른 변종이 튀어나왔다.
