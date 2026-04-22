@@ -69,7 +69,7 @@ In the chat above, my friend said "you'd probably burn through it in 3 runs." Th
 
 Let's go back to the library analogy.
 
-![Text search vs. structural search — flipping every page vs. checking the table of contents](/assets/images/posts/059-serena-compiler/library-analogy.png)
+<img src="/assets/images/posts/059-serena-compiler/library-analogy.png" alt="Text search vs. structural search — flipping every page vs. checking the table of contents" style="max-width: 500px; display: block; margin: 24px auto;">
 
 Text search (grep) is **flipping through every page of every book**. Serena is **checking the table of contents and the index**.
 
