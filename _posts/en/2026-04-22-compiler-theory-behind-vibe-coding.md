@@ -158,6 +158,8 @@ When you only want the `save` method from a 500-line Java file:
 
 **40x difference.** In a single session, you might read 10 or 20 files like this. Read 20 files the standard way: 40,000 tokens gone. With Serena: 1,000 tokens. That's the difference between "burned through it in 3 runs" and "working all day without hitting the limit."
 
+Community-reported token savings range from **50% to 90%**. A lightweight fork called [serena-slim](https://github.com/mcpslim/serena-slim) goes further by compressing Serena's own tool descriptions, achieving an additional 50.3% reduction. That said, these numbers are mostly anecdotal — no controlled A/B test has been published yet.
+
 ### 2. Accurate Reference Tracking
 
 When you want to find everywhere a method is called:
