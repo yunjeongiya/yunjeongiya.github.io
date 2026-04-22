@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How Serena Saves 40x on Tokens — The Compiler Theory Behind Your Vibe Coding</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Georgia, 'Times New Roman', serif;
+    background: #fff;
+    color: #292929;
+    line-height: 1.8;
+  }
+  .article {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+  }
+  h1 {
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1.3;
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+  }
+  .meta {
+    font-size: 14px;
+    color: #757575;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+  }
+  h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-top: 48px;
+    margin-bottom: 16px;
+    letter-spacing: -0.3px;
+  }
+  h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 36px;
+    margin-bottom: 12px;
+  }
+  p {
+    font-size: 18px;
+    margin-bottom: 16px;
+    color: #292929;
+  }
+  strong { font-weight: 700; }
+  img {
+    width: 100%;
+    border-radius: 8px;
+    margin: 24px 0;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  .chat-img {
+    max-width: 380px;
+    margin: 24px auto;
+    display: block;
+  }
+  pre {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    border-radius: 6px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    margin: 16px 0;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  code {
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 15px;
+  }
+  pre code {
+    font-size: 14px;
+    color: #d4d4d4;
+  }
+  p code {
+    background: #f0f0f0;
+    color: #292929;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 16px;
+  }
+  ul, ol {
+    margin: 12px 0 16px 24px;
+    font-size: 18px;
+  }
+  li { margin-bottom: 6px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 16px;
+  }
+  th, td {
+    border: 1px solid #e0e0e0;
+    padding: 10px 14px;
+    text-align: left;
+  }
+  th {
+    background: #f6f8fa;
+    font-weight: 700;
+  }
+  blockquote {
+    border-left: 3px solid #292929;
+    padding-left: 20px;
+    margin: 20px 0;
+    color: #555;
+    font-style: italic;
+  }
+  .separator {
+    text-align: center;
+    margin: 40px 0;
+    color: #ccc;
+    font-size: 24px;
+    letter-spacing: 8px;
+  }
+  a { color: #1a8917; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .tags {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+  }
+  .tag {
+    display: inline-block;
+    background: #f0f0f0;
+    color: #555;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    margin: 4px 4px 4px 0;
+  }
+</style>
+</head>
+<body>
+<article class="article">
+
+<h1>How Serena Saves 40x on Tokens — The Compiler Theory Behind Your Vibe Coding</h1>
+<div class="meta">April 22, 2026</div>
+
+<h2>Introduction</h2>
+
+<img class="chat-img" src="../assets/images/posts/059-serena-compiler/chat-en.png" alt="Recommending Serena to a friend whose tokens were burning out too fast">
+
+<p>When you ask an AI "find every place this method is called," what's actually happening under the hood?</p>
+
+<p>I'd been using Serena MCP for vibe coding — installed it, connected it, it worked, so I just used it. Then one day it stopped connecting, and while digging through the problem I discovered that this tool is built on <strong>core concepts from compiler theory</strong>.</p>
+
+<p>This isn't a guide to installing or using Serena. It's an explanation of <strong>"what this thing is actually doing internally"</strong> — written so that even non-CS people can follow along.</p>
+
+<h2>Background: How Does AI Read Code?</h2>
+
+<p>When you ask an AI "find this function," how does it actually find it? The simplest approach is just like <strong>Ctrl+F</strong> — open the file and search for text.</p>
+
+<pre><code>grep -r "findById" ./src</code></pre>
+
+<p>This finds every line containing the string "findById." Simple and intuitive. But there's a problem.</p>
+
+<h3>The Limits of Text Search</h3>
+
+<p>Imagine searching a library for every book that mentions the word "run." The Ctrl+F approach means <strong>flipping through every page of every book looking for those three letters</strong>. You'd end up with hits like:</p>
+
+<ul>
+<li>"run the server" (what you wanted)</li>
+<li>"running shoes review" (not quite...)</li>
+<li>"runtime error" (also not what you meant)</li>
+</ul>
+
+<p>The same thing happens in code:</p>
+
+<pre><code>Search results for "findById":
+✅ taskRepository.findById(id)     ← this is what you wanted
+❌ findByIdResult = ...             ← a variable name that matches
+❌ // findById is deprecated        ← a comment that matches
+❌ "findById"                       ← a string literal that matches</code></pre>
+
+<p>And there's an even bigger problem: <strong>token consumption</strong>.</p>
+
+<h3>Why Do Tokens Run Out?</h3>
+
+<p>AI coding tools like Claude and Cursor have something called a "context window." Think of it as <strong>the AI's short-term memory capacity</strong>. As the AI reads code, it fills up this memory, and once it's full, it can't read any more.</p>
+
+<p>With text search, even if you say "I just want to see the <code>save</code> method," the AI still has to <strong>read the entire file</strong>. To find a 5-line method in a 500-line file, it loads all 500 lines into memory.</p>
+
+<pre><code>To find a 5-line method in a 500-line file:
+→ Reads all 500 lines
+→ Consumes ~2,000 tokens
+→ Read just 10 files like this: 20,000 tokens
+→ Tokens drain fast</code></pre>
+
+<p>In the chat above, my friend's comment about "probably ran out after 3 turns" is exactly this problem. Every time the AI reads code, tokens get consumed, and once they're gone, the conversation is over.</p>
+
+<h2>What Serena Does Differently: Reading Code as Structure</h2>
+
+<p>Let's go back to the library analogy.</p>
+
+<img src="../assets/images/posts/059-serena-compiler/library-analogy.png" alt="Text search vs structural search — flipping every page vs reading the table of contents">
+
+<p>Text search (grep) is <strong>flipping through every page of every book</strong>. Serena, on the other hand, is <strong>looking at the table of contents and the index</strong>.</p>
+
+<p>If you ask a librarian "find me something about apples," a good librarian doesn't start reading every book from page one. They check the table of contents, find "Chapter 3: Fruits → 3.2 Apples," and open directly to that page. That's what Serena does.</p>
+
+<p>The technology that makes this possible is <strong>AST (Abstract Syntax Tree)</strong> and <strong>tree-sitter</strong>.</p>
+
+<h3>AST: Building a Table of Contents for Code</h3>
+
+<p>AST stands for Abstract Syntax Tree. The name sounds intimidating, but the concept is simple: <strong>it's code reorganized as a hierarchical structure</strong>.</p>
+
+<p>Take this code:</p>
+
+<pre><code class="language-java">public void save(Task task) {
+    repository.save(task);
+}</code></pre>
+
+<p>To the human eye, it's just text. But once converted to an AST, it becomes this structure:</p>
+
+<pre><code>Method Declaration
+├── modifier: public
+├── returnType: void
+├── name: save
+├── parameters:
+│   └── task of type Task
+└── body:
+    └── call repository.save (argument: task)</code></pre>
+
+<p>In book terms:</p>
+
+<pre><code>Reading as text:  "It was a sunny day so I went hiking..."  (have to read everything to know what it's about)
+Reading as AST:   Chapter 3 > Section 3.2 > Hiking story   (the table of contents tells you exactly where things are)</code></pre>
+
+<p>With this "table of contents," you can jump directly to the method you want <strong>without reading the entire file</strong>. That's where the token savings come from.</p>
+
+<h3>tree-sitter: The Machine That Builds the Table of Contents Instantly</h3>
+
+<p>To create an AST, code has to be analyzed first. The tool that does this analysis is <strong>tree-sitter</strong>.</p>
+
+<p>tree-sitter is <strong>a program that reads code and understands its structure</strong>. It knows things like "this opening brace starts a class, that closing brace ends a method." It's written in Rust, a fast systems language, which lets it analyze thousands of lines of code almost instantly.</p>
+
+<p>Three key characteristics:</p>
+
+<p><strong>1. Incremental updates:</strong> When one line changes, tree-sitter doesn't re-analyze the whole file — only the changed part. Edit one line in a 500-line file, and it re-parses just that one line.</p>
+
+<p><strong>2. Error-tolerant:</strong> It can analyze code even when there are syntax errors. This is why autocomplete works in your IDE while you're still typing — the code isn't finished yet, but tree-sitter already understands the structure.</p>
+
+<p><strong>3. No pre-indexing required:</strong> IntelliJ and VS Code make you wait through "Indexing..." when you open a project. tree-sitter skips that entirely — it parses each file on demand, right when it's needed.</p>
+
+<h3>Why Ctrl+F Isn't Enough (One Line of CS Theory)</h3>
+
+<p>"Can't you just do a really good Ctrl+F?" Code has <strong>nested structure</strong>. Classes contain methods, methods contain if-statements, if-statements contain more method calls.</p>
+
+<pre><code class="language-java">class Service {
+    void process() {
+        if (condition) {
+            helper.save(data);  // ← this save belongs to helper
+        }
+    }
+    void save(Task task) {      // ← this save belongs to Service
+        repository.save(task);  // ← this save belongs to repository
+    }
+}</code></pre>
+
+<p>A text search for "save" returns all three, but each one is <strong>a different method on a different object</strong>. Distinguishing them requires tracking "which set of braces is this inside?" — which plain text search cannot do. In CS terms, this is called the <strong>"limitation of regular languages"</strong>: regex (Ctrl+F) cannot track nested brackets; you need a parser that actually understands structure.</p>
+
+<h2>So What's the Benefit?</h2>
+
+<h3>1. Token Savings — The Core Advantage</h3>
+
+<p>When you want to look at just the <code>save</code> method in a 500-line Java file:</p>
+
+<table>
+<tr><th>Approach</th><th>What it does</th><th>Tokens consumed</th></tr>
+<tr><td>Standard (read whole file)</td><td>Reads all 500 lines</td><td>~2,000</td></tr>
+<tr><td>Serena (symbol search)</td><td>Reads just those 5 lines</td><td>~50</td></tr>
+</table>
+
+<img src="../assets/images/posts/059-serena-compiler/diagram-grep-vs-serena-en.png" alt="Standard vs Serena — file reading comparison">
+
+<img src="../assets/images/posts/059-serena-compiler/diagram-tokens-en.png" alt="Token consumption comparison">
+
+<p><strong>40x difference.</strong> A single task might involve reading 10, 20 files like this. Reading 20 files the standard way burns 40,000 tokens; with Serena, you need about 1,000. That gap is the difference between "runs out after 3 turns" and "works all day."</p>
+
+<h3>2. Precise Reference Tracking</h3>
+
+<p>When you want to find every caller of a method:</p>
+
+<pre><code>Text search:  "save" → catches variable names, comments, and save methods on other classes → requires manual review
+Serena:       "TaskService.save" → returns only the exact callers of that specific method</code></pre>
+
+<p>Because the results are accurate, the AI doesn't burn tokens sifting through "this one isn't relevant... this one isn't either..."</p>
+
+<h3>3. Safe Refactoring</h3>
+
+<p>When renaming a method:</p>
+
+<ul>
+<li><strong>Text replace:</strong> Renaming "save" to "store" risks changing every unrelated <code>save</code> in the project</li>
+<li><strong>Serena:</strong> Renames only <code>TaskService.save</code> to <code>TaskService.store</code>, precisely</li>
+</ul>
+
+<p>This is the same principle as <strong>Shift+F6 (Rename Symbol)</strong> in IntelliJ or VS Code. IDEs use AST internally too. Serena brings that same capability to AI coding tools.</p>
+
+<h2>The Connection to Compilers</h2>
+
+<p>At this point you might be thinking: "AST, parser... where have I heard these before?" You have — they come from <strong>compilers</strong>.</p>
+
+<p>A compiler is the program that transforms source code into something a computer can execute. The process looks like this:</p>
+
+<pre><code>Source code → [Step 1: Lexing/Parsing] → [Step 2: Build AST] → [Step 3: Optimization] → Executable
+                  read and tokenize           understand structure    generate machine code</code></pre>
+
+<p>Serena borrows only <strong>steps 1 and 2</strong>. It analyzes the code and builds the structural understanding, then exposes that as tools the AI can query. It doesn't compile anything, but <strong>it understands code the same way a compiler does.</strong></p>
+
+<img src="../assets/images/posts/059-serena-compiler/diagram-pipeline-en.png" alt="Compiler vs Serena — same technology, different purpose">
+
+<p>This is exactly what you study in university CS courses on "Compilers" and "Formal Languages." When you're vibe coding, you don't think about any of this — but this theory is running in the background the whole time.</p>
+
+<h2>Debugging Diary: When Serena Won't Run on Windows</h2>
+
+<p>Serena runs internally via a tool called <code>uvx</code>. <code>uvx</code> is Python's equivalent of <code>npx</code> — it installs a package into a temporary environment and runs it immediately.</p>
+
+<p>The problem: Windows 11's <strong>Smart App Control (SAC)</strong> blocks <code>uvx.exe</code>.</p>
+
+<pre><code>error: This file has been blocked by application control policy. (os error 4551)</code></pre>
+
+<p>The cause: <code>uv.exe</code> / <code>uvx.exe</code> are not code-signed. There's an open issue at <a href="https://github.com/astral-sh/uv/issues/18967">astral-sh/uv#18967</a> that hasn't been resolved as of April 2026.</p>
+
+<h3>The Fix</h3>
+
+<p><strong>You have to turn off Smart App Control:</strong></p>
+<ol>
+<li>Windows Security → App &amp; Browser Control → Smart App Control → Off</li>
+<li>Warning: this cannot be undone (requires reinstalling Windows to re-enable)</li>
+</ol>
+
+<p>Turning off SAC doesn't disable Windows Defender or SmartScreen, so the practical security impact is low. That said, you're losing an extra layer of protection against unsigned executables — so the habit of not running random downloaded <code>.exe</code> files matters more after this change.</p>
+
+<p>Installing via winget makes no difference, since the binary itself is unsigned. Until the uv team adds code signing, Serena simply cannot run in a SAC environment.</p>
+
+<h2>What I Learned</h2>
+
+<p><strong>1. Vibe coding tools are built on CS fundamentals.</strong> AST, parsers, formal language theory — these aren't "useless theory." They're the core of tools you use every day.</p>
+
+<p><strong>2. Text search and structural search are in completely different leagues.</strong> I used to think grep was good enough. It isn't, not when you care about token efficiency and accuracy.</p>
+
+<p><strong>3. Knowing the internals makes debugging possible.</strong> "Serena isn't working" → uvx → uv → code signing → Smart App Control. Without understanding the internals, "reinstall" is the only option you have.</p>
+
+<div class="separator">...</div>
+
+<div class="tags">
+<span class="tag">Serena</span>
+<span class="tag">MCP</span>
+<span class="tag">tree-sitter</span>
+<span class="tag">AST</span>
+<span class="tag">Compiler Theory</span>
+<span class="tag">Vibe Coding</span>
+<span class="tag">Claude Code</span>
+</div>
+
+<h2>References</h2>
+<ul>
+<li><a href="https://github.com/oraios/serena">Serena GitHub (oraios/serena)</a></li>
+<li><a href="https://tree-sitter.github.io/tree-sitter/">tree-sitter official site</a></li>
+<li><a href="https://github.com/astral-sh/uv/issues/18967">uv code signing issue (astral-sh/uv#18967)</a></li>
+<li><a href="https://support.microsoft.com/en-us/windows/smart-app-control-frequently-asked-questions-285ea03d-fa88-4d56-882e-6698afdb7003">Smart App Control FAQ (Microsoft)</a></li>
+</ul>
+
+</article>
+</body>
+</html>

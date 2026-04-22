@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Serena가 토큰을 40배 아끼는 원리 — grep은 5초, 컴파일러 이론은 0.1초</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 18px;
+      line-height: 1.8;
+      color: #242424;
+      background: #fff;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    article {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    /* Header */
+    .post-header {
+      margin-bottom: 40px;
+    }
+
+    .post-title {
+      font-size: 36px;
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: -0.5px;
+      color: #191919;
+      margin-bottom: 16px;
+    }
+
+    .post-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: #6b6b6b;
+    }
+
+    .post-meta .dot {
+      width: 3px;
+      height: 3px;
+      background: #6b6b6b;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* Divider */
+    .divider {
+      border: none;
+      border-top: 1px solid #e6e6e6;
+      margin: 32px 0;
+    }
+
+    /* Headings */
+    h2 {
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.35;
+      color: #191919;
+      margin-top: 52px;
+      margin-bottom: 20px;
+      letter-spacing: -0.3px;
+    }
+
+    h3 {
+      font-size: 21px;
+      font-weight: 700;
+      line-height: 1.4;
+      color: #191919;
+      margin-top: 36px;
+      margin-bottom: 14px;
+    }
+
+    /* Paragraphs */
+    p {
+      margin-bottom: 22px;
+      color: #242424;
+    }
+
+    /* Bold */
+    strong {
+      font-weight: 700;
+      color: #191919;
+    }
+
+    /* Lists */
+    ul, ol {
+      margin: 0 0 22px 0;
+      padding-left: 28px;
+    }
+
+    li {
+      margin-bottom: 8px;
+      color: #242424;
+    }
+
+    /* Links */
+    a {
+      color: #1a8917;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* Images */
+    .post-image {
+      margin: 32px 0;
+      text-align: center;
+    }
+
+    .post-image img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .post-image.chat img {
+      max-width: 380px;
+    }
+
+    .post-image figcaption {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #6b6b6b;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    /* Code blocks */
+    pre {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 1.65;
+      padding: 20px 24px;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin: 24px 0;
+    }
+
+    code {
+      font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+      font-size: 15px;
+      background: #f2f2f2;
+      color: #c7254e;
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+
+    pre code {
+      background: none;
+      color: inherit;
+      font-size: inherit;
+      padding: 0;
+      border-radius: 0;
+    }
+
+    /* Syntax colors */
+    pre .comment { color: #6a9955; }
+    pre .keyword { color: #569cd6; }
+    pre .string  { color: #ce9178; }
+    pre .number  { color: #b5cea8; }
+    pre .symbol  { color: #dcdcaa; }
+    pre .good    { color: #4ec9b0; }
+    pre .bad     { color: #f48771; }
+
+    /* Tables */
+    .table-wrapper {
+      overflow-x: auto;
+      margin: 28px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 16px;
+    }
+
+    thead {
+      background: #f7f7f7;
+    }
+
+    th {
+      padding: 12px 16px;
+      text-align: left;
+      font-weight: 700;
+      color: #191919;
+      border: 1px solid #e0e0e0;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 12px 16px;
+      border: 1px solid #e0e0e0;
+      color: #242424;
+      vertical-align: top;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #fafafa;
+    }
+
+    /* Tags */
+    .tags-section {
+      margin-top: 56px;
+      padding-top: 28px;
+      border-top: 1px solid #e6e6e6;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 6px 14px;
+      background: #f2f2f2;
+      color: #555;
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+
+    .tag:hover {
+      background: #e6e6e6;
+      text-decoration: none;
+      color: #333;
+    }
+
+    /* References section */
+    .references {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid #e6e6e6;
+    }
+
+    .references h2 {
+      margin-top: 0;
+      font-size: 20px;
+    }
+
+    .references ul {
+      list-style: disc;
+      padding-left: 24px;
+    }
+
+    .references li {
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <article>
+
+    <!-- Header -->
+    <header class="post-header">
+      <h1 class="post-title">Serena가 토큰을 40배 아끼는 원리 — grep은 5초, 컴파일러 이론은 0.1초</h1>
+      <div class="post-meta">
+        <span>yunjeongiya</span>
+        <span class="dot"></span>
+        <span>2026년 4월 22일</span>
+        <span class="dot"></span>
+        <span>AI · Developer Tools</span>
+      </div>
+    </header>
+
+    <hr class="divider">
+
+    <!-- 도입 -->
+    <h2>도입</h2>
+
+    <figure class="post-image chat">
+      <img src="../assets/images/posts/059-serena-compiler/chat-ko.png" alt="토큰이 너무 빨리 닳는다는 친구에게 Serena를 추천한 후">
+      <figcaption>토큰이 너무 빨리 닳는다는 친구에게 Serena를 추천한 후</figcaption>
+    </figure>
+
+    <p>AI에게 "이 메서드 쓰는 곳 다 찾아줘"라고 말하면, 뒤에서 무슨 일이 벌어질까?</p>
+
+    <p>바이브 코딩을 하면서 Serena MCP를 쓰고 있었다. 설치하고, 연결하고, 잘 되니까 그냥 썼다. 그런데 어느 날 연결이 안 되면서 삽질을 하다가, 이 도구 안에 <strong>컴파일러 이론의 핵심 개념들</strong>이 들어가 있다는 걸 알게 됐다.</p>
+
+    <p>이 글은 Serena의 설치법이나 기능 소개가 아니다. <strong>"이게 내부에서 뭘 하는 건지"</strong>를 비전공자도 이해할 수 있게 풀어본 글이다.</p>
+
+    <!-- 배경 -->
+    <h2>배경: AI는 코드를 어떻게 읽는가</h2>
+
+    <p>AI에게 "이 함수 찾아줘"라고 하면, 어떻게 찾을까? 가장 단순한 방법은 <strong>Ctrl+F</strong>와 같다. 파일을 열어서 텍스트를 검색하는 것이다.</p>
+
+<pre><code>grep -r "findById" ./src</code></pre>
+
+    <p>"findById"라는 글자가 포함된 모든 줄을 찾아준다. 간단하고 직관적이다. 하지만 문제가 있다.</p>
+
+    <h3>텍스트 검색의 한계</h3>
+
+    <p>도서관에서 "사과"라는 단어가 들어간 책을 찾는다고 생각해보자. Ctrl+F 방식은 <strong>모든 책의 모든 페이지를 넘기면서 "사과"라는 글자를 찾는 것</strong>이다. 그러면 이런 것들이 다 잡힌다:</p>
+
+    <ul>
+      <li>"사과나무가 열매를 맺었다" (원하던 것)</li>
+      <li>"그는 진심으로 사과했다" (이건 아닌데...)</li>
+      <li>"각주: 사과의 학명은 Malus domestica" (이것도 아닌데...)</li>
+    </ul>
+
+    <p>코드에서도 같은 일이 벌어진다:</p>
+
+<pre><code>"findById" 검색 결과:
+<span class="good">&#x2705; taskRepository.findById(id)</span>     ← 이걸 찾고 싶었다
+<span class="bad">&#x274C; findByIdResult = ...</span>             ← 변수명이 걸림
+<span class="bad">&#x274C; // findById는 deprecated</span>         ← 주석이 걸림
+<span class="bad">&#x274C; "findById"</span>                       ← 문자열이 걸림</code></pre>
+
+    <p>그리고 더 큰 문제가 있다. <strong>토큰 소모</strong>다.</p>
+
+    <h3>토큰이 왜 닳는가</h3>
+
+    <p>AI 코딩 도구(Claude, Cursor 등)에는 "컨텍스트 윈도우"라는 게 있다. 쉽게 말하면 <strong>AI의 단기 기억 용량</strong>이다. AI가 코드를 읽으면 이 용량이 차고, 다 차면 더 이상 읽을 수 없다.</p>
+
+    <p>텍스트 검색 방식에서는 "save 메서드 하나만 보고 싶어"라고 해도 <strong>파일 전체를 읽어야</strong> 한다. 500줄짜리 파일에서 5줄짜리 메서드 하나를 보려고 500줄을 전부 기억 용량에 넣는 것이다.</p>
+
+<pre><code>500줄 파일에서 5줄짜리 메서드를 찾기 위해
+→ 500줄 전부 읽음
+→ 토큰 약 2,000개 소모
+→ 이런 파일 10개만 읽으면 20,000 토큰
+→ 토큰이 빠르게 닳는다</code></pre>
+
+    <p>위 채팅에서 친구가 "3번 돌리고 끝났을 듯"이라고 한 게 바로 이 문제다. AI가 코드를 읽을 때마다 토큰이 닳고, 토큰이 다 떨어지면 더 이상 대화를 할 수 없다.</p>
+
+    <!-- Serena -->
+    <h2>Serena가 다르게 하는 것: 코드를 "구조"로 읽기</h2>
+
+    <p>다시 도서관 비유로 돌아가자.</p>
+
+    <figure class="post-image">
+      <img src="../assets/images/posts/059-serena-compiler/library-analogy.png" alt="텍스트 검색 vs 구조적 검색 — 모든 페이지를 넘기는 것 vs 목차를 보는 것">
+      <figcaption>텍스트 검색 vs 구조적 검색 — 모든 페이지를 넘기는 것 vs 목차를 보는 것</figcaption>
+    </figure>
+
+    <p>텍스트 검색(grep)은 <strong>모든 책의 모든 페이지를 넘기는 것</strong>이다. 반면 Serena는 <strong>목차와 색인을 보는 것</strong>이다.</p>
+
+    <p>도서관 사서에게 "사과에 대한 내용 찾아주세요"라고 하면, 좋은 사서는 모든 책을 처음부터 읽지 않는다. 목차를 보고, "3장 과일류 → 3.2 사과" 항목을 찾아서 해당 페이지만 펼친다. 이게 Serena가 하는 일이다.</p>
+
+    <p>이걸 가능하게 하는 기술이 <strong>AST(Abstract Syntax Tree)</strong>와 <strong>tree-sitter</strong>다.</p>
+
+    <h3>AST: 코드의 목차를 만드는 것</h3>
+
+    <p>AST는 한국어로 "추상 구문 트리"인데, 이름이 어려워서 그렇지 원리는 단순하다. <strong>코드를 계층 구조로 정리한 것</strong>이다.</p>
+
+    <p>이런 코드가 있다고 하자:</p>
+
+<pre><code><span class="keyword">public void</span> <span class="symbol">save</span>(Task task) {
+    repository.<span class="symbol">save</span>(task);
+}</code></pre>
+
+    <p>사람 눈에는 그냥 텍스트다. 하지만 AST로 변환하면 이런 구조가 된다:</p>
+
+<pre><code>메서드 선언
+├── 접근자: public
+├── 반환 타입: void
+├── 이름: save
+├── 파라미터:
+│   └── Task 타입의 task
+└── 본문:
+    └── repository의 save를 호출 (인수: task)</code></pre>
+
+    <p>책에 비유하면 이렇다:</p>
+
+<pre><code>텍스트로 보기: "오늘은 날씨가 좋아서 산에 갔다..."  (본문 전체를 읽어야 뭔 내용인지 앎)
+AST로 보기:   3장 > 3.2절 > 등산 이야기            (목차만 보면 어디에 뭐가 있는지 앎)</code></pre>
+
+    <p>이 "목차"가 있으면 <strong>파일 전체를 읽지 않아도</strong> 원하는 메서드만 바로 찾을 수 있다. 그래서 토큰이 절약된다.</p>
+
+    <h3>tree-sitter: 목차를 순식간에 만드는 기계</h3>
+
+    <p>AST(목차)를 만들려면 코드를 분석해야 한다. 이 분석을 해주는 도구가 <strong>tree-sitter</strong>다.</p>
+
+    <p>tree-sitter는 <strong>코드를 읽고 구조를 파악하는 프로그램</strong>이다. "이 중괄호는 클래스의 시작이고, 저 중괄호는 메서드의 끝" 같은 걸 이해한다. Rust라는 빠른 언어로 만들어져서 수천 줄의 코드도 순식간에 분석한다.</p>
+
+    <p>핵심 특징 세 가지:</p>
+
+    <p><strong>1. 부분 업데이트</strong>: 코드 한 줄이 바뀌면 전체를 다시 분석하는 게 아니라, 바뀐 부분만 다시 분석한다. 500줄 파일에서 1줄만 고쳤으면 1줄만 다시 보는 것이다.</p>
+
+    <p><strong>2. 오타에 강하다</strong>: 코드에 문법 오류가 있어도 최대한 분석해준다. IDE에서 코딩 중에 자동완성이 되는 것도 이 원리다 — 코드가 아직 완성되지 않았는데도 구조를 이해하고 있다.</p>
+
+    <p><strong>3. 미리 인덱싱 안 함</strong>: IntelliJ나 VS Code는 프로젝트를 열면 "인덱싱 중..." 하면서 한참 기다리게 한다. tree-sitter는 그런 거 없이, 필요한 파일을 그때그때 즉시 분석한다.</p>
+
+    <h3>왜 Ctrl+F로는 안 되는가 (CS 이론 한 줄)</h3>
+
+    <p>"그냥 Ctrl+F 잘하면 되지 않나?" 할 수 있다. 근데 코드에는 <strong>중첩 구조</strong>가 있다. 클래스 안에 메서드가 있고, 메서드 안에 if문이 있고, if문 안에 또 메서드 호출이 있다.</p>
+
+<pre><code><span class="keyword">class</span> <span class="symbol">Service</span> {
+    <span class="keyword">void</span> <span class="symbol">process</span>() {
+        <span class="keyword">if</span> (condition) {
+            helper.<span class="symbol">save</span>(data);  <span class="comment">// ← 이 save는 helper의 것</span>
+        }
+    }
+    <span class="keyword">void</span> <span class="symbol">save</span>(Task task) {      <span class="comment">// ← 이 save는 Service의 것</span>
+        repository.<span class="symbol">save</span>(task);  <span class="comment">// ← 이 save는 repository의 것</span>
+    }
+}</code></pre>
+
+    <p>"save"를 텍스트로 검색하면 3개가 다 잡히지만, 각각 <strong>다른 객체의 다른 메서드</strong>다. 이 차이를 이해하려면 "어떤 중괄호 안에 있는지"를 추적해야 하는데, 단순 텍스트 검색으로는 불가능하다. 이게 CS에서 말하는 <strong>"정규 언어의 한계"</strong>다 — Ctrl+F(정규식)로는 괄호의 중첩을 추적할 수 없고, 구조를 이해하는 파서가 필요하다.</p>
+
+    <!-- 그래서 뭐가 좋은데 -->
+    <h2>그래서 뭐가 좋은데?</h2>
+
+    <h3>1. 토큰 절약 — 핵심 장점</h3>
+
+    <p>500줄짜리 Java 파일에서 <code>save</code> 메서드 하나만 보고 싶을 때:</p>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>방법</th>
+            <th>하는 일</th>
+            <th>토큰 소모</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>일반 (파일 전체 읽기)</td>
+            <td>500줄 전부 읽음</td>
+            <td>~2,000</td>
+          </tr>
+          <tr>
+            <td>Serena (심볼 검색)</td>
+            <td>해당 메서드 5줄만 읽음</td>
+            <td>~50</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <figure class="post-image">
+      <img src="../assets/images/posts/059-serena-compiler/diagram-grep-vs-serena.png" alt="일반 vs Serena — 파일 읽기 비교">
+      <figcaption>일반 vs Serena — 파일 읽기 비교</figcaption>
+    </figure>
+
+    <figure class="post-image">
+      <img src="../assets/images/posts/059-serena-compiler/diagram-tokens.png" alt="토큰 소모 비교">
+      <figcaption>토큰 소모 비교</figcaption>
+    </figure>
+
+    <p><strong>40배 차이.</strong> 하나의 작업에서 이런 파일을 10개, 20개 읽는다. 일반 방식으로 20개 파일을 읽으면 40,000 토큰이 닳지만, Serena로는 1,000 토큰이면 된다. 이 차이가 "3번 돌리고 끝" vs "하루 종일 작업 가능"의 차이다.</p>
+
+    <h3>2. 정확한 참조 추적</h3>
+
+    <p>"이 메서드를 호출하는 곳"을 찾을 때:</p>
+
+<pre><code>텍스트 검색: "save" → 변수명, 주석, 다른 클래스의 save까지 전부 잡힘 → 하나하나 확인 필요
+Serena:     "TaskService의 save" → 정확히 그 메서드를 호출하는 곳만 반환</code></pre>
+
+    <p>결과가 정확하니까 AI가 "이건 관련 없고... 이것도 아니고..." 하면서 토큰을 쓸 필요가 없다.</p>
+
+    <h3>3. 안전한 리팩토링</h3>
+
+    <p>메서드 이름을 바꿀 때:</p>
+
+    <ul>
+      <li><strong>텍스트 치환</strong>: "save"를 "store"로 바꾸면 → 관련 없는 다른 save까지 다 바뀔 위험</li>
+      <li><strong>Serena</strong>: "TaskService.save"만 정확하게 "TaskService.store"로 변경</li>
+    </ul>
+
+    <p>이건 IntelliJ나 VS Code에서 <strong>Shift+F6 (Rename Symbol)</strong> 하는 것과 같은 원리다. IDE도 내부적으로 AST를 사용한다. Serena는 그 능력을 AI 코딩 도구에 가져다준 것이다.</p>
+
+    <!-- 컴파일러와의 관계 -->
+    <h2>컴파일러와의 관계</h2>
+
+    <p>여기까지 읽으면 "AST, 파서... 어디서 들어본 것 같은데?" 할 수 있다. 맞다. <strong>컴파일러</strong>에서 쓰는 기술이다.</p>
+
+    <p>컴파일러는 코드를 컴퓨터가 실행할 수 있는 형태로 바꿔주는 프로그램이다. 그 과정은 이렇다:</p>
+
+<pre><code>소스코드 → [1단계: 코드 분석] → [2단계: 구조 파악] → [3단계: 최적화] → 실행 파일
+              읽기                   AST 만들기          기계어 변환</code></pre>
+
+    <p>Serena는 이 중 <strong>1~2단계만 가져다 쓴다</strong>. 코드를 분석하고 구조를 파악하는 것까지만 하고, 그 결과를 AI가 쿼리할 수 있게 도구로 노출한다. 컴파일은 안 하지만, <strong>코드를 이해하는 능력은 컴파일러와 같다.</strong></p>
+
+    <figure class="post-image">
+      <img src="../assets/images/posts/059-serena-compiler/diagram-pipeline.png" alt="컴파일러 vs Serena — 같은 기술, 다른 목적">
+      <figcaption>컴파일러 vs Serena — 같은 기술, 다른 목적</figcaption>
+    </figure>
+
+    <p>대학 컴퓨터공학과에서 "컴파일러", "형식 언어" 같은 수업에서 배우는 내용이 바로 이것이다. 바이브 코딩을 할 때 의식하지 않지만, 뒤에서 이 이론이 돌아가고 있었다.</p>
+
+    <!-- 실전 삽질기 -->
+    <h2>실전 삽질기: Windows에서 Serena가 안 될 때</h2>
+
+    <p>Serena는 내부적으로 <code>uvx</code>라는 도구로 실행된다. <code>uvx</code>는 Python의 <code>npx</code> 같은 것으로, 패키지를 임시 환경에 설치하고 바로 실행한다.</p>
+
+    <p>문제는 Windows 11의 <strong>Smart App Control(SAC)</strong>이 <code>uvx.exe</code>를 차단한다는 것이다.</p>
+
+<pre><code>error: 애플리케이션 제어 정책에서 이 파일을 차단했습니다. (os error 4551)</code></pre>
+
+    <p>원인: <code>uv.exe</code>/<code>uvx.exe</code>에 코드 서명이 되어 있지 않다. <a href="https://github.com/astral-sh/uv/issues/18967" target="_blank" rel="noopener">astral-sh/uv#18967</a>에 이슈가 올라와 있고, 아직 해결되지 않았다 (2026년 4월 기준).</p>
+
+    <h3>해결 방법</h3>
+
+    <p><strong>Smart App Control을 끄는 수밖에 없다:</strong></p>
+    <ol>
+      <li>Windows 보안 → 앱 및 브라우저 컨트롤 → Smart App Control → 끄기</li>
+      <li>주의: 한번 끄면 다시 켤 수 없다 (Windows 재설치 필요)</li>
+    </ol>
+
+    <p>SAC를 꺼도 Windows Defender와 SmartScreen은 그대로 동작하므로, 실질적인 보안 위험은 낮다. 다만 서명되지 않은 실행 파일에 대한 추가 보호막이 사라지는 것이므로, 수상한 exe를 직접 다운받아 실행하지 않는 습관이 중요하다.</p>
+
+    <p>winget으로 설치해도 바이너리 자체가 unsigned라 차단된다. uv 측에서 코드 서명을 추가할 때까지는 SAC 환경에서 Serena를 쓸 수 없다.</p>
+
+    <!-- 배운 점 -->
+    <h2>배운 점</h2>
+
+    <ol>
+      <li><strong>바이브 코딩 도구도 결국 CS 기초 위에 서 있다.</strong> AST, 파서, 형식 언어 이론 — 이런 것들이 "쓸모없는 이론"이 아니라 실제로 매일 쓰는 도구의 핵심이다.</li>
+      <li><strong>텍스트 검색과 구조적 검색은 차원이 다르다.</strong> grep으로 충분하다고 생각했는데, 토큰 효율과 정확도에서 비교가 안 된다.</li>
+      <li><strong>도구가 안 될 때 원리를 알면 디버깅이 된다.</strong> "Serena가 안 돼요" → uvx → uv → 코드 서명 → Smart App Control. 원리를 모르면 "재설치" 밖에 할 수 없다.</li>
+    </ol>
+
+    <!-- References -->
+    <section class="references">
+      <h2>References</h2>
+      <ul>
+        <li><a href="https://github.com/oraios/serena" target="_blank" rel="noopener">Serena GitHub (oraios/serena)</a></li>
+        <li><a href="https://tree-sitter.github.io/tree-sitter/" target="_blank" rel="noopener">tree-sitter 공식 사이트</a></li>
+        <li><a href="https://github.com/astral-sh/uv/issues/18967" target="_blank" rel="noopener">uv 코드 서명 이슈 (astral-sh/uv#18967)</a></li>
+        <li><a href="https://support.microsoft.com/en-us/windows/smart-app-control-frequently-asked-questions-285ea03d-fa88-4d56-882e-6698afdb7003" target="_blank" rel="noopener">Smart App Control FAQ (Microsoft)</a></li>
+      </ul>
+    </section>
+
+    <!-- Tags -->
+    <div class="tags-section">
+      <a class="tag" href="#">serena</a>
+      <a class="tag" href="#">mcp</a>
+      <a class="tag" href="#">tree-sitter</a>
+      <a class="tag" href="#">ast</a>
+      <a class="tag" href="#">compiler-theory</a>
+      <a class="tag" href="#">vibe-coding</a>
+      <a class="tag" href="#">claude-code</a>
+    </div>
+
+  </article>
+</body>
+</html>

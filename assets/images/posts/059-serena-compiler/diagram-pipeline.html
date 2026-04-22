@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Malgun Gothic', -apple-system, sans-serif;
+    background: #1a1a2e;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px;
+    gap: 24px;
+  }
+  .pipeline {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    position: relative;
+  }
+  .stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .stage-box {
+    padding: 14px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    min-width: 100px;
+    border: 2px solid;
+  }
+  .stage-label {
+    font-size: 11px;
+    max-width: 100px;
+    text-align: center;
+    line-height: 1.4;
+  }
+  .arrow {
+    font-size: 20px;
+    margin: 0 6px;
+    margin-bottom: 20px;
+  }
+
+  /* Row label */
+  .row-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    width: 750px;
+  }
+  .row-label {
+    writing-mode: horizontal-tb;
+    font-size: 13px;
+    font-weight: 700;
+    min-width: 80px;
+    text-align: right;
+    padding-top: 14px;
+  }
+
+  /* Compiler row */
+  .compiler .stage-box {
+    background: #2a2a4a;
+    border-color: #5a5a8a;
+    color: #b0b0d0;
+  }
+  .compiler .stage-label { color: #7a7aa0; }
+  .compiler .arrow { color: #5a5a8a; }
+  .compiler .row-label { color: #8080b0; }
+
+  /* Serena row */
+  .serena .stage-box.active {
+    background: #1a3a2a;
+    border-color: #51cf66;
+    color: #69db7c;
+  }
+  .serena .stage-box.inactive {
+    background: #1a1a2e;
+    border-color: #333;
+    color: #444;
+  }
+  .serena .stage-label.active { color: #51cf66; }
+  .serena .stage-label.inactive { color: #444; }
+  .serena .arrow.active { color: #51cf66; }
+  .serena .arrow.inactive { color: #333; }
+  .serena .row-label { color: #51cf66; }
+
+  .serena .stage-box.output {
+    background: #1a2a3a;
+    border-color: #339af0;
+    color: #74c0fc;
+  }
+  .serena .stage-label.output { color: #339af0; }
+  .serena .arrow.output { color: #339af0; }
+
+  .title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #e6edf3;
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    font-size: 12px;
+    color: #6b7b8a;
+    margin-bottom: 16px;
+  }
+</style>
+</head>
+<body>
+  <div class="title">컴파일러 vs Serena</div>
+  <div class="subtitle">같은 기술, 다른 목적</div>
+
+  <!-- Compiler row -->
+  <div class="row-container compiler">
+    <div class="row-label">컴파일러</div>
+    <div class="pipeline">
+      <div class="stage">
+        <div class="stage-box">소스코드</div>
+        <div class="stage-label">개발자가 작성</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="stage">
+        <div class="stage-box">코드 분석</div>
+        <div class="stage-label">글자를 토큰으로</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="stage">
+        <div class="stage-box">구조 파악</div>
+        <div class="stage-label">AST 생성</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="stage">
+        <div class="stage-box">최적화</div>
+        <div class="stage-label">성능 개선</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="stage">
+        <div class="stage-box">실행 파일</div>
+        <div class="stage-label">기계어 변환</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Serena row -->
+  <div class="row-container serena">
+    <div class="row-label">Serena</div>
+    <div class="pipeline">
+      <div class="stage">
+        <div class="stage-box active">소스코드</div>
+        <div class="stage-label active">개발자가 작성</div>
+      </div>
+      <div class="arrow active">→</div>
+      <div class="stage">
+        <div class="stage-box active">코드 분석</div>
+        <div class="stage-label active">tree-sitter</div>
+      </div>
+      <div class="arrow active">→</div>
+      <div class="stage">
+        <div class="stage-box active">구조 파악</div>
+        <div class="stage-label active">AST 생성</div>
+      </div>
+      <div class="arrow output">→</div>
+      <div class="stage">
+        <div class="stage-box output">AI에 노출</div>
+        <div class="stage-label output">MCP 도구</div>
+      </div>
+      <div class="arrow inactive">→</div>
+      <div class="stage">
+        <div class="stage-box inactive">사용 안 함</div>
+        <div class="stage-label inactive">&nbsp;</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

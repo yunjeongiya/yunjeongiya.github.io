@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, 'Segoe UI', sans-serif;
+    background: #1a1a2e;
+    display: flex;
+    justify-content: center;
+    padding: 32px;
+  }
+  .container { width: 600px; }
+  .title { font-size: 16px; font-weight: 700; color: #e6edf3; text-align: center; margin-bottom: 6px; }
+  .subtitle { font-size: 12px; color: #6b7b8a; text-align: center; margin-bottom: 28px; }
+  .chart-row { display: flex; align-items: center; margin-bottom: 16px; gap: 12px; }
+  .chart-label { font-size: 13px; font-weight: 600; width: 130px; text-align: right; }
+  .bar-container { flex: 1; height: 36px; background: #0d1117; border-radius: 8px; overflow: hidden; position: relative; }
+  .bar { height: 100%; border-radius: 8px; display: flex; align-items: center; justify-content: flex-end; padding-right: 12px; font-size: 13px; font-weight: 700; }
+  .bar-value { position: absolute; right: 10px; font-size: 13px; font-weight: 600; top: 50%; transform: translateY(-50%); }
+  .row-bad .chart-label { color: #ff8787; }
+  .row-bad .bar { background: linear-gradient(90deg, #ff6b6b, #e03131); width: 100%; }
+  .row-bad .bar-value { color: #ff8787; }
+  .row-good .chart-label { color: #69db7c; }
+  .row-good .bar { background: linear-gradient(90deg, #51cf66, #2b8a3e); width: 2.5%; min-width: 60px; }
+  .row-good .bar-value { color: #69db7c; left: 75px; right: auto; }
+  .comparison { text-align: center; margin-top: 24px; padding: 16px; background: #16213e; border-radius: 10px; border: 1px solid #2a3a5c; }
+  .comparison .big { font-size: 32px; font-weight: 800; color: #ffd43b; }
+  .comparison .desc { font-size: 13px; color: #8899aa; margin-top: 4px; }
+  .scenario { display: flex; justify-content: center; gap: 32px; margin-top: 20px; }
+  .scenario-box { padding: 14px 20px; border-radius: 10px; text-align: center; flex: 1; max-width: 220px; }
+  .scenario-box.bad { background: #ff6b6b15; border: 1px solid #ff6b6b33; }
+  .scenario-box.good { background: #51cf6615; border: 1px solid #51cf6633; }
+  .scenario-box .num { font-size: 22px; font-weight: 800; }
+  .scenario-box.bad .num { color: #ff8787; }
+  .scenario-box.good .num { color: #69db7c; }
+  .scenario-box .label { font-size: 12px; color: #8899aa; margin-top: 4px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="title">Token Usage per File Read</div>
+  <div class="subtitle">Finding 1 method in a 500-line Java file</div>
+  <div class="chart-row row-bad">
+    <div class="chart-label">Default (read all)</div>
+    <div class="bar-container">
+      <div class="bar"></div>
+      <div class="bar-value">~2,000 tokens</div>
+    </div>
+  </div>
+  <div class="chart-row row-good">
+    <div class="chart-label">Serena</div>
+    <div class="bar-container">
+      <div class="bar"></div>
+      <div class="bar-value">~50</div>
+    </div>
+  </div>
+  <div class="comparison">
+    <div class="big">40x savings</div>
+    <div class="desc">Same information, 1/40th of the tokens</div>
+  </div>
+  <div class="scenario">
+    <div class="scenario-box bad">
+      <div class="num">40,000 tokens</div>
+      <div class="label">Default: 20 files<br>"Hit the limit after 3 runs"</div>
+    </div>
+    <div class="scenario-box good">
+      <div class="num">1,000 tokens</div>
+      <div class="label">Serena: same 20 files<br>"Code all day long"</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

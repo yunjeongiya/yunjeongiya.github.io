@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, 'Segoe UI', sans-serif;
+    background: #1a1a2e;
+    display: flex;
+    justify-content: center;
+    padding: 32px;
+  }
+  .container {
+    width: 720px;
+    display: flex;
+    gap: 32px;
+  }
+  .panel {
+    flex: 1;
+    background: #16213e;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #2a3a5c;
+  }
+  .panel-title {
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid;
+  }
+  .panel.bad .panel-title { color: #ff6b6b; border-color: #ff6b6b33; }
+  .panel.good .panel-title { color: #51cf66; border-color: #51cf6633; }
+  .file-header {
+    font-size: 12px;
+    color: #8899aa;
+    margin-bottom: 8px;
+    font-family: monospace;
+  }
+  .code-block {
+    background: #0d1117;
+    border-radius: 8px;
+    padding: 12px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.8;
+  }
+  .line {
+    display: flex;
+    align-items: center;
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+  .line-num {
+    color: #484f58;
+    width: 28px;
+    text-align: right;
+    margin-right: 12px;
+    user-select: none;
+  }
+  .line-content { color: #8b949e; }
+  .panel.bad .line { background: #ff6b6b15; }
+  .panel.bad .line .line-content { color: #c9d1d9; }
+  .panel.good .line.dim { background: transparent; }
+  .panel.good .line.dim .line-content { color: #484f58; }
+  .panel.good .line.dim .line-num { color: #333; }
+  .panel.good .line.target { background: #51cf6620; }
+  .panel.good .line.target .line-content { color: #e6edf3; }
+  .result-box {
+    margin-top: 14px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    text-align: center;
+    font-weight: 600;
+  }
+  .panel.bad .result-box { background: #ff6b6b18; color: #ff8787; border: 1px solid #ff6b6b33; }
+  .panel.good .result-box { background: #51cf6618; color: #69db7c; border: 1px solid #51cf6633; }
+  .token-num { font-size: 20px; }
+  .label { font-size: 11px; color: #6b7b8a; margin-top: 2px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="panel bad">
+    <div class="panel-title">Default (Read entire file)</div>
+    <div class="file-header">TaskService.java (500 lines)</div>
+    <div class="code-block">
+      <div class="line"><span class="line-num">1</span><span class="line-content">package com.app.service;</span></div>
+      <div class="line"><span class="line-num">2</span><span class="line-content">import java.util.List;</span></div>
+      <div class="line"><span class="line-num">3</span><span class="line-content">import com.app.model.*;</span></div>
+      <div class="line"><span class="line-num">4</span><span class="line-content">&nbsp;</span></div>
+      <div class="line"><span class="line-num">5</span><span class="line-content">public class TaskService {</span></div>
+      <div class="line"><span class="line-num">6</span><span class="line-content">  private final TaskRepo repo;</span></div>
+      <div class="line"><span class="line-num">...</span><span class="line-content" style="color:#555;">  // 200 lines of other methods</span></div>
+      <div class="line"><span class="line-num">210</span><span class="line-content">  public void save(Task t) {</span></div>
+      <div class="line"><span class="line-num">211</span><span class="line-content">    validate(t);</span></div>
+      <div class="line"><span class="line-num">212</span><span class="line-content">    repo.save(t);</span></div>
+      <div class="line"><span class="line-num">213</span><span class="line-content">  }</span></div>
+      <div class="line"><span class="line-num">...</span><span class="line-content" style="color:#555;">  // 287 lines of other methods</span></div>
+      <div class="line"><span class="line-num">500</span><span class="line-content">}</span></div>
+    </div>
+    <div class="result-box">
+      <div class="token-num">~2,000 tokens used</div>
+      <div class="label">All 500 lines read</div>
+    </div>
+  </div>
+  <div class="panel good">
+    <div class="panel-title">Serena (Symbol search)</div>
+    <div class="file-header">TaskService.java → save method only</div>
+    <div class="code-block">
+      <div class="line dim"><span class="line-num">1</span><span class="line-content">package com.app.service;</span></div>
+      <div class="line dim"><span class="line-num">2</span><span class="line-content">import java.util.List;</span></div>
+      <div class="line dim"><span class="line-num">3</span><span class="line-content">import com.app.model.*;</span></div>
+      <div class="line dim"><span class="line-num">4</span><span class="line-content">&nbsp;</span></div>
+      <div class="line dim"><span class="line-num">5</span><span class="line-content">public class TaskService {</span></div>
+      <div class="line dim"><span class="line-num">6</span><span class="line-content">  private final TaskRepo repo;</span></div>
+      <div class="line dim"><span class="line-num">...</span><span class="line-content">  .................</span></div>
+      <div class="line target"><span class="line-num">210</span><span class="line-content">  public void save(Task t) {</span></div>
+      <div class="line target"><span class="line-num">211</span><span class="line-content">    validate(t);</span></div>
+      <div class="line target"><span class="line-num">212</span><span class="line-content">    repo.save(t);</span></div>
+      <div class="line target"><span class="line-num">213</span><span class="line-content">  }</span></div>
+      <div class="line dim"><span class="line-num">...</span><span class="line-content">  .................</span></div>
+      <div class="line dim"><span class="line-num">500</span><span class="line-content">}</span></div>
+    </div>
+    <div class="result-box">
+      <div class="token-num">~50 tokens used</div>
+      <div class="label">Only 4 lines read</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
