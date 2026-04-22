@@ -162,6 +162,8 @@ Reading as AST:   Chapter 3 > Section 3.2 > Morning run story  (the table of con
 
 <p><strong>40x difference.</strong> A single task might involve reading 10, 20 files like this. Reading 20 files the standard way burns 40,000 tokens; with Serena, you need about 1,000. That gap is the difference between "runs out after 3 turns" and "works all day."</p>
 
+<p>Community-reported token savings range from <strong>50% to 90%</strong>. A lightweight fork called <a href="https://github.com/mcpslim/serena-slim">serena-slim</a> goes further by compressing Serena's own tool descriptions, achieving an additional 50.3% reduction. That said, these numbers are mostly anecdotal — no controlled A/B test has been published yet.</p>
+
 <h3>2. Precise Reference Tracking</h3>
 
 <p>When you want to find every caller of a method:</p>
@@ -226,6 +228,10 @@ Serena:       "TaskService.save" → returns only the exact callers of that spec
 <li><strong>Text search and structural search are in completely different leagues.</strong> I used to think grep was good enough. It isn't, not when you care about token efficiency and accuracy.</li>
 <li><strong>Knowing the internals makes debugging possible.</strong> "Serena isn't working" → uvx → uv → code signing → Smart App Control. Without understanding the internals, "reinstall" is the only option you have.</li>
 </ol>
+
+<h2>Coming Up Next</h2>
+
+<p>The "50-90% savings" numbers floating around the community are based on feel, not data. So I'm planning to <strong>run an actual experiment</strong> — the same task with Serena ON vs. OFF, measuring real token consumption in a controlled A/B test. I'll share the results in a follow-up post.</p>
 
 <h2>References</h2>
 

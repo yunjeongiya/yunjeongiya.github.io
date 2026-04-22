@@ -227,6 +227,10 @@ Even installing via winget doesn't help — the binary itself is unsigned, so it
 
 3. **Knowing the internals makes debugging possible.** "Serena isn't working" → uvx → uv → code signing → Smart App Control. Without understanding the internals, "reinstall it" is the only move you've got.
 
+## Coming Up Next
+
+The "50-90% savings" numbers floating around the community are based on feel, not data. So I'm planning to **run an actual experiment** — the same task with Serena ON vs. OFF, measuring real token consumption in a controlled A/B test. I'll share the results in a follow-up post.
+
 ## References
 
 - [Serena GitHub (oraios/serena)](https://github.com/oraios/serena)
