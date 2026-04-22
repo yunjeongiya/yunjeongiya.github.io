@@ -150,10 +150,7 @@ Search for "save" as text and you get all three — but each one is **a differen
 
 When you only want the `save` method from a 500-line Java file:
 
-| Approach | What it does | Tokens used |
-|---|---|---|
-| Standard (read whole file) | Reads all 500 lines | ~2,000 |
-| Serena (symbol lookup) | Reads just the 5-line method | ~50 |
+![Token usage comparison table](/assets/images/posts/059-serena-compiler/table-token-comparison-en.png)
 
 ![Standard vs. Serena — file reading comparison](/assets/images/posts/059-serena-compiler/diagram-grep-vs-serena-en.png)
 

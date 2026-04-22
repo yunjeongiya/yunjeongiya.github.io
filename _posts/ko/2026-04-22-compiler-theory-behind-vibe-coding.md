@@ -150,10 +150,7 @@ class Service {
 
 500줄짜리 Java 파일에서 `save` 메서드 하나만 보고 싶을 때:
 
-| 방법 | 하는 일 | 토큰 소모 |
-|---|---|---|
-| 일반 (파일 전체 읽기) | 500줄 전부 읽음 | ~2,000 |
-| Serena (심볼 검색) | 해당 메서드 5줄만 읽음 | ~50 |
+![토큰 소모 비교 표](/assets/images/posts/059-serena-compiler/table-token-comparison.png)
 
 ![일반 vs Serena — 파일 읽기 비교](/assets/images/posts/059-serena-compiler/diagram-grep-vs-serena.png)
 

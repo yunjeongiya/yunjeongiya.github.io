@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Malgun Gothic', -apple-system, sans-serif;
+    background: #fff;
+    display: flex;
+    justify-content: center;
+    padding: 16px;
+  }
+  table {
+    border-collapse: collapse;
+    font-size: 15px;
+    min-width: 460px;
+  }
+  th {
+    background: #f6f8fa;
+    font-weight: 700;
+    color: #24292f;
+    padding: 12px 20px;
+    border: 1px solid #d0d7de;
+    text-align: left;
+  }
+  td {
+    padding: 12px 20px;
+    border: 1px solid #d0d7de;
+    color: #1f2328;
+  }
+  tr:nth-child(1) td:last-child { color: #cf222e; font-weight: 700; }
+  tr:nth-child(2) td:last-child { color: #1a7f37; font-weight: 700; }
+</style>
+</head>
+<body>
+<table>
+  <thead>
+    <tr><th>방법</th><th>하는 일</th><th>토큰 소모</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>일반 (파일 전체 읽기)</td><td>500줄 전부 읽음</td><td>~2,000</td></tr>
+    <tr><td>Serena (심볼 검색)</td><td>해당 메서드 5줄만 읽음</td><td>~50</td></tr>
+  </tbody>
+</table>
+</body>
+</html>
