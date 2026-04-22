@@ -1,152 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html><head>
+<meta charset="utf-8">
 <title>How Serena Saves 40x on Tokens — The Compiler Theory Behind Your Vibe Coding</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Georgia, 'Times New Roman', serif;
-    background: #fff;
-    color: #292929;
-    line-height: 1.8;
-  }
-  .article {
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 40px 20px 80px;
-  }
-  h1 {
-    font-size: 32px;
-    font-weight: 800;
-    line-height: 1.3;
-    margin-bottom: 16px;
-    letter-spacing: -0.5px;
-  }
-  .meta {
-    font-size: 14px;
-    color: #757575;
-    margin-bottom: 32px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #eee;
-  }
-  h2 {
-    font-size: 24px;
-    font-weight: 700;
-    margin-top: 48px;
-    margin-bottom: 16px;
-    letter-spacing: -0.3px;
-  }
-  h3 {
-    font-size: 20px;
-    font-weight: 700;
-    margin-top: 36px;
-    margin-bottom: 12px;
-  }
-  p {
-    font-size: 18px;
-    margin-bottom: 16px;
-    color: #292929;
-  }
+  body { max-width: 680px; margin: 40px auto; font-family: Georgia, serif; font-size: 18px; line-height: 1.7; color: #333; padding: 0 20px; }
+  h1 { font-size: 32px; line-height: 1.3; }
+  h2 { font-size: 24px; margin-top: 40px; }
+  h3 { font-size: 20px; margin-top: 30px; }
+  img { max-width: 100%; margin: 20px 0; }
+  pre { background: #f6f8fa; padding: 16px; overflow-x: auto; font-size: 14px; line-height: 1.5; border-radius: 6px; }
+  code { background: #f6f8fa; padding: 2px 6px; font-size: 15px; border-radius: 3px; }
+  blockquote { border-left: 3px solid #ccc; margin-left: 0; padding-left: 20px; color: #555; }
   strong { font-weight: 700; }
-  img {
-    width: 100%;
-    border-radius: 8px;
-    margin: 24px 0;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-  }
-  .chat-img {
-    max-width: 380px;
-    margin: 24px auto;
-    display: block;
-  }
-  pre {
-    background: #1e1e1e;
-    color: #d4d4d4;
-    border-radius: 6px;
-    padding: 16px 20px;
-    overflow-x: auto;
-    margin: 16px 0;
-    font-size: 14px;
-    line-height: 1.6;
-  }
-  code {
-    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-    font-size: 15px;
-  }
-  pre code {
-    font-size: 14px;
-    color: #d4d4d4;
-  }
-  p code {
-    background: #f0f0f0;
-    color: #292929;
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-size: 16px;
-  }
-  ul, ol {
-    margin: 12px 0 16px 24px;
-    font-size: 18px;
-  }
-  li { margin-bottom: 6px; }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 16px 0;
-    font-size: 16px;
-  }
-  th, td {
-    border: 1px solid #e0e0e0;
-    padding: 10px 14px;
-    text-align: left;
-  }
-  th {
-    background: #f6f8fa;
-    font-weight: 700;
-  }
-  blockquote {
-    border-left: 3px solid #292929;
-    padding-left: 20px;
-    margin: 20px 0;
-    color: #555;
-    font-style: italic;
-  }
-  .separator {
-    text-align: center;
-    margin: 40px 0;
-    color: #ccc;
-    font-size: 24px;
-    letter-spacing: 8px;
-  }
-  a { color: #1a8917; text-decoration: none; }
-  a:hover { text-decoration: underline; }
-  .tags {
-    margin-top: 40px;
-    padding-top: 20px;
-    border-top: 1px solid #eee;
-  }
-  .tag {
-    display: inline-block;
-    background: #f0f0f0;
-    color: #555;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 13px;
-    margin: 4px 4px 4px 0;
-  }
+  hr { border: none; border-top: 1px solid #ddd; margin: 40px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+  th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: center; }
+  th { background: #f6f8fa; }
 </style>
-</head>
-<body>
-<article class="article">
+</head><body>
 
 <h1>How Serena Saves 40x on Tokens — The Compiler Theory Behind Your Vibe Coding</h1>
-<div class="meta">April 22, 2026</div>
 
-<h2>Introduction</h2>
+<p><em>This post is also available on <a href="https://yunjeongiya.github.io/posts/059-en/">my blog</a>. (<a href="https://yunjeongiya.github.io/posts/059/">한국어 버전은 여기</a>)</em></p>
 
-<img class="chat-img" src="../assets/images/posts/059-serena-compiler/chat-en.png" alt="Recommending Serena to a friend whose tokens were burning out too fast">
+<img src="https://yunjeongiya.github.io/assets/images/posts/059-serena-compiler/chat-en.png" alt="Recommending Serena to a friend whose tokens were burning out too fast">
 
 <p>When you ask an AI "find every place this method is called," what's actually happening under the hood?</p>
 
@@ -164,11 +41,11 @@
 
 <h3>The Limits of Text Search</h3>
 
-<p>Imagine searching a library for every book that mentions the word "run." The Ctrl+F approach means <strong>flipping through every page of every book looking for those three letters</strong>. You'd end up with hits like:</p>
+<p>Imagine searching a library for every book that uses the word "run." The Ctrl+F approach means <strong>flipping through every page of every book looking for those three letters</strong>. You'd end up with hits like:</p>
 
 <ul>
 <li>"run the server" (what you wanted)</li>
-<li>"running shoes review" (not quite...)</li>
+<li>"morning run" (not quite...)</li>
 <li>"runtime error" (also not what you meant)</li>
 </ul>
 
@@ -200,11 +77,11 @@
 
 <p>Let's go back to the library analogy.</p>
 
-<img src="../assets/images/posts/059-serena-compiler/library-analogy.png" alt="Text search vs structural search — flipping every page vs reading the table of contents">
+<img src="https://yunjeongiya.github.io/assets/images/posts/059-serena-compiler/library-analogy.png" alt="Text search vs structural search — flipping every page vs reading the table of contents">
 
 <p>Text search (grep) is <strong>flipping through every page of every book</strong>. Serena, on the other hand, is <strong>looking at the table of contents and the index</strong>.</p>
 
-<p>If you ask a librarian "find me something about apples," a good librarian doesn't start reading every book from page one. They check the table of contents, find "Chapter 3: Fruits → 3.2 Apples," and open directly to that page. That's what Serena does.</p>
+<p>If you ask a librarian "find me something about running," a good librarian doesn't start reading every book from page one. They check the table of contents, find "Chapter 3: Exercise → 3.2 Running," and open directly to that page. That's what Serena does.</p>
 
 <p>The technology that makes this possible is <strong>AST (Abstract Syntax Tree)</strong> and <strong>tree-sitter</strong>.</p>
 
@@ -214,7 +91,7 @@
 
 <p>Take this code:</p>
 
-<pre><code class="language-java">public void save(Task task) {
+<pre><code>public void save(Task task) {
     repository.save(task);
 }</code></pre>
 
@@ -231,8 +108,8 @@
 
 <p>In book terms:</p>
 
-<pre><code>Reading as text:  "It was a sunny day so I went hiking..."  (have to read everything to know what it's about)
-Reading as AST:   Chapter 3 > Section 3.2 > Hiking story   (the table of contents tells you exactly where things are)</code></pre>
+<pre><code>Reading as text:  "It was a sunny day so I went for a run..."  (have to read everything to know what it's about)
+Reading as AST:   Chapter 3 > Section 3.2 > Morning run story  (the table of contents tells you exactly where things are)</code></pre>
 
 <p>With this "table of contents," you can jump directly to the method you want <strong>without reading the entire file</strong>. That's where the token savings come from.</p>
 
@@ -254,7 +131,7 @@ Reading as AST:   Chapter 3 > Section 3.2 > Hiking story   (the table of content
 
 <p>"Can't you just do a really good Ctrl+F?" Code has <strong>nested structure</strong>. Classes contain methods, methods contain if-statements, if-statements contain more method calls.</p>
 
-<pre><code class="language-java">class Service {
+<pre><code>class Service {
     void process() {
         if (condition) {
             helper.save(data);  // ← this save belongs to helper
@@ -279,9 +156,9 @@ Reading as AST:   Chapter 3 > Section 3.2 > Hiking story   (the table of content
 <tr><td>Serena (symbol search)</td><td>Reads just those 5 lines</td><td>~50</td></tr>
 </table>
 
-<img src="../assets/images/posts/059-serena-compiler/diagram-grep-vs-serena-en.png" alt="Standard vs Serena — file reading comparison">
+<img src="https://yunjeongiya.github.io/assets/images/posts/059-serena-compiler/diagram-grep-vs-serena-en.png" alt="Standard vs Serena — file reading comparison">
 
-<img src="../assets/images/posts/059-serena-compiler/diagram-tokens-en.png" alt="Token consumption comparison">
+<img src="https://yunjeongiya.github.io/assets/images/posts/059-serena-compiler/diagram-tokens-en.png" alt="Token consumption comparison">
 
 <p><strong>40x difference.</strong> A single task might involve reading 10, 20 files like this. Reading 20 files the standard way burns 40,000 tokens; with Serena, you need about 1,000. That gap is the difference between "runs out after 3 turns" and "works all day."</p>
 
@@ -316,7 +193,7 @@ Serena:       "TaskService.save" → returns only the exact callers of that spec
 
 <p>Serena borrows only <strong>steps 1 and 2</strong>. It analyzes the code and builds the structural understanding, then exposes that as tools the AI can query. It doesn't compile anything, but <strong>it understands code the same way a compiler does.</strong></p>
 
-<img src="../assets/images/posts/059-serena-compiler/diagram-pipeline-en.png" alt="Compiler vs Serena — same technology, different purpose">
+<img src="https://yunjeongiya.github.io/assets/images/posts/059-serena-compiler/diagram-pipeline-en.png" alt="Compiler vs Serena — same technology, different purpose">
 
 <p>This is exactly what you study in university CS courses on "Compilers" and "Formal Languages." When you're vibe coding, you don't think about any of this — but this theory is running in the background the whole time.</p>
 
@@ -344,25 +221,14 @@ Serena:       "TaskService.save" → returns only the exact callers of that spec
 
 <h2>What I Learned</h2>
 
-<p><strong>1. Vibe coding tools are built on CS fundamentals.</strong> AST, parsers, formal language theory — these aren't "useless theory." They're the core of tools you use every day.</p>
-
-<p><strong>2. Text search and structural search are in completely different leagues.</strong> I used to think grep was good enough. It isn't, not when you care about token efficiency and accuracy.</p>
-
-<p><strong>3. Knowing the internals makes debugging possible.</strong> "Serena isn't working" → uvx → uv → code signing → Smart App Control. Without understanding the internals, "reinstall" is the only option you have.</p>
-
-<div class="separator">...</div>
-
-<div class="tags">
-<span class="tag">Serena</span>
-<span class="tag">MCP</span>
-<span class="tag">tree-sitter</span>
-<span class="tag">AST</span>
-<span class="tag">Compiler Theory</span>
-<span class="tag">Vibe Coding</span>
-<span class="tag">Claude Code</span>
-</div>
+<ol>
+<li><strong>Vibe coding tools are built on CS fundamentals.</strong> AST, parsers, formal language theory — these aren't "useless theory." They're the core of tools you use every day.</li>
+<li><strong>Text search and structural search are in completely different leagues.</strong> I used to think grep was good enough. It isn't, not when you care about token efficiency and accuracy.</li>
+<li><strong>Knowing the internals makes debugging possible.</strong> "Serena isn't working" → uvx → uv → code signing → Smart App Control. Without understanding the internals, "reinstall" is the only option you have.</li>
+</ol>
 
 <h2>References</h2>
+
 <ul>
 <li><a href="https://github.com/oraios/serena">Serena GitHub (oraios/serena)</a></li>
 <li><a href="https://tree-sitter.github.io/tree-sitter/">tree-sitter official site</a></li>
@@ -370,6 +236,4 @@ Serena:       "TaskService.save" → returns only the exact callers of that spec
 <li><a href="https://support.microsoft.com/en-us/windows/smart-app-control-frequently-asked-questions-285ea03d-fa88-4d56-882e-6698afdb7003">Smart App Control FAQ (Microsoft)</a></li>
 </ul>
 
-</article>
-</body>
-</html>
+</body></html>
