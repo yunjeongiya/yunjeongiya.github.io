@@ -1,0 +1,162 @@
+﻿<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<title>If You Typed the Same Sentence 60 Times, That's a Skill — Mining 1.5GB of Chat Logs for AI Code Review Anchoring Bias and /reinspect</title>
+<style>
+  html { background: #fff; }
+  body { max-width: 680px; margin: 40px auto; font-family: Georgia, serif; font-size: 18px; line-height: 1.7; color: #333; background: #fff; padding: 0 20px; }
+  h1 { font-size: 32px; line-height: 1.3; }
+  h2 { font-size: 24px; margin-top: 40px; }
+  h3 { font-size: 20px; margin-top: 30px; }
+  img { max-width: 100%; margin: 20px 0; }
+  pre { background: #f6f8fa; padding: 16px; overflow-x: auto; font-size: 14px; line-height: 1.5; border-radius: 6px; }
+  code { background: #f6f8fa; padding: 2px 6px; font-size: 15px; border-radius: 3px; }
+  pre code { background: transparent; padding: 0; }
+  blockquote { border-left: 3px solid #ccc; margin-left: 0; padding-left: 20px; color: #555; }
+  strong { font-weight: 700; }
+  hr { border: none; border-top: 1px solid #ddd; margin: 40px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+  th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: center; }
+  th { background: #f6f8fa; }
+</style>
+</head><body>
+
+<h1>If You Typed the Same Sentence 60 Times, That's a Skill — Mining 1.5GB of Chat Logs for AI Code Review Anchoring Bias and /reinspect</h1>
+
+<p><em>This post is also available on <a href="https://yunjeongiya.github.io/posts/071-en/">my blog</a>. (<a href="https://yunjeongiya.github.io/posts/071/">한국어 버전은 여기</a>)</em></p>
+
+<p><img alt="Typed 60 Times Became a Skill" src="../assets/images/posts/071-reinspect-anchoring-bias/thumbnail-en.png" /></p>
+<h2>Introduction</h2>
+<p>I use a Claude Code skill called <code>/inspect</code> for code reviews. It runs a structured 4-pass review: correctness, convention, security, and completeness. It works well.</p>
+<p>Then one day I noticed something odd. Almost every time <code>/inspect</code> finished, I typed one more natural-language instruction:</p>
+<blockquote>
+<p>inspect once more with a fresh eye</p>
+</blockquote>
+<p>I had typed this more than 60 times. Even though I already had a skill. Why?</p>
+<p>This post covers two things:</p>
+<ol>
+<li>How I mined 1.5GB of Claude Code chat logs with grep and Python to find an implicit skill</li>
+<li>The <code>/reinspect</code> skill that came out of it, and the anchoring bias problem in AI code review</li>
+</ol>
+<h2>Background — The Signal of an Implicit Skill</h2>
+<p><code>/inspect</code> was designed for the first pass. It runs a structured 4-pass review. It does its job.</p>
+<p>But after it finishes, I keep typing "look at it one more time with fresh eyes." That is strange. If I already have the skill, why not just run the same skill again?</p>
+<p>Hypothesis: when I run the same skill in the same context, I get the <strong>same conclusion</strong>. So I had been using natural language, "fresh eye," to push the AI into a different mode of reading.</p>
+<p>The question: does that actually change the behavior? Or does it just feel better?</p>
+<h2>The Process</h2>
+<h3>1. Mining the Chat Logs</h3>
+<p>Claude Code stores conversations as JSONL under <code>~/.claude/projects/&lt;project-path&gt;/</code>. The CheckUS project had 1.5GB of logs across 630 files.</p>
+<p>Reading all of that into context would be a token bomb. So I used grep and Python to extract only user messages:</p>
+<pre><code class="language-python">import json
+from pathlib import Path
+
+base = Path(&quot;~/.claude/projects/C--dev-checkus&quot;).expanduser()
+results = []
+
+for jf in base.glob(&quot;*.jsonl&quot;):
+    with open(jf, encoding='utf-8') as f:
+        for ln, line in enumerate(f, 1):
+            if 'fresh eye' not in line.lower():
+                continue
+            obj = json.loads(line)
+            if obj.get('type') != 'user':
+                continue
+            content = obj.get('message', {}).get('content', '')
+            if isinstance(content, list):
+                text = '\n'.join(
+                    p.get('text', '') for p in content
+                    if isinstance(p, dict) and p.get('type') == 'text'
+                )
+            else:
+                text = str(content)
+            # Only short user inputs. Long ones are usually transcript replays.
+            if 'fresh eye' not in text.lower() or len(text) &gt; 2000:
+                continue
+            results.append((jf.stem[:8], ln, text[:200]))
+
+print(f&quot;Total: {len(results)}&quot;)
+</code></pre>
+<p>Result: <strong>60+ occurrences</strong> across 73 sessions over two months.</p>
+<h3>2. Verifying the Behavior — Was It Actually Different?</h3>
+<p>Typing the phrase 60 times was one signal. The important question was whether Claude actually behaved differently.</p>
+<p>I found sessions where I ran both <code>/inspect</code> and a "fresh eye" follow-up, then compared the response patterns.</p>
+<table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Frequency</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fresh re-read</td>
+<td>~40%</td>
+<td>Declares "fresh review from scratch" and rereads the full <code>git diff</code></td>
+</tr>
+<tr>
+<td>Subagent second opinion</td>
+<td>~30%</td>
+<td>Dispatches a <code>code-reviewer</code> subagent and returns a severity table</td>
+</tr>
+<tr>
+<td><code>/inspect</code> rerun</td>
+<td>~30%</td>
+<td>Just runs the same skill again, with little value</td>
+</tr>
+</tbody>
+</table>
+<p>In about 70% of cases, it really did behave differently. The best results came from the subagent dispatch pattern because it used a separate context.</p>
+<h3>3. Hypothesis: AI Also Gets Anchored</h3>
+<p>Why is rerunning <code>/inspect</code> in the same context weak?</p>
+<p>Hypothesis: once the first pass conclusion is in the context, the second pass becomes biased toward <strong>validating that conclusion</strong>. This is similar to anchoring bias in humans: the first piece of information becomes the reference point for later judgment.</p>
+<p>Evidence: in about 30% of cases, rerunning <code>/inspect</code> produced almost the same conclusion. Very few new findings.</p>
+<p>Solution: use an <strong>independent context</strong>. Claude Code subagents do not inherit the parent session's full context. Separate context means no anchor.</p>
+<p><img alt="Same-context rerun versus independent second-pass review" src="../assets/images/posts/071-reinspect-anchoring-bias/diagram-anchoring-en.png" /></p>
+<h3>4. Writing the Skill</h3>
+<p>The skill lives at <code>.claude/skills/reinspect/SKILL.md</code>. The most important part is the description:</p>
+<pre><code class="language-yaml">---
+name: reinspect
+description: Second-opinion pass for code review. Must trigger when the user says &quot;fresh eye&quot;, &quot;look one more time&quot;, &quot;inspect once more&quot;, or similar. Do not rerun /inspect — the same context will hit the same anchor and return the same conclusion. Always spawn an independent code-reviewer subagent that actively challenges the previous review.
+---
+</code></pre>
+<p>I also added an explicit anti-pattern section. The failure mode in 30% of cases was exactly "just run the same skill again":</p>
+<pre><code class="language-markdown">### Anti-pattern: rerunning /inspect
+- /reinspect was invoked, but /inspect is invoked again (X)
+- rereading git diff inline without spawning a subagent (X)
+- listing the first review findings and confirming them without challenge (X)
+</code></pre>
+<p>The key instruction passed to the subagent is "challenge":</p>
+<pre><code class="language-text">Previous review conclusion:
+{findings reported by /inspect}
+
+Your job:
+1. Read the full contents of the changed files. Do not rely only on git diff; diff context strengthens the anchor.
+2. Challenge the previous review's conclusion.
+   - Was any finding interpreted incorrectly? (overturned)
+   - Did the first pass miss anything because it was anchored? (newly found)
+</code></pre>
+<h2>Result</h2>
+<p>Before: I typed the natural-language instruction 60 times, and it produced the intended behavior about 70% of the time.</p>
+<p>After: <code>/reinspect</code> and natural-language triggers both route into one consistent behavior.</p>
+<p>The key was explicitly saying "do not rerun /inspect" in the skill description. Sometimes "do this" is weaker than "do not do that," especially when two similar tools exist.</p>
+<h2>Lessons Learned</h2>
+<h3>1. Repeated Natural Language Is a Signal for an Implicit Skill</h3>
+<p>If you keep typing the same phrase, that phrase is an unformalized workflow. Even if a skill already exists, the repetition means something is still missing. Find the missing piece, and it becomes a new skill.</p>
+<p>This applies to LLM workflows in general. If you keep giving the same natural-language instruction, there is probably a skill hiding there.</p>
+<h3>2. Validate the Hypothesis With Data</h3>
+<p>Do not answer "is this really different?" by intuition. Answer it with logs. Even a 1.5GB log directory is manageable with grep and a small Python script.</p>
+<p>I worried the investigation might cost more than it was worth, but the actual cost was around 10K tokens. The answer was worth much more than that.</p>
+<h3>3. AI Can Have Anchoring Bias Too</h3>
+<p>If you ask the same context to do the same task twice, it tends to see the same thing twice. If you need a genuinely different perspective, separate the context: subagent, separate session, or different model.</p>
+<p>The same is true for human code review. If the same person reviews their own PR twice, they often see the same thing. A different person sees different things.</p>
+<h3>4. Naming Anti-Patterns Helps</h3>
+<p>If a skill description only says "do this," the model may drift into a nearby tool. Adding "do not do this" makes the trigger sharper. This matters especially when similar tools coexist, like <code>/inspect</code> and <code>/reinspect</code>.</p>
+<h2>References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Anchoring_effect">Anchoring effect — Wikipedia</a></li>
+<li><a href="https://docs.claude.com/claude-code">Claude Code subagent docs</a></li>
+</ul>
+
+</body>
+</html>

@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="360" viewBox="0 0 900 360" role="img" aria-labelledby="title desc">
+  <title id="title">1차 리뷰와 2차 fresh-eye 리뷰 결과 비교</title>
+  <desc id="desc">1차 리뷰에서 12개 finding을 처리한 뒤 2차 fresh-eye 리뷰에서 Critical 1개와 Important 4개가 추가 발견된 흐름</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#0d1117"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#38bdf8"/>
+    </marker>
+  </defs>
+  <rect width="900" height="360" rx="18" fill="url(#bg)"/>
+  <text x="450" y="42" text-anchor="middle" fill="#e5e7eb" font-family="D2Coding, Consolas, monospace" font-size="24" font-weight="700">
+    1차에서 끝난 줄 알았는데, 2차에서 더 나왔다
+  </text>
+  <text x="450" y="70" text-anchor="middle" fill="#94a3b8" font-family="D2Coding, Consolas, monospace" font-size="14">
+    같은 코드라도 질문이 달라지면 보는 영역이 달라진다
+  </text>
+
+  <rect x="58" y="112" width="210" height="150" rx="16" fill="#111827" stroke="#334155"/>
+  <text x="163" y="150" text-anchor="middle" fill="#93c5fd" font-family="D2Coding, Consolas, monospace" font-size="18" font-weight="700">1차 /inspect</text>
+  <text x="163" y="196" text-anchor="middle" fill="#e5e7eb" font-family="D2Coding, Consolas, monospace" font-size="48" font-weight="700">12</text>
+  <text x="163" y="226" text-anchor="middle" fill="#94a3b8" font-family="D2Coding, Consolas, monospace" font-size="15">findings 처리</text>
+
+  <path d="M278 188 L370 188" stroke="#38bdf8" stroke-width="4" marker-end="url(#arrow)"/>
+  <rect x="382" y="112" width="140" height="150" rx="16" fill="#101827" stroke="#334155"/>
+  <text x="452" y="174" text-anchor="middle" fill="#e5e7eb" font-family="D2Coding, Consolas, monospace" font-size="17" font-weight="700">모두</text>
+  <text x="452" y="205" text-anchor="middle" fill="#e5e7eb" font-family="D2Coding, Consolas, monospace" font-size="17" font-weight="700">수정</text>
+
+  <path d="M532 188 L624 188" stroke="#38bdf8" stroke-width="4" marker-end="url(#arrow)"/>
+  <rect x="636" y="112" width="210" height="150" rx="16" fill="#12251c" stroke="#22c55e"/>
+  <text x="741" y="150" text-anchor="middle" fill="#bbf7d0" font-family="D2Coding, Consolas, monospace" font-size="18" font-weight="700">2차 fresh-eye</text>
+  <text x="712" y="201" text-anchor="middle" fill="#f87171" font-family="D2Coding, Consolas, monospace" font-size="36" font-weight="700">Critical 1</text>
+  <text x="741" y="232" text-anchor="middle" fill="#86efac" font-family="D2Coding, Consolas, monospace" font-size="17">Important 4 추가</text>
+
+  <rect x="210" y="292" width="480" height="36" rx="18" fill="#0f172a" stroke="#334155"/>
+  <text x="450" y="316" text-anchor="middle" fill="#cbd5e1" font-family="D2Coding, Consolas, monospace" font-size="15">
+    권한 조건 · race window · timezone · N+1 · cache invalidation
+  </text>
+</svg>

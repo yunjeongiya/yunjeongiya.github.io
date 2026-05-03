@@ -1,0 +1,262 @@
+﻿<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<title>Fresh-eye 2차 /inspect: 같은 코드를 두 번 다른 시각으로 보면 어떤 버그가 나오는가</title>
+<style>
+  html { background: #fff; }
+  body { max-width: 680px; margin: 40px auto; font-family: Georgia, serif; font-size: 18px; line-height: 1.7; color: #333; background: #fff; padding: 0 20px; }
+  h1 { font-size: 32px; line-height: 1.3; }
+  h2 { font-size: 24px; margin-top: 40px; }
+  h3 { font-size: 20px; margin-top: 30px; }
+  img { max-width: 100%; margin: 20px 0; }
+  pre { background: #f6f8fa; padding: 16px; overflow-x: auto; font-size: 14px; line-height: 1.5; border-radius: 6px; }
+  code { background: #f6f8fa; padding: 2px 6px; font-size: 15px; border-radius: 3px; }
+  pre code { background: transparent; padding: 0; }
+  blockquote { border-left: 3px solid #ccc; margin-left: 0; padding-left: 20px; color: #555; }
+  strong { font-weight: 700; }
+  hr { border: none; border-top: 1px solid #ddd; margin: 40px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+  th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: center; }
+  th { background: #f6f8fa; }
+</style>
+</head><body>
+
+<h1>Fresh-eye 2차 /inspect: 같은 코드를 두 번 다른 시각으로 보면 어떤 버그가 나오는가</h1>
+
+<p><em>이 글은 <a href="https://yunjeongiya.github.io/posts/065/">블로그</a>에서도 읽을 수 있습니다. (<a href="https://yunjeongiya.github.io/posts/065-en/">English version here</a>)</em></p>
+
+<p><img alt="2차 fresh-eye 리뷰에서 5개 버그를 더 찾았다" src="../assets/images/posts/065-fresh-eye-second-inspect/thumbnail.png" /></p>
+<h2>도입</h2>
+<p>대규모 PR에 /inspect 코드 리뷰를 두 번 돌렸다.</p>
+<ul>
+<li><strong>1차</strong>: 12 findings 발견 → 모두 처리.</li>
+<li><strong>2차 fresh-eye</strong> (같은 PR, 같은 리뷰어 패턴, 다른 prompt): <strong>5건 추가 발견</strong> (Critical 1 + Important 4).</li>
+</ul>
+<p>이 글은 두 번째 검토 패스에서만 나온 버그들을 정리한다. AI pair-programming에서 "fresh perspective"의 가치를 정량적으로 보여주는 사례.</p>
+<h2>배경 — 왜 두 번 검토하는가</h2>
+<p>CheckUS의 TV 대시보드 시스템(18 모드, 5 vertical slice, 백엔드 60+ 클래스)을 만든 후 /inspect 1차로 12개 finding을 처리했다.</p>
+<p>이론상 1차로 충분해야 한다. AI 리뷰어가 4-pass 검토(Correctness / Conventions / Security / Completeness)를 다 거쳤다. 그런데도 2차를 돌린 이유:</p>
+<blockquote>
+<p>"Same code, fresh prompt, different perspective. 1차가 놓친 게 있는지."</p>
+</blockquote>
+<p>실제로 5건이 더 나왔다. 그 중 Critical 1건은 1차가 정반대로 해석한 사례.</p>
+<p><img alt="1차 리뷰와 2차 fresh-eye 리뷰 결과 비교" src="../assets/images/posts/065-fresh-eye-second-inspect/diagram-findings-ko.png" /></p>
+<h2>사례 1 — 1차가 정반대로 본 버그</h2>
+<p><strong>1차 보고</strong>: "TvContentController.update()의 글로벌 콘텐츠 게이트가 누락 — TEACHER가 글로벌 콘텐츠 만들 수 있음 (Important)."</p>
+<p><strong>1차 픽스</strong>: DEVELOPER 역할 검증 추가.</p>
+<pre><code class="language-java">// 1차 fix 후
+if (existing.campusId() == null
+    || (request.campusId() == null &amp;&amp; request.campusId() != existing.campusId())) {
+    requireDeveloper();
+} else {
+    validateAccess(existing.campusId());
+}
+</code></pre>
+<p><strong>2차 발견 (Critical)</strong>: 이 조건문은 정상 케이스를 차단한다.</p>
+<p><code>request.campusId() != existing.campusId()</code>은 Java에서 <code>Long != Long</code> reference equality다. unboxing이 일어나지 않는다. 그리고 <code>request.campusId() == null</code>이 true인 시점에서 <code>null != someNonNullLong</code>은 <strong>항상 true</strong>다.</p>
+<table>
+<thead>
+<tr>
+<th>existing.campusId</th>
+<th>request.campusId</th>
+<th>의도</th>
+<th>실제 동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>null (글로벌)</td>
+<td>어떤 값이든</td>
+<td>DEVELOPER만</td>
+<td>✅ requireDeveloper</td>
+</tr>
+<tr>
+<td>캠퍼스 X</td>
+<td>동일 X</td>
+<td>TEACHER가 자기 거 수정</td>
+<td>✅ validateAccess</td>
+</tr>
+<tr>
+<td>캠퍼스 X</td>
+<td>null (필드 누락 = 변경 의도 없음)</td>
+<td>TEACHER가 다른 필드만 수정</td>
+<td>❌ requireDeveloper 호출됨</td>
+</tr>
+<tr>
+<td>캠퍼스 X</td>
+<td>다른 캠퍼스 Y</td>
+<td>TEACHER가 캠퍼스 변경</td>
+<td>✅ DEVELOPER 게이트</td>
+</tr>
+</tbody>
+</table>
+<p>즉 partial update에서 <code>campusId</code>를 보내지 않는 정상 요청이 <strong>글로벌 콘텐츠 수정 시도처럼 오해되어 차단</strong>된다. 1차는 "권한 우회 가능"으로 봤지만, 2차는 "정상 케이스가 차단된다"는 정반대 결과를 발견.</p>
+<p>근본 원인은 Java record는 <code>null</code> 값과 "필드 없음"을 구분하지 못한다는 것. <code>UpdateTvContentRequest.campusId()</code>가 null이면 "변경 안 함"인지 "null로 변경"인지 모른다.</p>
+<p><strong>2차 픽스</strong>: service에서 campusId 변경 자체를 차단. 글로벌↔캠퍼스 변환은 삭제+재생성으로 강제.</p>
+<pre><code class="language-java">@Transactional
+public TvContentResponse update(Long contentId, UpdateTvContentRequest req) {
+    TvContent content = contentRepository.findById(contentId).orElseThrow(...);
+
+    // campusId 변경은 PUT에서 허용 안 함 — global ↔ campus 변경은 삭제+재생성으로.
+    if (req.category() != null) content.setCategory(req.category());
+    if (req.title() != null) content.setTitle(req.title());
+    // ... 다른 필드들
+}
+</code></pre>
+<p>Controller도 단순화. 기존 콘텐츠가 글로벌이면 DEVELOPER, 아니면 캠퍼스 접근권. 끝.</p>
+<h2>사례 2 — Race window: existsBySlug 통과 후 INSERT 사이</h2>
+<p><strong>1차 보고</strong>: 슬러그 충돌 시 SLUG_CONFLICT 에러 잘 던진다 (<code>existsBySlug</code> + <code>BusinessException</code>).</p>
+<p><strong>2차 발견</strong>: 동시 요청 race window. <code>existsBySlug</code> 통과 후 INSERT 사이에 다른 요청이 같은 slug로 INSERT하면 DB UK constraint(<code>uk_tv_profile_slug</code>)가 깨져 일반 500 (<code>DataIntegrityViolationException</code>)이 사용자에게 노출.</p>
+<p><strong>2차 픽스</strong>:</p>
+<pre><code class="language-java">@Transactional
+public TvProfileResponse create(Long campusId, CreateTvProfileRequest req) {
+    if (profileRepository.existsBySlug(req.slug())) {
+        throw ErrorCode.TV_PROFILE_SLUG_CONFLICT.toException();
+    }
+    TvProfile profile = ...;
+    try {
+        return profileRepository.save(profile);
+    } catch (DataIntegrityViolationException e) {
+        // existsBySlug 통과 후 INSERT 사이에 동시 요청이 같은 slug 사용
+        log.warn(&quot;TvProfile slug 충돌 (race window): slug={}&quot;, req.slug());
+        throw ErrorCode.TV_PROFILE_SLUG_CONFLICT.toException();
+    }
+}
+</code></pre>
+<p>명시적 catch + 같은 비즈니스 에러로 변환. UI에서 일관된 메시지 표시.</p>
+<h2>사례 3 — Timezone: 브라우저 local time에 의존</h2>
+<p><strong>1차 보고</strong>: D-day 계산이 12월 1~22일에 음수 표시 → 다음 해 advance 로직 추가.</p>
+<p><strong>1차 픽스</strong>:</p>
+<pre><code class="language-typescript">function nextThirdThursdayOfNovember(): Date {
+  const now = new Date();
+  let target = thirdThursdayOfNovemberForYear(now.getFullYear());
+  if (target.getTime() &lt; now.getTime()) {
+    target = thirdThursdayOfNovemberForYear(now.getFullYear() + 1);
+  }
+  return target;
+}
+
+function thirdThursdayOfNovemberForYear(year: number): Date {
+  return new Date(year, 10, day, 8, 40, 0);  // ← 브라우저 local time
+}
+</code></pre>
+<p><strong>2차 발견</strong>: <code>new Date(year, 10, ...)</code> 생성자는 <strong>브라우저 local timezone</strong> 기준. KST 환경에서는 정상이지만, kiosk 모드 헤드리스 브라우저(UTC) 또는 VPN 우회 환경에서는 시각이 9시간 어긋난다.</p>
+<p><strong>2차 픽스</strong>: timezone-explicit 처리.</p>
+<pre><code class="language-typescript">function thirdThursdayOfNovemberKst(year: number): Date {
+  // 날짜는 timezone 무관 → UTC로 weekday 계산
+  const nov1Utc = new Date(Date.UTC(year, 10, 1));
+  const dayOfWeek = nov1Utc.getUTCDay();
+  const offsetToFirstThu = (4 - dayOfWeek + 7) % 7;
+  const day = 1 + offsetToFirstThu + 14;
+  // KST 08:40 = UTC 23:40 prev day. Date.UTC가 hour=-1 overflow 처리.
+  return new Date(Date.UTC(year, 10, day, 8 - 9, 40, 0));
+}
+
+function currentKstYear(): number {
+  return Number(new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Seoul', year: 'numeric',
+  }).format(new Date()));
+}
+</code></pre>
+<p><code>Intl.DateTimeFormat(timeZone:'Asia/Seoul')</code>로 명시적 KST 추출. 어떤 브라우저 timezone에서도 정확.</p>
+<p>datetime-local input 변환도 같은 패턴. <code>new Date(localValue + ':00+09:00')</code>로 KST 명시.</p>
+<h2>사례 4 — N+1: 5초 polling이 매번 DB hit</h2>
+<p><strong>1차 보고</strong>: <code>tv-interrupt</code> 캐시 90초 TTL로 산출 캐싱 OK.</p>
+<p><strong>2차 발견</strong>: interrupt resolver는 캐싱돼 있지만, 그 호출자 <code>PublicTvProfileService.getInterrupt()</code>는 <strong>5초마다 <code>findBySlug()</code> DB hit</strong>. 캐싱 없음.</p>
+<pre><code>TV 1대 = 5초 polling → 하루 17,280회 profile lookup
+TV 10대 → 172,800회/일
+</code></pre>
+<p><strong>2차 픽스</strong>: slug → 메타(campusId, scheduleId, customMessages) 매핑을 1분 캐시.</p>
+<pre><code class="language-java">@Cacheable(value = &quot;tv-profile-slug-meta&quot;, key = &quot;#slug&quot;)
+public InterruptContext getInterruptContext(String slug) {
+    return profileRepository.findBySlug(slug)
+            .map(p -&gt; new InterruptContext(p.getCampusId(), p.getScheduleId(), p.getCustomMessages()))
+            .orElseThrow(...);
+}
+
+public Optional&lt;InterruptResponse&gt; getInterrupt(String slug) {
+    InterruptContext ctx = getInterruptContext(slug);  // 1분 캐시
+    long minuteBucket = System.currentTimeMillis() / 60_000L;
+    return interruptResolver.resolve(...);  // 90초 캐시
+}
+</code></pre>
+<p>2단 캐시(slug→meta 1분 + minuteBucket 90초)로 5초 polling이 대부분 캐시 hit.</p>
+<h2>사례 5 — Cache invalidation 누락</h2>
+<p><strong>1차 보고</strong>: 캐시 TTL 1분이라 stale도 운영상 OK.</p>
+<p><strong>2차 발견</strong>: admin이 프로필 메타 변경(slug, customMessages) 시 캐시 evict 없음. 1분 동안 stale slug → 캠퍼스 매핑이 살아있을 수 있다. 새 slug로 admin이 PR을 만들고 운영팀에 안내했는데, 1분 동안 다른 사용자는 옛 slug → null campus로 조회 실패.</p>
+<p><strong>2차 픽스</strong>: <code>@CacheEvict</code> annotation으로 메타 변경 시 일괄 evict.</p>
+<pre><code class="language-java">@Transactional
+@Caching(evict = {
+    @CacheEvict(value = &quot;tv-profile-slug&quot;, allEntries = true),
+    @CacheEvict(value = &quot;tv-profile-slug-campus&quot;, allEntries = true),
+    @CacheEvict(value = &quot;tv-profile-slug-meta&quot;, allEntries = true),
+    @CacheEvict(value = &quot;tv-interrupt&quot;, allEntries = true),
+    @CacheEvict(value = &quot;tv-battle&quot;, allEntries = true)
+})
+public TvProfileResponse update(Long campusId, Long profileId, UpdateTvProfileRequest req) { ... }
+</code></pre>
+<p><code>allEntries = true</code> — 캐시 size가 작아 (200개 max) 부하 부담 없음.</p>
+<h2>결과</h2>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>1차</th>
+<th>2차 (fresh-eye)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Findings</td>
+<td>12</td>
+<td>5</td>
+</tr>
+<tr>
+<td>Critical</td>
+<td>0 (false positive 1 포함)</td>
+<td>1 (정상 케이스 차단)</td>
+</tr>
+<tr>
+<td>Important</td>
+<td>4</td>
+<td>4</td>
+</tr>
+<tr>
+<td>Low</td>
+<td>8</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1차가 false positive로 본 항목</td>
+<td>(H4 — 이미 적용된 상태였음)</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1차가 정반대로 해석</td>
+<td>-</td>
+<td>1건 (사례 1)</td>
+</tr>
+</tbody>
+</table>
+<p>2차에서 발견된 5건 중 4건은 1차가 보지 않은 영역(N+1, race window, cache invalidation, timezone). 1건은 1차가 본 영역인데 정반대로 해석.</p>
+<h2>배운 점</h2>
+<p><strong>1. AI 리뷰어도 prompt 설계에 따라 보는 게 다르다.</strong>
+1차 prompt는 "spec 준수, 규약 준수, 보안" 중심. 2차 prompt는 "1차 fix가 새 버그 도입했는지 + 1차가 놓친 영역(end-to-end 흐름, 운영 시나리오)" 중심. 같은 4-pass 패턴이지만 prompt에 명시한 영역이 달라 다른 버그가 발견됨.</p>
+<p><strong>2. 정반대 영향을 발견할 가능성이 있다.</strong>
+같은 코드를 보더라도 1차가 "권한 우회"로 본 것을 2차가 "정상 차단됨"으로 본 케이스. 두 해석 모두 부분적으로 맞고, 종합하면 코드 자체가 잘못됨.</p>
+<p><strong>3. Critical 발견 1건만으로 2차 검토 비용 정당화.</strong>
+1차 fix 후 commit하고 끝냈다면 production에서 TEACHER가 본인 콘텐츠 수정이 안 되는 사용자 보고를 받았을 것. 2차 검토 비용(LLM 토큰 + 30분)이 그것보다 훨씬 작음.</p>
+<p><strong>4. Java record + null 의미론은 위험 패턴.</strong>
+<code>record</code>는 immutable하지만 "필드 없음" 표현이 없다. partial update API에서 null이 "변경 안 함"인지 "null로 변경"인지 구분 안 됨. clearXxx 플래그 패턴 또는 PUT semantics 명시화 필요.</p>
+<p><strong>5. 캐시 invalidation은 캐시 추가 시 같이 설계.</strong>
+1차에서는 캐시 추가만 했고 invalidation은 누락. 2차에서 evict 추가. 캐시 코드 작성 시 "이 데이터가 변경되는 시점은 어디인가?" 함께 답해야 함.</p>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.spring.io/spring-framework/reference/integration/cache/annotations.html#cache-annotations-evict">Spring <code>@CacheEvict</code> 가이드</a></li>
+<li><a href="https://blog.jooq.org/the-java-record-pattern-is-a-game-changer/">Java record + Optional 패턴 논의</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat">Intl.DateTimeFormat MDN</a></li>
+<li>관련 글: <a href="https://yunjeongiya.github.io/posts/071/">같은 문장을 60번 타이핑했다면, 그건 스킬이다</a> — 이 반복 요청이 <code>/reinspect</code> 스킬이 된 이야기</li>
+</ul>
+
+</body>
+</html>

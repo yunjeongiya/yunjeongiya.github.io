@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="430" viewBox="0 0 900 430" role="img" aria-labelledby="title desc">
+  <title id="title">The difference between rerunning /inspect and using /reinspect</title>
+  <desc id="desc">A comparison diagram showing how rerunning review in the same context can anchor on the first conclusion, while an independent subagent can challenge it.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#0d1117"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="bad" x1="0" x2="1">
+      <stop offset="0%" stop-color="#3a1f22"/>
+      <stop offset="100%" stop-color="#1f2937"/>
+    </linearGradient>
+    <linearGradient id="good" x1="0" x2="1">
+      <stop offset="0%" stop-color="#102a24"/>
+      <stop offset="100%" stop-color="#12263a"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <marker id="arrow-red" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#f97373"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#4ade80"/>
+    </marker>
+  </defs>
+
+  <rect width="900" height="430" rx="18" fill="url(#bg)"/>
+  <text x="450" y="42" text-anchor="middle" fill="#e5e7eb" font-family="D2Coding, Consolas, monospace" font-size="24" font-weight="700">
+    Why /reinspect, not another /inspect?
+  </text>
+  <text x="450" y="70" text-anchor="middle" fill="#94a3b8" font-family="D2Coding, Consolas, monospace" font-size="14">
+    When the first conclusion stays in context, the second review tends to validate it
+  </text>
+
+  <rect x="48" y="102" width="378" height="284" rx="16" fill="url(#bad)" stroke="#5b3035"/>
+  <rect x="474" y="102" width="378" height="284" rx="16" fill="url(#good)" stroke="#1f5f50"/>
+
+  <text x="237" y="136" text-anchor="middle" fill="#fecaca" font-family="D2Coding, Consolas, monospace" font-size="20" font-weight="700">
+    Same Context Rerun
+  </text>
+  <text x="663" y="136" text-anchor="middle" fill="#bbf7d0" font-family="D2Coding, Consolas, monospace" font-size="20" font-weight="700">
+    Independent Second Pass
+  </text>
+
+  <rect x="92" y="166" width="290" height="52" rx="10" fill="#111827" stroke="#475569"/>
+  <text x="237" y="198" text-anchor="middle" fill="#e5e7eb" font-family="D2Coding, Consolas, monospace" font-size="16">/inspect findings</text>
+
+  <path d="M237 220 C237 246, 237 246, 237 270" stroke="#f97373" stroke-width="3" fill="none" marker-end="url(#arrow-red)"/>
+  <rect x="92" y="270" width="290" height="52" rx="10" fill="#24171a" stroke="#f97373"/>
+  <text x="237" y="302" text-anchor="middle" fill="#fecaca" font-family="D2Coding, Consolas, monospace" font-size="16">first conclusion anchors</text>
+
+  <path d="M128 296 C72 292, 72 186, 130 184" stroke="#f97373" stroke-width="3" fill="none" marker-end="url(#arrow-red)" opacity="0.85"/>
+  <text x="237" y="354" text-anchor="middle" fill="#fca5a5" font-family="D2Coding, Consolas, monospace" font-size="15">few new findings · same result</text>
+
+  <rect x="518" y="166" width="290" height="52" rx="10" fill="#111827" stroke="#475569"/>
+  <text x="663" y="198" text-anchor="middle" fill="#e5e7eb" font-family="D2Coding, Consolas, monospace" font-size="16">/inspect findings</text>
+
+  <path d="M663 220 C663 246, 663 246, 663 270" stroke="#4ade80" stroke-width="3" fill="none" marker-end="url(#arrow-green)"/>
+  <rect x="518" y="270" width="290" height="52" rx="10" fill="#10251d" stroke="#4ade80" filter="url(#glow)"/>
+  <text x="663" y="292" text-anchor="middle" fill="#bbf7d0" font-family="D2Coding, Consolas, monospace" font-size="15">independent subagent</text>
+  <text x="663" y="314" text-anchor="middle" fill="#bbf7d0" font-family="D2Coding, Consolas, monospace" font-size="15">challenges the review</text>
+
+  <path d="M808 296 C848 296, 848 250, 812 238" stroke="#4ade80" stroke-width="3" fill="none" marker-end="url(#arrow-green)" opacity="0.9"/>
+  <text x="663" y="354" text-anchor="middle" fill="#86efac" font-family="D2Coding, Consolas, monospace" font-size="15">overturned · newly found</text>
+
+  <line x1="450" y1="108" x2="450" y2="384" stroke="#334155" stroke-dasharray="6 8"/>
+</svg>

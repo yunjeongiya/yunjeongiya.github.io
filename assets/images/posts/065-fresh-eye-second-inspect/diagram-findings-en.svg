@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="360" viewBox="0 0 900 360" role="img" aria-labelledby="title desc">
+  <title id="title">First review versus second fresh-eye review findings</title>
+  <desc id="desc">After 12 first-pass findings were fixed, a second fresh-eye review found 1 critical and 4 important issues.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#0d1117"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#38bdf8"/>
+    </marker>
+  </defs>
+  <rect width="900" height="360" rx="18" fill="url(#bg)"/>
+  <text x="450" y="42" text-anchor="middle" fill="#e5e7eb" font-family="D2Coding, Consolas, monospace" font-size="24" font-weight="700">
+    I thought the first review was done. The second one found more.
+  </text>
+  <text x="450" y="70" text-anchor="middle" fill="#94a3b8" font-family="D2Coding, Consolas, monospace" font-size="14">
+    Same code, different prompt, different failure modes
+  </text>
+
+  <rect x="58" y="112" width="210" height="150" rx="16" fill="#111827" stroke="#334155"/>
+  <text x="163" y="150" text-anchor="middle" fill="#93c5fd" font-family="D2Coding, Consolas, monospace" font-size="18" font-weight="700">First /inspect</text>
+  <text x="163" y="196" text-anchor="middle" fill="#e5e7eb" font-family="D2Coding, Consolas, monospace" font-size="48" font-weight="700">12</text>
+  <text x="163" y="226" text-anchor="middle" fill="#94a3b8" font-family="D2Coding, Consolas, monospace" font-size="15">findings fixed</text>
+
+  <path d="M278 188 L370 188" stroke="#38bdf8" stroke-width="4" marker-end="url(#arrow)"/>
+  <rect x="382" y="112" width="140" height="150" rx="16" fill="#101827" stroke="#334155"/>
+  <text x="452" y="174" text-anchor="middle" fill="#e5e7eb" font-family="D2Coding, Consolas, monospace" font-size="17" font-weight="700">all</text>
+  <text x="452" y="205" text-anchor="middle" fill="#e5e7eb" font-family="D2Coding, Consolas, monospace" font-size="17" font-weight="700">fixed</text>
+
+  <path d="M532 188 L624 188" stroke="#38bdf8" stroke-width="4" marker-end="url(#arrow)"/>
+  <rect x="636" y="112" width="210" height="150" rx="16" fill="#12251c" stroke="#22c55e"/>
+  <text x="741" y="150" text-anchor="middle" fill="#bbf7d0" font-family="D2Coding, Consolas, monospace" font-size="18" font-weight="700">Fresh-eye pass</text>
+  <text x="712" y="201" text-anchor="middle" fill="#f87171" font-family="D2Coding, Consolas, monospace" font-size="36" font-weight="700">Critical 1</text>
+  <text x="741" y="232" text-anchor="middle" fill="#86efac" font-family="D2Coding, Consolas, monospace" font-size="17">Important 4 more</text>
+
+  <rect x="198" y="292" width="504" height="36" rx="18" fill="#0f172a" stroke="#334155"/>
+  <text x="450" y="316" text-anchor="middle" fill="#cbd5e1" font-family="D2Coding, Consolas, monospace" font-size="15">
+    access logic · race window · timezone · N+1 · cache invalidation
+  </text>
+</svg>

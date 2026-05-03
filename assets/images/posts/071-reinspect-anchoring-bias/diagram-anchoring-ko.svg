@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="430" viewBox="0 0 900 430" role="img" aria-labelledby="title desc">
+  <title id="title">/inspect 재실행과 /reinspect의 차이</title>
+  <desc id="desc">같은 컨텍스트에서 리뷰를 재실행하면 첫 결론에 고정되기 쉽고, 독립 subagent를 사용하면 새로운 발견 가능성이 높아진다는 비교 다이어그램</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#0d1117"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="bad" x1="0" x2="1">
+      <stop offset="0%" stop-color="#3a1f22"/>
+      <stop offset="100%" stop-color="#1f2937"/>
+    </linearGradient>
+    <linearGradient id="good" x1="0" x2="1">
+      <stop offset="0%" stop-color="#102a24"/>
+      <stop offset="100%" stop-color="#12263a"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <marker id="arrow-red" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#f97373"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#4ade80"/>
+    </marker>
+  </defs>
+
+  <rect width="900" height="430" rx="18" fill="url(#bg)"/>
+  <text x="450" y="42" text-anchor="middle" fill="#e5e7eb" font-family="D2Coding, Consolas, monospace" font-size="24" font-weight="700">
+    왜 /inspect 재실행이 아니라 /reinspect인가
+  </text>
+  <text x="450" y="70" text-anchor="middle" fill="#94a3b8" font-family="D2Coding, Consolas, monospace" font-size="14">
+    첫 리뷰의 결론이 컨텍스트에 남아 있으면, 두 번째 리뷰는 그 결론을 검증하는 쪽으로 기울기 쉽다
+  </text>
+
+  <rect x="48" y="102" width="378" height="284" rx="16" fill="url(#bad)" stroke="#5b3035"/>
+  <rect x="474" y="102" width="378" height="284" rx="16" fill="url(#good)" stroke="#1f5f50"/>
+
+  <text x="237" y="136" text-anchor="middle" fill="#fecaca" font-family="D2Coding, Consolas, monospace" font-size="20" font-weight="700">
+    같은 컨텍스트 재실행
+  </text>
+  <text x="663" y="136" text-anchor="middle" fill="#bbf7d0" font-family="D2Coding, Consolas, monospace" font-size="20" font-weight="700">
+    독립 컨텍스트 2차 검토
+  </text>
+
+  <rect x="92" y="166" width="290" height="52" rx="10" fill="#111827" stroke="#475569"/>
+  <text x="237" y="198" text-anchor="middle" fill="#e5e7eb" font-family="D2Coding, Consolas, monospace" font-size="16">/inspect 결과</text>
+
+  <path d="M237 220 C237 246, 237 246, 237 270" stroke="#f97373" stroke-width="3" fill="none" marker-end="url(#arrow-red)"/>
+  <rect x="92" y="270" width="290" height="52" rx="10" fill="#24171a" stroke="#f97373"/>
+  <text x="237" y="302" text-anchor="middle" fill="#fecaca" font-family="D2Coding, Consolas, monospace" font-size="16">첫 결론이 anchor</text>
+
+  <path d="M128 296 C72 292, 72 186, 130 184" stroke="#f97373" stroke-width="3" fill="none" marker-end="url(#arrow-red)" opacity="0.85"/>
+  <text x="237" y="354" text-anchor="middle" fill="#fca5a5" font-family="D2Coding, Consolas, monospace" font-size="15">새 발견 적음 · 같은 결론 반복</text>
+
+  <rect x="518" y="166" width="290" height="52" rx="10" fill="#111827" stroke="#475569"/>
+  <text x="663" y="198" text-anchor="middle" fill="#e5e7eb" font-family="D2Coding, Consolas, monospace" font-size="16">/inspect 결과</text>
+
+  <path d="M663 220 C663 246, 663 246, 663 270" stroke="#4ade80" stroke-width="3" fill="none" marker-end="url(#arrow-green)"/>
+  <rect x="518" y="270" width="290" height="52" rx="10" fill="#10251d" stroke="#4ade80" filter="url(#glow)"/>
+  <text x="663" y="292" text-anchor="middle" fill="#bbf7d0" font-family="D2Coding, Consolas, monospace" font-size="15">독립 subagent</text>
+  <text x="663" y="314" text-anchor="middle" fill="#bbf7d0" font-family="D2Coding, Consolas, monospace" font-size="15">이전 결론 challenge</text>
+
+  <path d="M808 296 C848 296, 848 250, 812 238" stroke="#4ade80" stroke-width="3" fill="none" marker-end="url(#arrow-green)" opacity="0.9"/>
+  <text x="663" y="354" text-anchor="middle" fill="#86efac" font-family="D2Coding, Consolas, monospace" font-size="15">overturned · newly found</text>
+
+  <line x1="450" y1="108" x2="450" y2="384" stroke="#334155" stroke-dasharray="6 8"/>
+</svg>

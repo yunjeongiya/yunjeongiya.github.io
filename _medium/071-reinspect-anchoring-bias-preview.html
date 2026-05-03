@@ -1,0 +1,162 @@
+﻿<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<title>같은 문장을 60번 타이핑했다면, 그건 스킬이다 — 1.5GB 대화 로그에서 찾아낸 AI 코드 리뷰의 anchoring bias와 /reinspect</title>
+<style>
+  html { background: #fff; }
+  body { max-width: 680px; margin: 40px auto; font-family: Georgia, serif; font-size: 18px; line-height: 1.7; color: #333; background: #fff; padding: 0 20px; }
+  h1 { font-size: 32px; line-height: 1.3; }
+  h2 { font-size: 24px; margin-top: 40px; }
+  h3 { font-size: 20px; margin-top: 30px; }
+  img { max-width: 100%; margin: 20px 0; }
+  pre { background: #f6f8fa; padding: 16px; overflow-x: auto; font-size: 14px; line-height: 1.5; border-radius: 6px; }
+  code { background: #f6f8fa; padding: 2px 6px; font-size: 15px; border-radius: 3px; }
+  pre code { background: transparent; padding: 0; }
+  blockquote { border-left: 3px solid #ccc; margin-left: 0; padding-left: 20px; color: #555; }
+  strong { font-weight: 700; }
+  hr { border: none; border-top: 1px solid #ddd; margin: 40px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+  th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: center; }
+  th { background: #f6f8fa; }
+</style>
+</head><body>
+
+<h1>같은 문장을 60번 타이핑했다면, 그건 스킬이다 — 1.5GB 대화 로그에서 찾아낸 AI 코드 리뷰의 anchoring bias와 /reinspect</h1>
+
+<p><em>이 글은 <a href="https://yunjeongiya.github.io/posts/071/">블로그</a>에서도 읽을 수 있습니다. (<a href="https://yunjeongiya.github.io/posts/071-en/">English version here</a>)</em></p>
+
+<p><img alt="AI 코드 리뷰의 anchoring bias와 독립된 2차 검토" src="../assets/images/posts/071-reinspect-anchoring-bias/thumbnail.png" /></p>
+<h2>도입</h2>
+<p>Claude Code에 <code>/inspect</code>라는 코드 리뷰 스킬을 만들어 쓴다. 4-pass 구조화 리뷰 (correctness / convention / security / completeness). 잘 작동한다.</p>
+<p>그런데 어느 날 깨달았다 — <code>/inspect</code>가 끝난 다음 거의 매번 자연어로 한 번 더 친다.</p>
+<blockquote>
+<p>inspect once more with a fresh eye</p>
+</blockquote>
+<p>이걸 60번 넘게 타이핑했다. 스킬이 있는데도. 왜?</p>
+<p>이 글은 두 가지를 다룬다:</p>
+<ol>
+<li>1.5GB짜리 Claude Code 대화 로그를 grep + Python으로 마이닝해 implicit skill을 찾아낸 과정</li>
+<li>그 결과로 만든 <code>/reinspect</code> 스킬과, AI 코드 리뷰의 anchoring bias</li>
+</ol>
+<h2>배경 — implicit skill의 신호</h2>
+<p><code>/inspect</code>는 첫 패스용으로 설계됐다. 4-pass 구조화. 잘 돈다.</p>
+<p>그런데 끝난 다음 "fresh eye로 한 번 더"를 매번 친다. 이상하지 않은가? 같은 스킬을 다시 돌리면 되는데.</p>
+<p>가설: 같은 컨텍스트에서 같은 스킬을 다시 돌리면 <strong>같은 결론</strong>이 나온다. 그래서 자연어로 "fresh eye"라고 명시해서, AI가 다른 방식으로 보게 유도하고 있던 것이다.</p>
+<p>질문: 이게 진짜 다른 동작인가? 아니면 내 기분 문제인가?</p>
+<h2>해결 과정</h2>
+<h3>1. 대화 로그 마이닝</h3>
+<p>Claude Code는 대화를 JSONL로 <code>~/.claude/projects/&lt;project-path&gt;/</code>에 저장한다. CheckUS 프로젝트는 1.5GB / 630개 파일.</p>
+<p>전부 읽으면 token bomb이다. grep + Python으로 user 메시지만 추출했다:</p>
+<pre><code class="language-python">import json
+from pathlib import Path
+
+base = Path(&quot;~/.claude/projects/C--dev-checkus&quot;).expanduser()
+results = []
+
+for jf in base.glob(&quot;*.jsonl&quot;):
+    with open(jf, encoding='utf-8') as f:
+        for ln, line in enumerate(f, 1):
+            if 'fresh eye' not in line.lower():
+                continue
+            obj = json.loads(line)
+            if obj.get('type') != 'user':
+                continue
+            content = obj.get('message', {}).get('content', '')
+            if isinstance(content, list):
+                text = '\n'.join(
+                    p.get('text', '') for p in content
+                    if isinstance(p, dict) and p.get('type') == 'text'
+                )
+            else:
+                text = str(content)
+            # 짧은 사용자 입력만 — 긴 건 transcript replay
+            if 'fresh eye' not in text.lower() or len(text) &gt; 2000:
+                continue
+            results.append((jf.stem[:8], ln, text[:200]))
+
+print(f&quot;Total: {len(results)}&quot;)
+</code></pre>
+<p>결과: <strong>60+회</strong>. 73개 세션에 걸쳐 2개월간.</p>
+<h3>2. 동작 검증 — 진짜 다른가?</h3>
+<p>문구를 60번 친 건 알았다. 진짜 중요한 건 — Claude가 정말 다르게 동작했는가?</p>
+<p>같은 세션에서 <code>/inspect</code>와 "fresh eye"를 둘 다 친 케이스를 찾아 응답 패턴을 비교했다.</p>
+<table>
+<thead>
+<tr>
+<th>패턴</th>
+<th>빈도</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fresh re-read</td>
+<td>~40%</td>
+<td>"Fresh review from scratch" 선언 후 <code>git diff</code> 전체 내용 재읽음</td>
+</tr>
+<tr>
+<td>Subagent 2nd opinion</td>
+<td>~30%</td>
+<td><code>code-reviewer</code> subagent dispatch → severity 테이블 산출</td>
+</tr>
+<tr>
+<td><code>/inspect</code> 재실행</td>
+<td>~30%</td>
+<td>그냥 같은 스킬 다시 돔 — 의미 없음</td>
+</tr>
+</tbody>
+</table>
+<p>70%는 정말 다른 동작이었다. 특히 subagent dispatch 패턴 — 별도 컨텍스트로 띄우는 — 이 결과가 가장 좋았다.</p>
+<h3>3. 가설: AI도 anchoring에 걸린다</h3>
+<p>왜 같은 컨텍스트에서 <code>/inspect</code>를 다시 돌리면 안 되는가?</p>
+<p>가설: 첫 패스의 결론이 컨텍스트에 남아 있으면, 두 번째 패스는 그 결론을 <strong>검증하는 방향</strong>으로 편향된다. 사람의 anchoring bias와 같다 — 처음 본 정보가 이후 판단의 기준점이 된다.</p>
+<p>증거: 30% 케이스에서 <code>/inspect</code>를 그냥 다시 돌렸을 때 결론이 거의 동일했다. 새 발견 거의 없음.</p>
+<p>해결: <strong>독립된 컨텍스트</strong>가 필요하다. Claude Code의 subagent는 부모 세션의 컨텍스트를 상속받지 않는다. 별도 컨텍스트 = anchor 없음.</p>
+<p><img alt="같은 컨텍스트 재실행과 독립 컨텍스트 2차 검토의 차이" src="../assets/images/posts/071-reinspect-anchoring-bias/diagram-anchoring-ko.png" /></p>
+<h3>4. 스킬 작성</h3>
+<p><code>.claude/skills/reinspect/SKILL.md</code>. 핵심은 description:</p>
+<pre><code class="language-yaml">---
+name: reinspect
+description: 코드 리뷰의 두 번째 의견(second-opinion) 패스. 사용자가 &quot;fresh eye&quot;, &quot;한 번 더 봐&quot;, &quot;inspect once more&quot; 같은 표현을 쓰면 반드시 발동. /inspect를 다시 돌리지 말 것 — 같은 컨텍스트는 같은 anchor에 걸려 같은 결론이 나온다. 반드시 독립된 code-reviewer subagent를 띄워 이전 결론을 적극적으로 challenge한다.
+---
+</code></pre>
+<p>본문에는 명시적 anti-pattern 섹션을 넣었다. 30%의 실패 모드가 정확히 "스킬을 그냥 재실행"이었기 때문이다:</p>
+<pre><code class="language-markdown">### Anti-pattern: /inspect 재실행
+- /reinspect 호출됐는데 /inspect 스킬을 다시 invoke (X)
+- subagent 안 띄우고 인라인으로 git diff 다시 읽기 (X)
+- 첫 리뷰의 finding 리스트만 나열하고 challenge 없이 confirm (X)
+</code></pre>
+<p>Subagent에게 넘기는 프롬프트의 핵심은 "challenge하라"는 명시:</p>
+<pre><code>이전 리뷰의 결론:
+{/inspect가 보고한 finding들}
+
+너의 임무:
+1. 변경된 파일의 전체 내용을 읽어라 (git diff가 아니다 — diff context는 anchor를 강화한다)
+2. 이전 리뷰의 결론이 옳은지 challenge하라
+   - 잘못 본 finding이 있는가? (overturned)
+   - 첫 패스가 anchor에 걸려 놓친 게 있는가? (newly found)
+</code></pre>
+<h2>결과</h2>
+<p>Before: 60번 자연어로 타이핑, 70% 확률로 의도된 동작
+After: <code>/reinspect</code> 슬래시 커맨드 또는 자연어 트리거 모두 일관된 동작 (목표)</p>
+<p>스킬 description에서 "/inspect를 다시 돌리지 말 것"을 명시한 게 핵심이다. AI에게 "이걸 해라"보다 "이걸 <strong>하지 마라</strong>"가 더 강한 신호일 때가 있다 — 비슷한 다른 도구가 있을 때 특히.</p>
+<h2>배운 점</h2>
+<h3>1. 자주 타이핑하는 자연어 = implicit skill의 신호</h3>
+<p>같은 문구를 반복적으로 타이핑한다면, 그건 형식화되지 않은 워크플로다. <strong>이미 스킬이 있어도</strong> 부족하다고 느낀다는 뜻. 그 부족함이 어디인지 알아내면 새 스킬이 된다.</p>
+<p>이건 LLM 워크플로 일반에 적용된다. 자연어로 매번 같은 지시를 하고 있다면, 거기 스킬이 있다.</p>
+<h3>2. 가설은 데이터로 검증한다</h3>
+<p>"이게 정말 다른가?"라는 의문을 머리로 답하지 말고 로그로 답한다. 1.5GB짜리 로그도 grep + Python이면 몇 초.</p>
+<p>배보다 배꼽이 클까 걱정했지만 실제 비용은 ~10K 토큰. 답을 얻은 가치보다 훨씬 작았다.</p>
+<h3>3. AI도 anchoring bias가 있다</h3>
+<p>같은 컨텍스트에서 같은 작업을 두 번 시키면 같은 결과가 나오기 쉽다. 정말 다른 관점이 필요하면 컨텍스트를 분리한다 (subagent / 별도 세션 / 다른 모델).</p>
+<p>이건 사람의 코드 리뷰에도 적용된다. 같은 사람이 자기 PR을 두 번 봐도 같은 걸 본다. 다른 사람이 봐야 다른 게 보인다.</p>
+<h3>4. Anti-pattern을 명시하는 게 효과적</h3>
+<p>스킬 description에 "이걸 해라"만 쓰면 LLM이 비슷한 다른 도구로 흘러간다. "이걸 하지 마라"를 같이 쓰면 트리거가 더 정확해진다. 특히 이름이 비슷한 도구 (<code>/inspect</code> vs <code>/reinspect</code>)가 공존할 때.</p>
+<h2>References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Anchoring_effect">Anchoring effect — Wikipedia</a></li>
+<li><a href="https://docs.claude.com/claude-code">Claude Code subagent docs</a></li>
+</ul>
+
+</body>
+</html>
