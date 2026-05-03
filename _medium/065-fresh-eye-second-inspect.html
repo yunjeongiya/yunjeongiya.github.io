@@ -54,42 +54,7 @@ if (existing.campusId() == null
 </code></pre>
 <p><strong>2차 발견 (Critical)</strong>: 이 조건문은 정상 케이스를 차단한다.</p>
 <p><code>request.campusId() != existing.campusId()</code>은 Java에서 <code>Long != Long</code> reference equality다. unboxing이 일어나지 않는다. 그리고 <code>request.campusId() == null</code>이 true인 시점에서 <code>null != someNonNullLong</code>은 <strong>항상 true</strong>다.</p>
-<table>
-<thead>
-<tr>
-<th>existing.campusId</th>
-<th>request.campusId</th>
-<th>의도</th>
-<th>실제 동작</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>null (글로벌)</td>
-<td>어떤 값이든</td>
-<td>DEVELOPER만</td>
-<td>✅ requireDeveloper</td>
-</tr>
-<tr>
-<td>캠퍼스 X</td>
-<td>동일 X</td>
-<td>TEACHER가 자기 거 수정</td>
-<td>✅ validateAccess</td>
-</tr>
-<tr>
-<td>캠퍼스 X</td>
-<td>null (필드 누락 = 변경 의도 없음)</td>
-<td>TEACHER가 다른 필드만 수정</td>
-<td>❌ requireDeveloper 호출됨</td>
-</tr>
-<tr>
-<td>캠퍼스 X</td>
-<td>다른 캠퍼스 Y</td>
-<td>TEACHER가 캠퍼스 변경</td>
-<td>✅ DEVELOPER 게이트</td>
-</tr>
-</tbody>
-</table>
+<p><img alt="Case 1 behavior table" src="https://yunjeongiya.github.io/assets/images/posts/065-fresh-eye-second-inspect/table-case1-ko.png" /></p>
 <p>즉 partial update에서 <code>campusId</code>를 보내지 않는 정상 요청이 <strong>글로벌 콘텐츠 수정 시도처럼 오해되어 차단</strong>된다. 1차는 "권한 우회 가능"으로 봤지만, 2차는 "정상 케이스가 차단된다"는 정반대 결과를 발견.</p>
 <p>근본 원인은 Java record는 <code>null</code> 값과 "필드 없음"을 구분하지 못한다는 것. <code>UpdateTvContentRequest.campusId()</code>가 null이면 "변경 안 함"인지 "null로 변경"인지 모른다.</p>
 <p><strong>2차 픽스</strong>: service에서 campusId 변경 자체를 차단. 글로벌↔캠퍼스 변환은 삭제+재생성으로 강제.</p>
@@ -197,47 +162,7 @@ public TvProfileResponse update(Long campusId, Long profileId, UpdateTvProfileRe
 </code></pre>
 <p><code>allEntries = true</code> — 캐시 size가 작아 (200개 max) 부하 부담 없음.</p>
 <h2>결과</h2>
-<table>
-<thead>
-<tr>
-<th>항목</th>
-<th>1차</th>
-<th>2차 (fresh-eye)</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Findings</td>
-<td>12</td>
-<td>5</td>
-</tr>
-<tr>
-<td>Critical</td>
-<td>0 (false positive 1 포함)</td>
-<td>1 (정상 케이스 차단)</td>
-</tr>
-<tr>
-<td>Important</td>
-<td>4</td>
-<td>4</td>
-</tr>
-<tr>
-<td>Low</td>
-<td>8</td>
-<td>0</td>
-</tr>
-<tr>
-<td>1차가 false positive로 본 항목</td>
-<td>(H4 — 이미 적용된 상태였음)</td>
-<td>-</td>
-</tr>
-<tr>
-<td>1차가 정반대로 해석</td>
-<td>-</td>
-<td>1건 (사례 1)</td>
-</tr>
-</tbody>
-</table>
+<p><img alt="Review result comparison table" src="https://yunjeongiya.github.io/assets/images/posts/065-fresh-eye-second-inspect/table-result-ko.png" /></p>
 <p>2차에서 발견된 5건 중 4건은 1차가 보지 않은 영역(N+1, race window, cache invalidation, timezone). 1건은 1차가 본 영역인데 정반대로 해석.</p>
 <h2>배운 점</h2>
 <p><strong>1. AI 리뷰어도 prompt 설계에 따라 보는 게 다르다.</strong>

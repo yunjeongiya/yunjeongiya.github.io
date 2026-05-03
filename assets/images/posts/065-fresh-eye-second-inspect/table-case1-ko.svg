@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="420" viewBox="0 0 1100 420" role="img" aria-labelledby="title">
+  <title id="title">사례 1 조건문 동작 표</title>
+  <rect width="1100" height="420" rx="18" fill="#0d1117"/>
+  <text x="550" y="42" text-anchor="middle" fill="#e5e7eb" font-family="Arial, sans-serif" font-size="26" font-weight="700">사례 1: 조건문이 실제로 한 일</text>
+  <g font-family="Arial, sans-serif" font-size="18">
+    <rect x="40" y="72" width="1020" height="54" fill="#111827" stroke="#334155"/>
+    <text x="150" y="106" text-anchor="middle" fill="#93c5fd" font-weight="700">existing.campusId</text>
+    <text x="380" y="106" text-anchor="middle" fill="#93c5fd" font-weight="700">request.campusId</text>
+    <text x="650" y="106" text-anchor="middle" fill="#93c5fd" font-weight="700">의도</text>
+    <text x="930" y="106" text-anchor="middle" fill="#93c5fd" font-weight="700">실제 동작</text>
+    <g fill="#e5e7eb">
+      <rect x="40" y="126" width="1020" height="68" fill="#0f172a" stroke="#334155"/>
+      <text x="150" y="166" text-anchor="middle">null (글로벌)</text>
+      <text x="380" y="166" text-anchor="middle">어떤 값이든</text>
+      <text x="650" y="166" text-anchor="middle">DEVELOPER만</text>
+      <text x="930" y="166" text-anchor="middle" fill="#86efac">requireDeveloper</text>
+      <rect x="40" y="194" width="1020" height="68" fill="#111827" stroke="#334155"/>
+      <text x="150" y="234" text-anchor="middle">캠퍼스 X</text>
+      <text x="380" y="234" text-anchor="middle">동일 X</text>
+      <text x="650" y="234" text-anchor="middle">TEACHER가 자기 거 수정</text>
+      <text x="930" y="234" text-anchor="middle" fill="#86efac">validateAccess</text>
+      <rect x="40" y="262" width="1020" height="68" fill="#24171a" stroke="#7f1d1d"/>
+      <text x="150" y="302" text-anchor="middle">캠퍼스 X</text>
+      <text x="380" y="292" text-anchor="middle">null</text>
+      <text x="380" y="316" text-anchor="middle" fill="#cbd5e1" font-size="15">필드 누락</text>
+      <text x="650" y="302" text-anchor="middle">다른 필드만 수정</text>
+      <text x="930" y="302" text-anchor="middle" fill="#fca5a5">requireDeveloper</text>
+      <rect x="40" y="330" width="1020" height="68" fill="#0f172a" stroke="#334155"/>
+      <text x="150" y="370" text-anchor="middle">캠퍼스 X</text>
+      <text x="380" y="370" text-anchor="middle">다른 캠퍼스 Y</text>
+      <text x="650" y="370" text-anchor="middle">캠퍼스 변경</text>
+      <text x="930" y="370" text-anchor="middle" fill="#86efac">DEVELOPER 게이트</text>
+    </g>
+  </g>
+</svg>

@@ -54,42 +54,7 @@ if (existing.campusId() == null
 </code></pre>
 <p><strong>Second-pass finding (Critical)</strong>: this condition blocks a normal case.</p>
 <p><code>request.campusId() != existing.campusId()</code> is reference equality for <code>Long != Long</code> in Java. There is no unboxing here. And when <code>request.campusId() == null</code> is true, <code>null != someNonNullLong</code> is <strong>always true</strong>.</p>
-<table>
-<thead>
-<tr>
-<th>existing.campusId</th>
-<th>request.campusId</th>
-<th>Intended behavior</th>
-<th>Actual behavior</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>null (global)</td>
-<td>any value</td>
-<td>DEVELOPER only</td>
-<td>✅ requireDeveloper</td>
-</tr>
-<tr>
-<td>campus X</td>
-<td>same X</td>
-<td>TEACHER edits own content</td>
-<td>✅ validateAccess</td>
-</tr>
-<tr>
-<td>campus X</td>
-<td>null (field omitted = no change intended)</td>
-<td>TEACHER edits another field</td>
-<td>❌ requireDeveloper called</td>
-</tr>
-<tr>
-<td>campus X</td>
-<td>different campus Y</td>
-<td>TEACHER tries to move campus</td>
-<td>✅ DEVELOPER gate</td>
-</tr>
-</tbody>
-</table>
+<p><img alt="Case 1 behavior table" src="../assets/images/posts/065-fresh-eye-second-inspect/table-case1-en.png" /></p>
 <p>So a normal partial update where <code>campusId</code> is omitted gets misread as a global-content modification attempt and is blocked. The first pass saw "possible authorization bypass"; the second pass found the opposite effect: a normal path was blocked.</p>
 <p>The root cause is that a Java record does not distinguish between <code>null</code> and "field absent." If <code>UpdateTvContentRequest.campusId()</code> is null, you cannot tell whether the client meant "no change" or "set it to null."</p>
 <p><strong>Second-pass fix</strong>: block campusId changes in the service. Force global ↔ campus conversion to happen through delete + recreate.</p>
@@ -198,47 +163,7 @@ public TvProfileResponse update(Long campusId, Long profileId, UpdateTvProfileRe
 </code></pre>
 <p><code>allEntries = true</code> is acceptable here because the cache is small, capped around 200 entries.</p>
 <h2>Result</h2>
-<table>
-<thead>
-<tr>
-<th>Item</th>
-<th>First pass</th>
-<th>Second pass (fresh-eye)</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Findings</td>
-<td>12</td>
-<td>5</td>
-</tr>
-<tr>
-<td>Critical</td>
-<td>0 (including 1 false positive)</td>
-<td>1 (normal case blocked)</td>
-</tr>
-<tr>
-<td>Important</td>
-<td>4</td>
-<td>4</td>
-</tr>
-<tr>
-<td>Low</td>
-<td>8</td>
-<td>0</td>
-</tr>
-<tr>
-<td>False positive from first pass</td>
-<td>H4 — already applied</td>
-<td>-</td>
-</tr>
-<tr>
-<td>First pass interpreted backwards</td>
-<td>-</td>
-<td>1 case (Case 1)</td>
-</tr>
-</tbody>
-</table>
+<p><img alt="Review result comparison table" src="../assets/images/posts/065-fresh-eye-second-inspect/table-result-en.png" /></p>
 <p>Four of the five second-pass findings came from areas the first pass did not focus on: N+1, race window, cache invalidation, and timezone. One finding came from an area the first pass had seen, but interpreted in the opposite direction.</p>
 <h2>Lessons Learned</h2>
 <p><strong>1. AI reviewers see different things depending on prompt design.</strong>
