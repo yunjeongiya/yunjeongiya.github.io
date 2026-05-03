@@ -53,12 +53,7 @@ if (existing.campusId() == null
 
 `request.campusId() != existing.campusId()` is reference equality for `Long != Long` in Java. There is no unboxing here. And when `request.campusId() == null` is true, `null != someNonNullLong` is **always true**.
 
-| existing.campusId | request.campusId | Intended behavior | Actual behavior |
-|------|------|------|------|
-| null (global) | any value | DEVELOPER only | ✅ requireDeveloper |
-| campus X | same X | TEACHER edits own content | ✅ validateAccess |
-| campus X | null (field omitted = no change intended) | TEACHER edits another field | ❌ requireDeveloper called |
-| campus X | different campus Y | TEACHER tries to move campus | ✅ DEVELOPER gate |
+![Case 1 behavior table](/assets/images/posts/065-fresh-eye-second-inspect/table-case1-en.png){: width="700"}
 
 So a normal partial update where `campusId` is omitted gets misread as a global-content modification attempt and is blocked. The first pass saw "possible authorization bypass"; the second pass found the opposite effect: a normal path was blocked.
 
@@ -209,14 +204,7 @@ public TvProfileResponse update(Long campusId, Long profileId, UpdateTvProfileRe
 
 ## Result
 
-| Item | First pass | Second pass (fresh-eye) |
-|------|-----|-----------------|
-| Findings | 12 | 5 |
-| Critical | 0 (including 1 false positive) | 1 (normal case blocked) |
-| Important | 4 | 4 |
-| Low | 8 | 0 |
-| False positive from first pass | H4 — already applied | - |
-| First pass interpreted backwards | - | 1 case (Case 1) |
+![Review result comparison table](/assets/images/posts/065-fresh-eye-second-inspect/table-result-en.png){: width="700"}
 
 Four of the five second-pass findings came from areas the first pass did not focus on: N+1, race window, cache invalidation, and timezone. One finding came from an area the first pass had seen, but interpreted in the opposite direction.
 

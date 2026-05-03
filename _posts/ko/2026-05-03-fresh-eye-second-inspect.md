@@ -53,12 +53,7 @@ if (existing.campusId() == null
 
 `request.campusId() != existing.campusId()`은 Java에서 `Long != Long` reference equality다. unboxing이 일어나지 않는다. 그리고 `request.campusId() == null`이 true인 시점에서 `null != someNonNullLong`은 **항상 true**다.
 
-| existing.campusId | request.campusId | 의도 | 실제 동작 |
-|------|------|------|------|
-| null (글로벌) | 어떤 값이든 | DEVELOPER만 | ✅ requireDeveloper |
-| 캠퍼스 X | 동일 X | TEACHER가 자기 거 수정 | ✅ validateAccess |
-| 캠퍼스 X | null (필드 누락 = 변경 의도 없음) | TEACHER가 다른 필드만 수정 | ❌ requireDeveloper 호출됨 |
-| 캠퍼스 X | 다른 캠퍼스 Y | TEACHER가 캠퍼스 변경 | ✅ DEVELOPER 게이트 |
+![사례 1 조건문 동작 표](/assets/images/posts/065-fresh-eye-second-inspect/table-case1-ko.png){: width="700"}
 
 즉 partial update에서 `campusId`를 보내지 않는 정상 요청이 **글로벌 콘텐츠 수정 시도처럼 오해되어 차단**된다. 1차는 "권한 우회 가능"으로 봤지만, 2차는 "정상 케이스가 차단된다"는 정반대 결과를 발견.
 
@@ -207,14 +202,7 @@ public TvProfileResponse update(Long campusId, Long profileId, UpdateTvProfileRe
 
 ## 결과
 
-| 항목 | 1차 | 2차 (fresh-eye) |
-|------|-----|-----------------|
-| Findings | 12 | 5 |
-| Critical | 0 (false positive 1 포함) | 1 (정상 케이스 차단) |
-| Important | 4 | 4 |
-| Low | 8 | 0 |
-| 1차가 false positive로 본 항목 | (H4 — 이미 적용된 상태였음) | - |
-| 1차가 정반대로 해석 | - | 1건 (사례 1) |
+![1차와 2차 리뷰 결과 비교 표](/assets/images/posts/065-fresh-eye-second-inspect/table-result-ko.png){: width="700"}
 
 2차에서 발견된 5건 중 4건은 1차가 보지 않은 영역(N+1, race window, cache invalidation, timezone). 1건은 1차가 본 영역인데 정반대로 해석.
 
