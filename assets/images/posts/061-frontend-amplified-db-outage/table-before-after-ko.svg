@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="420" viewBox="0 0 980 420" role="img" aria-labelledby="title">
+  <title id="title">Before After 비교</title>
+  <rect width="980" height="420" rx="18" fill="#0d1117"/>
+  <text x="490" y="42" text-anchor="middle" fill="#e5e7eb" font-family="Arial, sans-serif" font-size="26" font-weight="700">Before / After</text>
+  <g font-family="Arial, sans-serif" font-size="17">
+    <rect x="40" y="74" width="900" height="48" fill="#111827" stroke="#334155"/>
+    <text x="210" y="105" text-anchor="middle" fill="#93c5fd" font-weight="700">지표</text><text x="520" y="105" text-anchor="middle" fill="#fca5a5" font-weight="700">Before</text><text x="790" y="105" text-anchor="middle" fill="#86efac" font-weight="700">After</text>
+    <g fill="#e5e7eb">
+      <rect x="40" y="122" width="900" height="52" fill="#0f172a" stroke="#334155"/><text x="210" y="154" text-anchor="middle">listItems 반환 행 수</text><text x="520" y="154" text-anchor="middle">600행</text><text x="790" y="154" text-anchor="middle" fill="#86efac">100행 + 1 배치</text>
+      <rect x="40" y="174" width="900" height="52" fill="#111827" stroke="#334155"/><text x="210" y="206" text-anchor="middle">listDynamicItems 쿼리 수</text><text x="520" y="206" text-anchor="middle">301</text><text x="790" y="206" text-anchor="middle" fill="#86efac">3 고정</text>
+      <rect x="40" y="226" width="900" height="52" fill="#0f172a" stroke="#334155"/><text x="210" y="258" text-anchor="middle">탭 전환 리페치</text><text x="520" y="258" text-anchor="middle">매번</text><text x="790" y="258" text-anchor="middle" fill="#86efac">60초 이내 스킵</text>
+      <rect x="40" y="278" width="900" height="52" fill="#111827" stroke="#334155"/><text x="210" y="310" text-anchor="middle">다이얼로그 열기</text><text x="520" y="310" text-anchor="middle">리페치</text><text x="790" y="310" text-anchor="middle" fill="#86efac">없음</text>
+      <rect x="40" y="330" width="900" height="52" fill="#0f172a" stroke="#334155"/><text x="210" y="362" text-anchor="middle">커넥션 풀</text><text x="520" y="362" text-anchor="middle">10</text><text x="790" y="362" text-anchor="middle" fill="#86efac">20 안전 마진</text>
+    </g>
+  </g>
+</svg>

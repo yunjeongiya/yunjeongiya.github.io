@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="420" viewBox="0 0 980 420" role="img" aria-labelledby="title">
+  <title id="title">Before After comparison</title>
+  <rect width="980" height="420" rx="18" fill="#0d1117"/>
+  <text x="490" y="42" text-anchor="middle" fill="#e5e7eb" font-family="Arial, sans-serif" font-size="26" font-weight="700">Before / After</text>
+  <g font-family="Arial, sans-serif" font-size="17">
+    <rect x="40" y="74" width="900" height="48" fill="#111827" stroke="#334155"/>
+    <text x="210" y="105" text-anchor="middle" fill="#93c5fd" font-weight="700">Metric</text><text x="520" y="105" text-anchor="middle" fill="#fca5a5" font-weight="700">Before</text><text x="790" y="105" text-anchor="middle" fill="#86efac" font-weight="700">After</text>
+    <g fill="#e5e7eb">
+      <rect x="40" y="122" width="900" height="52" fill="#0f172a" stroke="#334155"/><text x="210" y="154" text-anchor="middle">listItems rows</text><text x="520" y="154" text-anchor="middle">600 rows</text><text x="790" y="154" text-anchor="middle" fill="#86efac">100 + 1 batch</text>
+      <rect x="40" y="174" width="900" height="52" fill="#111827" stroke="#334155"/><text x="210" y="206" text-anchor="middle">listDynamicItems queries</text><text x="520" y="206" text-anchor="middle">301</text><text x="790" y="206" text-anchor="middle" fill="#86efac">3 fixed</text>
+      <rect x="40" y="226" width="900" height="52" fill="#0f172a" stroke="#334155"/><text x="210" y="258" text-anchor="middle">Refetch on tab switch</text><text x="520" y="258" text-anchor="middle">every time</text><text x="790" y="258" text-anchor="middle" fill="#86efac">skip within 60s</text>
+      <rect x="40" y="278" width="900" height="52" fill="#111827" stroke="#334155"/><text x="210" y="310" text-anchor="middle">Dialog open</text><text x="520" y="310" text-anchor="middle">refetch</text><text x="790" y="310" text-anchor="middle" fill="#86efac">none</text>
+      <rect x="40" y="330" width="900" height="52" fill="#0f172a" stroke="#334155"/><text x="210" y="362" text-anchor="middle">Connection pool</text><text x="520" y="362" text-anchor="middle">10</text><text x="790" y="362" text-anchor="middle" fill="#86efac">20 margin</text>
+    </g>
+  </g>
+</svg>

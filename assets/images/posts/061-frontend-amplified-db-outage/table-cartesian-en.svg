@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="260" viewBox="0 0 760 260" role="img" aria-labelledby="title">
+  <title id="title">Cartesian product returned rows</title>
+  <rect width="760" height="260" rx="18" fill="#0d1117"/>
+  <text x="380" y="42" text-anchor="middle" fill="#e5e7eb" font-family="Arial, sans-serif" font-size="24" font-weight="700">Actual data vs returned DB rows</text>
+  <g font-family="Arial, sans-serif" font-size="20">
+    <rect x="80" y="72" width="600" height="46" fill="#111827" stroke="#334155"/>
+    <text x="230" y="102" text-anchor="middle" fill="#93c5fd" font-weight="700">Actual data</text>
+    <text x="530" y="102" text-anchor="middle" fill="#93c5fd" font-weight="700">DB rows returned</text>
+    <rect x="80" y="118" width="600" height="42" fill="#0f172a" stroke="#334155"/>
+    <text x="230" y="146" text-anchor="middle" fill="#e5e7eb">1 Task</text><text x="530" y="146" text-anchor="middle" fill="#fcd34d">3 × 2 = 6 rows</text>
+    <rect x="80" y="160" width="600" height="42" fill="#111827" stroke="#334155"/>
+    <text x="230" y="188" text-anchor="middle" fill="#e5e7eb">100 Tasks</text><text x="530" y="188" text-anchor="middle" fill="#f97316">600 rows</text>
+    <rect x="80" y="202" width="600" height="42" fill="#24171a" stroke="#7f1d1d"/>
+    <text x="230" y="230" text-anchor="middle" fill="#e5e7eb">500 Tasks</text><text x="530" y="230" text-anchor="middle" fill="#fca5a5">3,000 rows</text>
+  </g>
+</svg>

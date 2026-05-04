@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="360" viewBox="0 0 980 360" role="img" aria-labelledby="title">
+  <title id="title">Task 1개가 6행으로 늘어나는 Cartesian Product</title>
+  <rect width="980" height="360" rx="18" fill="#0d1117"/>
+  <text x="490" y="42" text-anchor="middle" fill="#e5e7eb" font-family="Arial, sans-serif" font-size="26" font-weight="700">컬렉션 2개 FETCH JOIN = 곱셈</text>
+  <g font-family="Arial, sans-serif" font-size="16" fill="#e5e7eb">
+    <rect x="60" y="150" width="150" height="60" rx="12" fill="#111827" stroke="#58a6ff"/>
+    <text x="135" y="186" text-anchor="middle" fill="#58a6ff" font-weight="700">Task #1</text>
+    <text x="284" y="118" text-anchor="middle" fill="#86efac" font-weight="700">assignees 3명</text>
+    <rect x="240" y="135" width="88" height="36" rx="8" fill="#12251c" stroke="#22c55e"/><text x="284" y="159" text-anchor="middle">user A</text>
+    <rect x="240" y="181" width="88" height="36" rx="8" fill="#12251c" stroke="#22c55e"/><text x="284" y="205" text-anchor="middle">user B</text>
+    <rect x="240" y="227" width="88" height="36" rx="8" fill="#12251c" stroke="#22c55e"/><text x="284" y="251" text-anchor="middle">user C</text>
+    <text x="430" y="148" text-anchor="middle" fill="#fcd34d" font-size="32" font-weight="700">×</text>
+    <text x="536" y="142" text-anchor="middle" fill="#fbbf24" font-weight="700">tags 2개</text>
+    <rect x="492" y="160" width="88" height="36" rx="18" fill="#241f12" stroke="#f59e0b"/><text x="536" y="184" text-anchor="middle">tag X</text>
+    <rect x="492" y="206" width="88" height="36" rx="18" fill="#241f12" stroke="#f59e0b"/><text x="536" y="230" text-anchor="middle">tag Y</text>
+    <text x="650" y="190" text-anchor="middle" fill="#f87171" font-size="32" font-weight="700">=</text>
+    <rect x="704" y="112" width="218" height="160" rx="14" fill="#24171a" stroke="#ef4444"/>
+    <text x="813" y="146" text-anchor="middle" fill="#fca5a5" font-size="20" font-weight="700">DB 반환 6행</text>
+    <text x="813" y="182" text-anchor="middle" fill="#e5e7eb">3 × 2 = 6</text>
+    <text x="813" y="216" text-anchor="middle" fill="#94a3b8">DISTINCT는 앱 메모리에서</text>
+    <text x="813" y="242" text-anchor="middle" fill="#94a3b8">중복을 제거할 뿐</text>
+  </g>
+</svg>
