@@ -51,9 +51,9 @@ at TaskListController.listDynamicItems(...)
 
 두 개의 컬렉션을 동시에 FETCH JOIN하고 있다. 시각화하면:
 
-![두 컬렉션 FETCH JOIN이 만드는 Cartesian Product](/assets/images/posts/061-frontend-amplified-db-outage/diagram-cartesian-ko.png){: width="700"}
+![두 컬렉션 FETCH JOIN이 만드는 Cartesian Product](/assets/images/posts/061-frontend-amplified-db-outage/diagram-cartesian-ko-v2.png){: width="700"}
 
-![실제 데이터와 DB 반환 행 수](/assets/images/posts/061-frontend-amplified-db-outage/table-cartesian-ko.png){: width="700"}
+![실제 데이터와 DB 반환 행 수](/assets/images/posts/061-frontend-amplified-db-outage/table-cartesian-ko-v2.png){: width="700"}
 
 `DISTINCT`를 써도 DB에서 애플리케이션으로 전송되는 데이터량은 줄지 않는다. Hibernate가 메모리에서 중복을 제거할 뿐이다. 데이터가 쌓이면서 쿼리 실행 시간이 30초를 넘기기 시작했다.
 
@@ -231,7 +231,7 @@ grep -r "JOIN FETCH" --include="*.java" src/ | \
 
 ## Before / After
 
-![Before / After 요약](/assets/images/posts/061-frontend-amplified-db-outage/table-before-after-ko.png){: width="700"}
+![Before / After 요약](/assets/images/posts/061-frontend-amplified-db-outage/table-before-after-ko-v2.png){: width="700"}
 
 ## 배운 점
 
