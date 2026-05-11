@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html><head>
 <meta charset="utf-8">
 <title>왜 코딩 AI는 자꾸 '이건 나중에 해도 됨'이라고 할까 — 학습 데이터, RLHF, 평가 비대칭</title>
@@ -8,7 +8,6 @@
   h1 { font-size: 32px; line-height: 1.3; }
   h2 { font-size: 24px; margin-top: 40px; }
   h3 { font-size: 20px; margin-top: 30px; }
-  h4 { font-size: 18px; margin-top: 24px; }
   img { max-width: 100%; margin: 20px 0; }
   pre { background: #f6f8fa; padding: 16px; overflow-x: auto; font-size: 14px; line-height: 1.5; border-radius: 6px; }
   code { background: #f6f8fa; padding: 2px 6px; font-size: 15px; border-radius: 3px; }
@@ -16,15 +15,12 @@
   blockquote { border-left: 3px solid #ccc; margin-left: 0; padding-left: 20px; color: #555; }
   strong { font-weight: 700; }
   hr { border: none; border-top: 1px solid #ddd; margin: 40px 0; }
-  table { border-collapse: collapse; width: 100%; margin: 20px 0; }
-  th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: center; }
-  th { background: #f6f8fa; }
 </style>
 </head><body>
 
 <h1>왜 코딩 AI는 자꾸 '이건 나중에 해도 됨'이라고 할까 — 학습 데이터, RLHF, 평가 비대칭</h1>
 
-<p><em>이 글은 <a href="https://yunjeongiya.github.io/posts/076/">블로그</a>에서도 읽을 수 있습니다. (<a href="https://yunjeongiya.github.io/posts/076-en/">English version here</a>)</em></p>
+<p><em>? ?? <a href="https://yunjeongiya.github.io/posts/076/">???</a>??? ?? ? ????. (<a href="https://yunjeongiya.github.io/posts/076-en/">English version here</a>)</em></p>
 
 <p><img alt="코딩 AI는 왜 자꾸 미룰까" src="https://yunjeongiya.github.io/assets/images/posts/076-why-llm-defers-work/thumbnail.png" /></p>
 <h2>TL;DR</h2>
@@ -47,6 +43,7 @@
 <p>검증해보니 <strong>부분적으로 맞았다</strong>.</p>
 <h3>TODO는 코드 어디에나 있다</h3>
 <p>가장 오래된 측정은 <a href="http://users.encs.concordia.ca/~eshihab/pubs/Potdar_ICSME2014.pdf">Potdar &amp; Shihab의 ICSME 2014 논문</a>이다. Eclipse, Chromium OS, Apache HTTP, ArgoUML 4개 대형 프로젝트의 101,762개 코멘트를 사람이 직접 분류했다. 결과:</p>
+<p>여기서 SATD는 <strong>Self-Admitted Technical Debt</strong>, 즉 &quot;개발자가 스스로 인정한 기술 부채&quot;다. 코드 안에 <code>TODO</code>, <code>FIXME</code>, <code>HACK</code>, <code>temporary workaround</code>, <code>clean this up later</code> 같은 주석으로 &quot;이거 완벽하지 않다&quot;, &quot;나중에 고쳐야 한다&quot;고 남겨둔 흔적을 말한다. TODO와 완전히 같진 않지만, 이 글에서는 둘 다 <strong>미완성/임시/나중에 정리 패턴</strong>으로 묶어서 본다.</p>
 <ul>
 <li><strong>파일의 2.4-31%가 Self-Admitted Technical Debt(SATD)를 포함</strong></li>
 <li>더 흥미로운 건, &quot;<strong>경험 많은 개발자가 SATD를 더 많이 추가한다</strong>&quot; — 시간 압박이 원인이라는 통념과 반대였다</li>

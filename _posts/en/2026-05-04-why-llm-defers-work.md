@@ -56,6 +56,8 @@ After digging into the evidence, this was **partly true**.
 
 One of the older measurements is [Potdar & Shihab, ICSME 2014](http://users.encs.concordia.ca/~eshihab/pubs/Potdar_ICSME2014.pdf). They manually classified 101,762 comments from four large projects: Eclipse, Chromium OS, Apache HTTP, and ArgoUML.
 
+SATD means **Self-Admitted Technical Debt**: debt that developers explicitly admit in the code itself. Think comments like `TODO`, `FIXME`, `HACK`, `temporary workaround`, or `clean this up later`. TODO and SATD are not identical, but in this post I group them as the same broader pattern: unfinished, temporary, or "clean this up later" work.
+
 Results:
 
 - **2.4-31% of files contained Self-Admitted Technical Debt (SATD)**

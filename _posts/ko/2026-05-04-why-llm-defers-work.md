@@ -46,6 +46,8 @@ published: true
 
 가장 오래된 측정은 [Potdar & Shihab의 ICSME 2014 논문](http://users.encs.concordia.ca/~eshihab/pubs/Potdar_ICSME2014.pdf)이다. Eclipse, Chromium OS, Apache HTTP, ArgoUML 4개 대형 프로젝트의 101,762개 코멘트를 사람이 직접 분류했다. 결과:
 
+여기서 SATD는 **Self-Admitted Technical Debt**, 즉 "개발자가 스스로 인정한 기술 부채"다. 코드 안에 `TODO`, `FIXME`, `HACK`, `temporary workaround`, `clean this up later` 같은 주석으로 "이거 완벽하지 않다", "나중에 고쳐야 한다"고 남겨둔 흔적을 말한다. TODO와 완전히 같진 않지만, 이 글에서는 둘 다 **미완성/임시/나중에 정리 패턴**으로 묶어서 본다.
+
 - **파일의 2.4-31%가 Self-Admitted Technical Debt(SATD)를 포함**
 - 더 흥미로운 건, "**경험 많은 개발자가 SATD를 더 많이 추가한다**" — 시간 압박이 원인이라는 통념과 반대였다
 - 시간 압박과 SATD 도입은 통계적으로 무관
