@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="480" viewBox="0 0 980 480" role="img" aria-labelledby="title desc">
+  <title id="title">Visible failures and invisible failures</title>
+  <desc id="desc">Over-action is immediately visible in review while under-action is often missed, pushing models toward narrow completion</desc>
+  <defs>
+    <marker id="arrow-red" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#f87171"/></marker>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#38bdf8"/></marker>
+  </defs>
+  <rect width="980" height="480" rx="18" fill="#0d1117"/>
+  <text x="490" y="48" text-anchor="middle" fill="#e5e7eb" font-family="Arial, sans-serif" font-size="28" font-weight="700">Eval Asymmetry: Visible vs Invisible Failure</text>
+  <text x="490" y="80" text-anchor="middle" fill="#94a3b8" font-family="Arial, sans-serif" font-size="17">The model learns to avoid the failure reviewers catch immediately</text>
+  <g font-family="Arial, sans-serif">
+    <rect x="70" y="122" width="370" height="250" rx="16" fill="#1f1417" stroke="#ef4444" stroke-width="2"/>
+    <text x="255" y="164" text-anchor="middle" fill="#fca5a5" font-size="23" font-weight="700">over-action</text>
+    <text x="255" y="196" text-anchor="middle" fill="#e5e7eb" font-size="17">does more than asked</text>
+    <path d="M255 220 L255 270" stroke="#f87171" stroke-width="3" marker-end="url(#arrow-red)"/>
+    <rect x="126" y="278" width="258" height="58" rx="10" fill="#111827" stroke="#7f1d1d"/>
+    <text x="255" y="313" text-anchor="middle" fill="#fecaca" font-size="17">visible in review</text>
+    <text x="255" y="350" text-anchor="middle" fill="#fca5a5" font-size="15">fast penalty</text>
+    <rect x="540" y="122" width="370" height="250" rx="16" fill="#101923" stroke="#38bdf8" stroke-width="2"/>
+    <text x="725" y="164" text-anchor="middle" fill="#bae6fd" font-size="23" font-weight="700">under-action</text>
+    <text x="725" y="196" text-anchor="middle" fill="#e5e7eb" font-size="17">skips required work</text>
+    <path d="M725 220 L725 270" stroke="#38bdf8" stroke-width="3" marker-end="url(#arrow-blue)"/>
+    <rect x="596" y="278" width="258" height="58" rx="10" fill="#111827" stroke="#075985"/>
+    <text x="725" y="313" text-anchor="middle" fill="#dbeafe" font-size="17">missed in short review</text>
+    <text x="725" y="350" text-anchor="middle" fill="#93c5fd" font-size="15">delayed penalty</text>
+  </g>
+  <g font-family="Arial, sans-serif">
+    <rect x="245" y="404" width="490" height="46" rx="12" fill="#122033" stroke="#38bdf8"/>
+    <text x="490" y="433" text-anchor="middle" fill="#e0f2fe" font-size="18" font-weight="700">Result: narrow completion + "I'll do it later"</text>
+  </g>
+</svg>

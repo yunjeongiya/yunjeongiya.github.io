@@ -1,0 +1,45 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="980" height="520" viewBox="0 0 980 520" role="img" aria-labelledby="title desc">
+  <title id="title">코딩 AI가 작업을 미루는 세 가지 압력</title>
+  <desc id="desc">학습 데이터, RLHF 보상 왜곡, 평가 비대칭이 미루기와 임시 패치로 합쳐지는 구조</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#38bdf8"/>
+    </marker>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#000000" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+  <rect width="980" height="520" rx="18" fill="#0d1117"/>
+  <text x="490" y="48" text-anchor="middle" fill="#e5e7eb" font-family="'Malgun Gothic', Arial, 'Noto Sans KR', sans-serif" font-size="28" font-weight="700">왜 코딩 AI는 "나중에"를 고를까</text>
+  <text x="490" y="82" text-anchor="middle" fill="#94a3b8" font-family="'Malgun Gothic', Arial, 'Noto Sans KR', sans-serif" font-size="17">한 가지 버릇이 아니라, 세 압력이 같은 방향으로 민 결과</text>
+
+  <g font-family="'Malgun Gothic', Arial, 'Noto Sans KR', sans-serif" filter="url(#shadow)">
+    <rect x="58" y="130" width="248" height="168" rx="14" fill="#111827" stroke="#22c55e" stroke-width="2"/>
+    <text x="182" y="166" text-anchor="middle" fill="#86efac" font-size="21" font-weight="700">학습 데이터</text>
+    <text x="182" y="203" text-anchor="middle" fill="#e5e7eb" font-size="17">SATD / TODO</text>
+    <text x="182" y="230" text-anchor="middle" fill="#e5e7eb" font-size="17">미해결 부채</text>
+    <text x="182" y="257" text-anchor="middle" fill="#94a3b8" font-size="15">"나중에 고쳐" 패턴</text>
+
+    <rect x="366" y="130" width="248" height="168" rx="14" fill="#111827" stroke="#f59e0b" stroke-width="2"/>
+    <text x="490" y="166" text-anchor="middle" fill="#fcd34d" font-size="21" font-weight="700">RLHF 보상</text>
+    <text x="490" y="203" text-anchor="middle" fill="#e5e7eb" font-size="17">길고 그럴듯한 답</text>
+    <text x="490" y="230" text-anchor="middle" fill="#e5e7eb" font-size="17">확신 있는 톤</text>
+    <text x="490" y="257" text-anchor="middle" fill="#94a3b8" font-size="15">미루기도 설득력 있게 포장</text>
+
+    <rect x="674" y="130" width="248" height="168" rx="14" fill="#111827" stroke="#ef4444" stroke-width="2"/>
+    <text x="798" y="166" text-anchor="middle" fill="#fca5a5" font-size="21" font-weight="700">평가 비대칭</text>
+    <text x="798" y="203" text-anchor="middle" fill="#e5e7eb" font-size="17">한 일은 보임</text>
+    <text x="798" y="230" text-anchor="middle" fill="#e5e7eb" font-size="17">안 한 일은 안 보임</text>
+    <text x="798" y="257" text-anchor="middle" fill="#94a3b8" font-size="15">under-action이 덜 위험</text>
+  </g>
+
+  <path d="M182 308 C182 366 352 376 430 390" stroke="#38bdf8" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+  <path d="M490 308 L490 372" stroke="#38bdf8" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+  <path d="M798 308 C798 366 628 376 550 390" stroke="#38bdf8" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+
+  <g font-family="'Malgun Gothic', Arial, 'Noto Sans KR', sans-serif" filter="url(#shadow)">
+    <rect x="285" y="386" width="410" height="86" rx="16" fill="#122033" stroke="#38bdf8" stroke-width="2"/>
+    <text x="490" y="422" text-anchor="middle" fill="#e0f2fe" font-size="22" font-weight="700">임시 패치 + 작업 미루기</text>
+    <text x="490" y="452" text-anchor="middle" fill="#bae6fd" font-size="16">"이 부분은 다음 PR에서 처리하겠습니다"</text>
+  </g>
+</svg>

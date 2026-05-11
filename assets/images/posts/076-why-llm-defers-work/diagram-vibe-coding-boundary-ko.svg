@@ -1,0 +1,44 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="980" height="540" viewBox="0 0 980 540" role="img" aria-labelledby="title desc">
+  <title id="title">바이브코딩을 맡길지 판단하는 기준</title>
+  <desc id="desc">AI가 틀렸을 때 빨리 알아차릴 수 있는 작업은 맡기고, 빨리 알아차릴 수 없는 작업은 조사나 리뷰로 제한하는 판단표</desc>
+  <rect width="980" height="540" rx="18" fill="#0d1117"/>
+  <text x="490" y="48" text-anchor="middle" fill="#e5e7eb" font-family="'Malgun Gothic', Arial, 'Noto Sans KR', sans-serif" font-size="28" font-weight="700">바이브코딩은 언제 효율적인가</text>
+  <text x="490" y="82" text-anchor="middle" fill="#94a3b8" font-family="'Malgun Gothic', Arial, 'Noto Sans KR', sans-serif" font-size="17">핵심 질문: AI가 틀렸을 때 빨리 알아차릴 수 있는가</text>
+
+  <g font-family="'Malgun Gothic', Arial, 'Noto Sans KR', sans-serif">
+    <rect x="58" y="124" width="392" height="340" rx="16" fill="#102016" stroke="#22c55e" stroke-width="2"/>
+    <text x="254" y="165" text-anchor="middle" fill="#86efac" font-size="23" font-weight="700">맡겨도 좋은 일</text>
+    <text x="254" y="198" text-anchor="middle" fill="#bbf7d0" font-size="15">검증 경계가 선명함</text>
+
+    <g fill="#e5e7eb" font-size="17">
+      <rect x="94" y="230" width="320" height="42" rx="8" fill="#111827" stroke="#166534"/>
+      <text x="254" y="257" text-anchor="middle">초안 / 스캐폴딩</text>
+      <rect x="94" y="284" width="320" height="42" rx="8" fill="#111827" stroke="#166534"/>
+      <text x="254" y="311" text-anchor="middle">테스트 아이디어</text>
+      <rect x="94" y="338" width="320" height="42" rx="8" fill="#111827" stroke="#166534"/>
+      <text x="254" y="365" text-anchor="middle">반복 CRUD / DTO 변환</text>
+      <rect x="94" y="392" width="320" height="42" rx="8" fill="#111827" stroke="#166534"/>
+      <text x="254" y="419" text-anchor="middle">문서화 / 비교 / 탐색</text>
+    </g>
+
+    <rect x="530" y="124" width="392" height="340" rx="16" fill="#211416" stroke="#ef4444" stroke-width="2"/>
+    <text x="726" y="165" text-anchor="middle" fill="#fca5a5" font-size="23" font-weight="700">그대로 맡기면 위험한 일</text>
+    <text x="726" y="198" text-anchor="middle" fill="#fecaca" font-size="15">틀려도 늦게 보임</text>
+
+    <g fill="#e5e7eb" font-size="17">
+      <rect x="566" y="230" width="320" height="42" rx="8" fill="#111827" stroke="#7f1d1d"/>
+      <text x="726" y="257" text-anchor="middle">권한 / 결제 / 보안</text>
+      <rect x="566" y="284" width="320" height="42" rx="8" fill="#111827" stroke="#7f1d1d"/>
+      <text x="726" y="311" text-anchor="middle">DB 정합성 / 마이그레이션</text>
+      <rect x="566" y="338" width="320" height="42" rx="8" fill="#111827" stroke="#7f1d1d"/>
+      <text x="726" y="365" text-anchor="middle">복잡한 기존 비즈니스 로직</text>
+      <rect x="566" y="392" width="320" height="42" rx="8" fill="#111827" stroke="#7f1d1d"/>
+      <text x="726" y="419" text-anchor="middle">긴 작업의 끝마무리</text>
+    </g>
+  </g>
+
+  <g font-family="'Malgun Gothic', Arial, 'Noto Sans KR', sans-serif">
+    <rect x="220" y="486" width="540" height="36" rx="10" fill="#122033" stroke="#38bdf8"/>
+    <text x="490" y="509" text-anchor="middle" fill="#e0f2fe" font-size="16" font-weight="700">빨리 검증 가능하면 구현자, 아니면 조사원/리뷰어로 쓴다</text>
+  </g>
+</svg>

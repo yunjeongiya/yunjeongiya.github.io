@@ -1,0 +1,41 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="980" height="500" viewBox="0 0 980 500" role="img" aria-labelledby="title desc">
+  <title id="title">임시 패치가 강화되는 루프</title>
+  <desc id="desc">문제 해결 실패가 임시 패치, 테스트 통과, 숨은 부채, 반복 패턴으로 이어지는 루프</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#38bdf8"/></marker>
+  </defs>
+  <rect width="980" height="500" rx="18" fill="#0d1117"/>
+  <text x="490" y="48" text-anchor="middle" fill="#e5e7eb" font-family="'Malgun Gothic', Arial, 'Noto Sans KR', sans-serif" font-size="28" font-weight="700">"temporary fix"가 끝까지 남는 루프</text>
+  <text x="490" y="82" text-anchor="middle" fill="#94a3b8" font-family="'Malgun Gothic', Arial, 'Noto Sans KR', sans-serif" font-size="17">평가가 통과 신호만 보면 임시 패치는 전략이 된다</text>
+
+  <g font-family="'Malgun Gothic', Arial, 'Noto Sans KR', sans-serif" font-size="17">
+    <rect x="70" y="155" width="180" height="86" rx="14" fill="#111827" stroke="#f97316" stroke-width="2"/>
+    <text x="160" y="190" text-anchor="middle" fill="#fed7aa" font-weight="700">원인 해결 실패</text>
+    <text x="160" y="218" text-anchor="middle" fill="#e5e7eb">버그는 그대로</text>
+
+    <path d="M260 198 L348 198" stroke="#38bdf8" stroke-width="3" marker-end="url(#arrow)"/>
+
+    <rect x="360" y="155" width="180" height="86" rx="14" fill="#111827" stroke="#facc15" stroke-width="2"/>
+    <text x="450" y="190" text-anchor="middle" fill="#fde68a" font-weight="700">임시 패치</text>
+    <text x="450" y="218" text-anchor="middle" fill="#e5e7eb">hardcode / skip</text>
+
+    <path d="M550 198 L638 198" stroke="#38bdf8" stroke-width="3" marker-end="url(#arrow)"/>
+
+    <rect x="650" y="155" width="180" height="86" rx="14" fill="#111827" stroke="#22c55e" stroke-width="2"/>
+    <text x="740" y="190" text-anchor="middle" fill="#bbf7d0" font-weight="700">테스트 통과</text>
+    <text x="740" y="218" text-anchor="middle" fill="#e5e7eb">점수는 좋아짐</text>
+
+    <path d="M740 250 C740 322 650 344 572 344" stroke="#38bdf8" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+
+    <rect x="360" y="300" width="220" height="88" rx="14" fill="#1f1417" stroke="#ef4444" stroke-width="2"/>
+    <text x="470" y="335" text-anchor="middle" fill="#fecaca" font-weight="700">숨은 부채</text>
+    <text x="470" y="363" text-anchor="middle" fill="#e5e7eb">리뷰에서 안 보일 수 있음</text>
+
+    <path d="M350 344 C225 344 160 302 160 252" stroke="#38bdf8" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+  </g>
+
+  <g font-family="'Malgun Gothic', Arial, 'Noto Sans KR', sans-serif">
+    <rect x="225" y="420" width="530" height="44" rx="12" fill="#122033" stroke="#38bdf8"/>
+    <text x="490" y="448" text-anchor="middle" fill="#e0f2fe" font-size="17" font-weight="700">"나중에 정리" 약속은 평가에 잘 안 잡히고, 패턴만 남는다</text>
+  </g>
+</svg>

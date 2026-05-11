@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1680" height="945" viewBox="0 0 1680 945" role="img" aria-labelledby="title desc">
+  <title id="title">Why Does Coding AI Keep Deferring?</title>
+  <desc id="desc">English blog thumbnail text overlay for a post about AI deferring coding work</desc>
+  <defs>
+    <linearGradient id="leftShade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#030712" stop-opacity="0.98"/>
+      <stop offset="0.42" stop-color="#030712" stop-opacity="0.9"/>
+      <stop offset="0.72" stop-color="#030712" stop-opacity="0.34"/>
+      <stop offset="1" stop-color="#030712" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="textShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000000" flood-opacity="0.62"/>
+    </filter>
+  </defs>
+
+  <rect width="1680" height="945" fill="url(#leftShade)"/>
+  <rect x="70" y="76" width="126" height="50" rx="12" fill="#111827" stroke="#38bdf8" stroke-width="2"/>
+  <text x="133" y="110" text-anchor="middle" fill="#67e8f9" font-family="Arial, sans-serif" font-size="27" font-weight="800">076</text>
+
+  <g filter="url(#textShadow)" font-family="Arial, sans-serif">
+    <text x="82" y="246" fill="#ffffff" font-size="86" font-weight="900">WHY DOES</text>
+    <text x="82" y="370" fill="#ffffff" font-size="108" font-weight="900">CODING AI</text>
+    <text x="82" y="512" fill="#facc15" font-size="126" font-weight="900">DEFER?</text>
+  </g>
+
+  <rect x="82" y="606" width="640" height="74" rx="12" fill="#111827" fill-opacity="0.82" stroke="#38bdf8" stroke-width="2"/>
+  <text x="112" y="655" fill="#e0f2fe" font-family="Arial, sans-serif" font-size="38" font-weight="800">The Eval Asymmetry Trap</text>
+
+  <g font-family="Arial, sans-serif" font-size="28" font-weight="700">
+    <rect x="82" y="724" width="210" height="58" rx="29" fill="#12251c" stroke="#22c55e" stroke-width="2"/>
+    <text x="187" y="762" text-anchor="middle" fill="#86efac">Training Data</text>
+    <rect x="316" y="724" width="180" height="58" rx="29" fill="#2a2111" stroke="#f59e0b" stroke-width="2"/>
+    <text x="406" y="762" text-anchor="middle" fill="#fcd34d">RLHF</text>
+    <rect x="520" y="724" width="220" height="58" rx="29" fill="#2b1517" stroke="#ef4444" stroke-width="2"/>
+    <text x="630" y="762" text-anchor="middle" fill="#fca5a5">Evaluation</text>
+  </g>
+</svg>
