@@ -7,7 +7,7 @@ tags: [llm, claude-code, rlhf, evaluation, alignment, technical-debt]
 lang: en
 slug: "076-en"
 thumbnail: /assets/images/posts/076-why-llm-defers-work/thumbnail-en.png
-published: false
+published: true
 ---
 
 ![Why does coding AI keep deferring?](/assets/images/posts/076-why-llm-defers-work/thumbnail-en.png){: width="700"}

@@ -7,7 +7,7 @@ tags: [llm, claude-code, rlhf, evaluation, alignment, technical-debt]
 lang: ko
 slug: "076"
 thumbnail: /assets/images/posts/076-why-llm-defers-work/thumbnail.png
-published: false
+published: true
 ---
 
 ![코딩 AI는 왜 자꾸 미룰까](/assets/images/posts/076-why-llm-defers-work/thumbnail.png){: width="700"}
