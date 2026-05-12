@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 460" role="img" aria-labelledby="title desc">
+  <title id="title">Five Entity-DB drift patterns</title>
+  <desc id="desc">Five drift patterns: rename orphan, double unique, hotfix unsync, name-column mismatch, and FK orphan.</desc>
+  <rect width="900" height="460" rx="14" fill="#0d1117"/>
+  <text x="42" y="52" fill="#8ab4f8" font-family="Segoe UI, sans-serif" font-size="25">Five ways entity and prod DB drift apart</text>
+  <g font-family="Segoe UI, sans-serif" font-size="18">
+    <rect x="62" y="92" width="230" height="112" rx="10" fill="#17122a" stroke="#8957e5"/>
+    <text x="86" y="132" fill="#f0f6fc">rename orphan</text><text x="86" y="164" fill="#d8b9ff">old index remains</text>
+    <rect x="334" y="92" width="230" height="112" rx="10" fill="#2a1115" stroke="#f85149"/>
+    <text x="358" y="132" fill="#f0f6fc">double UNIQUE</text><text x="358" y="164" fill="#ffb3ad">same constraint twice</text>
+    <rect x="606" y="92" width="230" height="112" rx="10" fill="#2d2308" stroke="#f2cc60"/>
+    <text x="630" y="132" fill="#f0f6fc">hotfix unsync</text><text x="630" y="164" fill="#ffe9a8">prod ALTER only</text>
+    <rect x="198" y="246" width="230" height="112" rx="10" fill="#111827" stroke="#58a6ff"/>
+    <text x="222" y="286" fill="#f0f6fc">name mismatch</text><text x="222" y="318" fill="#c9d1d9">humans misread</text>
+    <rect x="470" y="246" width="230" height="112" rx="10" fill="#092d26" stroke="#2ea043"/>
+    <text x="494" y="286" fill="#f0f6fc">FK orphan</text><text x="494" y="318" fill="#a7f3c4">DB protects FK</text>
+  </g>
+</svg>

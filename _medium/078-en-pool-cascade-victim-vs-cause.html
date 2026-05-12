@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<title>DB pool exhaustion cascade: do not mistake victim traces for causes</title>
+<style>html{background:#fff}body{max-width:680px;margin:40px auto;font-family:Georgia,serif;font-size:18px;line-height:1.7;color:#333;background:#fff;padding:0 20px}h1{font-size:32px;line-height:1.3}h2{font-size:24px;margin-top:40px}h3{font-size:20px;margin-top:30px}img{max-width:100%;margin:20px 0;border-radius:6px}pre{background:#f6f8fa;padding:16px;overflow-x:auto;font-size:14px;line-height:1.5;border-radius:6px}code{background:#f6f8fa;padding:2px 6px;font-size:15px;border-radius:3px}pre code{background:transparent;padding:0}blockquote{border-left:3px solid #ccc;margin-left:0;padding-left:20px;color:#555}strong{font-weight:700}table{border-collapse:collapse;margin:20px 0;width:100%}th,td{border:1px solid #ddd;padding:8px 12px;text-align:left}th{background:#f6f8fa}</style>
+</head><body>
+
+<h1>DB pool exhaustion cascade: do not mistake victim traces for causes</h1>
+
+
+<blockquote><p>5/4 DB incident series</p><p>1. <a href="https://yunjeongiya.github.io/posts/077-en/">When a cardinality=1 single-column index beats the compound index</a></p><p>2. <strong>DB pool exhaustion cascade: do not mistake victim traces for causes</strong></p><p>3. <a href="https://yunjeongiya.github.io/posts/079-en/">Latent slow query incident: why &quot;why today?&quot; may have no clean answer</a></p><p>4. <a href="https://yunjeongiya.github.io/posts/080-en/">124 index anti-patterns found, 19 dropped — why the rest stayed</a></p><p>5. <a href="https://yunjeongiya.github.io/posts/081-en/">JPA @Index is not prod DB index — 5 Entity-DB drift patterns</a></p></blockquote>
+
+<p><img src="https://yunjeongiya.github.io/assets/images/posts/078-pool-cascade/thumbnail-en.jpg" alt="one cause many victim leak warnings"></p>
+
+<h2>Introduction</h2>
+
+<p>When <code>Apparent connection leak detected</code> warnings fire from eight services, the intuitive reaction is: &quot;we have eight leaks.&quot; In a single-pool cascade, that intuition is often wrong. One path can be the cause; the rest can be victims.</p>
+
+<p>This post describes how we separated cause from victim during the incident review.</p>
+
+<h2>Background / Problem</h2>
+
+<p>At the P0 moment, leak warnings appeared across eight service paths:</p>
+
+<table>
+<thead><tr><th>Source</th><th>Warning count</th></tr></thead>
+<tbody>
+<tr><td>User progress lookup</td><td>20</td></tr>
+<tr><td>Catalog tree lazy load</td><td>11</td></tr>
+<tr><td>Virtual task aggregation</td><td>6</td></tr>
+<tr><td>Integrated status aggregation</td><td>4</td></tr>
+<tr><td>User list lookup</td><td>3</td></tr>
+<tr><td>Calendar schedule</td><td>2</td></tr>
+<tr><td>Auth login / refresh</td><td>4</td></tr>
+<tr><td>Notification scheduler</td><td>1</td></tr>
+</tbody>
+</table>
+
+<p>The first instinct was to audit transaction leaks in every domain. That would have turned into several days of unnecessary work.</p>
+
+<h2>Mechanism</h2>
+
+<p>HikariCP <code>leakDetectionThreshold</code> defaults to <code>0</code>, meaning disabled. Our setting was 30 seconds.</p>
+
+<p>The warning means: a borrowed connection has not been returned within the threshold. It does not necessarily mean the code forgot to close a connection.</p>
+
+<p>In this incident:</p>
+
+<ul><li>Several concurrent executions of the same slow path held connections for too long.</li><li>The pool became saturated.</li><li>Other requests waited for connections or ran under heavy DB CPU pressure.</li><li>Normal queries also crossed the 30-second threshold.</li><li>Those normal paths emitted their own stack traces as leak warnings.</li></ul>
+
+<p><img src="https://yunjeongiya.github.io/assets/images/posts/078-pool-cascade/pool-cascade-diagram.svg" alt="Connection pool cascade diagram"></p>
+
+<h2>Cause / Victim Rule</h2>
+
+<p>For each warning source:</p>
+
+<pre><code class="language-sql">EXPLAIN [that query];
+-- then measure standalone runtime on prod-like data</code></pre>
+
+<ul><li>Fast alone: victim of the cascade.</li><li>Slow alone: possible independent cause.</li></ul>
+
+<p>The result was simple: one slow query was the cause; the rest were victims. Fixing the one index problem removed the entire warning spread the next day, even with higher traffic.</p>
+
+<p><img src="https://yunjeongiya.github.io/assets/images/posts/078-pool-cascade/cause-victim-check-loop.svg" alt="Cause victim check loop"></p>
+
+<h2>Lessons</h2>
+
+<h3>Distributed signals do not imply distributed causes</h3>
+
+<p>The same incident can generate many stack traces. Treat them as evidence, not as separate tickets by default.</p>
+
+<h3>Validate standalone behavior first</h3>
+
+<p>Before starting code changes in seven domains, measure each query alone. Thirty minutes of diagnosis can save days of false cleanup.</p>
+
+<h3>The word &quot;leak&quot; is misleading</h3>
+
+<p>Read the warning as &quot;borrow time exceeded threshold.&quot; It can still reveal a real leak, but it can also reveal slow work under a saturated pool.</p>
+
+<h2>Next</h2>
+
+<p>After root cause and cascade structure were clear, the next question was: why did it happen today? <a href="https://yunjeongiya.github.io/posts/079-en/">The next post</a> covers latent incidents where that question has no clean trigger answer.</p>
+
+<h2>References</h2>
+
+<ul><li>HikariCP: <a href="https://github.com/brettwooldridge/HikariCP#frequently-used">leakDetectionThreshold</a></li><li>Useful pool metrics during review: <code>pool_active</code>, <code>pool_pending</code>, <code>pool_idle</code></li><li>Resilience4j circuit breakers as a first containment layer during pool exhaustion</li></ul>
+
+</body></html>

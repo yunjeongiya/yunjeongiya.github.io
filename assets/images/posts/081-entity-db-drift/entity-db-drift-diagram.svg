@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 450" role="img" aria-labelledby="title desc">
+  <title id="title">Entity to database index drift patterns</title>
+  <desc id="desc">JPA entity index declarations and production database indexes drift apart through several patterns.</desc>
+  <rect width="900" height="450" rx="14" fill="#0d1117"/>
+  <text x="42" y="52" fill="#8ab4f8" font-family="Segoe UI, sans-serif" font-size="24">Entity-DB index drift</text>
+  <rect x="72" y="96" width="250" height="260" rx="12" fill="#17122a" stroke="#8957e5"/>
+  <text x="132" y="132" fill="#d8b9ff" font-family="Segoe UI, sans-serif" font-size="22">Entity</text>
+  <rect x="578" y="96" width="250" height="260" rx="12" fill="#0f2633" stroke="#39c5cf"/>
+  <text x="650" y="132" fill="#b8f7ff" font-family="Segoe UI, sans-serif" font-size="22">Prod DB</text>
+  <g font-family="Consolas, monospace" font-size="15" fill="#f0f6fc">
+    <text x="104" y="178">@Index A</text><text x="104" y="220">@Index B</text><text x="104" y="262">@Column unique</text><text x="104" y="304">FK mapping</text>
+    <text x="620" y="178">idx_a_old</text><text x="620" y="220">idx_b</text><text x="620" y="262">unique + idx_unique</text><text x="620" y="304">fk helper index</text>
+  </g>
+  <g stroke-width="3" fill="none">
+    <path d="M322 172 C420 158 488 158 578 178" stroke="#f2cc60" stroke-dasharray="7 7"/>
+    <path d="M322 214 C430 214 482 214 578 214" stroke="#39c5cf"/>
+    <path d="M322 258 C430 276 482 276 578 260" stroke="#f85149"/>
+    <path d="M322 300 C430 332 482 332 578 304" stroke="#8957e5" stroke-dasharray="7 7"/>
+  </g>
+  <circle cx="450" cy="258" r="18" fill="#2a1115" stroke="#f85149"/>
+  <text x="444" y="265" fill="#ffb3ad" font-family="Segoe UI, sans-serif" font-size="22">!</text>
+  <rect x="238" y="382" width="424" height="42" rx="8" fill="#161b22" stroke="#30363d"/>
+  <text x="276" y="409" fill="#f0f6fc" font-family="Segoe UI, sans-serif" font-size="18">cross-check entity grep x information_schema</text>
+</svg>

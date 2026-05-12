@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<title>cardinality=1 단일컬럼 인덱스가 새 compound index를 무력화한다</title>
+<style>html{background:#fff}body{max-width:680px;margin:40px auto;font-family:Georgia,serif;font-size:18px;line-height:1.7;color:#333;background:#fff;padding:0 20px}h1{font-size:32px;line-height:1.3}h2{font-size:24px;margin-top:40px}h3{font-size:20px;margin-top:30px}img{max-width:100%;margin:20px 0;border-radius:6px}pre{background:#f6f8fa;padding:16px;overflow-x:auto;font-size:14px;line-height:1.5;border-radius:6px}code{background:#f6f8fa;padding:2px 6px;font-size:15px;border-radius:3px}pre code{background:transparent;padding:0}blockquote{border-left:3px solid #ccc;margin-left:0;padding-left:20px;color:#555}strong{font-weight:700}table{border-collapse:collapse;margin:20px 0;width:100%}th,td{border:1px solid #ddd;padding:8px 12px;text-align:left}th{background:#f6f8fa}</style>
+</head><body>
+
+<h1>cardinality=1 단일컬럼 인덱스가 새 compound index를 무력화한다</h1>
+
+
+<blockquote><p>5/4 DB incident 시리즈</p><p>1. <strong>cardinality=1 단일컬럼 인덱스가 새 compound index를 무력화한다</strong></p><p>2. <a href="https://yunjeongiya.github.io/posts/078/">DB 풀 고갈 cascade: leak 출처 분산에 속지 말 것</a></p><p>3. <a href="https://yunjeongiya.github.io/posts/079/">잠복 슬로우 쿼리 incident: &quot;왜 하필 오늘?&quot;의 답을 짚을 수 없는 이유</a></p><p>4. <a href="https://yunjeongiya.github.io/posts/080/">anti-pattern 124곳 발견, DROP은 19개 — 나머지를 그대로 둔 이유</a></p><p>5. <a href="https://yunjeongiya.github.io/posts/081/">JPA @Index ≠ prod DB index — Entity-DB drift 의 5가지 패턴</a></p></blockquote>
+
+<p><img src="https://yunjeongiya.github.io/assets/images/posts/077-cardinality-one-index/thumbnail-ko.jpg" alt="잘못된 이정표가 좋은 인덱스를 지나치게 했다"></p>
+
+<h2>도입</h2>
+
+<p>대형 테이블에 <code>WHERE col_a IN (...) AND flag=1 AND enabled=1</code> 같은 쿼리를 빠르게 만들기 위해 compound index 를 추가했다. 그런데 EXPLAIN 으로 보면 옵티마이저가 그 새 인덱스를 안 고른다. 대신 cardinality 가 1인 (값이 사실상 두 종류뿐인 boolean 컬럼에 붙어 있던) 단일컬럼 인덱스를 골라서 사실상 풀스캔에 가까운 실행을 한다.</p>
+
+<p>이 글은 그 함정의 메커니즘과 처방을 정리한다. 실제 prod P0 incident 사후 분석에서 도출된 패턴이다.</p>
+
+<h2>배경 / 문제</h2>
+
+<p>수십만 row 규모의 카탈로그 테이블 한 곳에서 잠복하던 슬로우 쿼리가 운영시간 동시 호출에 풀(HikariPool 기본 20개) 을 모두 점유하면서 P0 가 됐다. 단일 쿼리가 50–391 초 동안 conn 을 잡았다. 12개 endpoint 가 cascade 로 circuit breaker OPEN.</p>
+
+<p>원인 쿼리:</p>
+
+<pre><code class="language-sql">SELECT id, group_id, parent_id, order_index, name
+FROM item_catalog
+WHERE group_id IN (?, ?, ?, ?, ?, ?)
+  AND leaf_flag = 1
+  AND enabled = 1
+ORDER BY group_id, parent_id, order_index;</code></pre>
+
+<p>테이블 기존 인덱스:</p>
+
+<pre><code>idx_group_id (group_id)                                       -- cardinality 8
+idx_leaf_flag (leaf_flag)                                     -- cardinality 1
+idx_catalog_roots (group_id, parent_id, enabled, order_index, id)
+idx_catalog_children (parent_id, group_id, enabled, order_index, id)</code></pre>
+
+<p><code>idx_leaf_flag</code> 는 boolean 컬럼에 붙은 단일 인덱스. 0/1 두 값뿐이라 cardinality 통계가 1. 일반적으로 이런 인덱스는 선택도가 낮아서 유용하지 않다. 그런데 이 케이스에서는 통계 오차, <code>ORDER BY</code>/filesort 비용 추정, 기존 인덱스 후보들의 비용 비교가 겹치면서 옵티마이저가 이 인덱스를 더 싼 경로로 판단했다. EXPLAIN 결과:</p>
+
+<pre><code>type: ref
+key: idx_leaf_flag
+rows: 293,871
+Extra: Using where; Using filesort</code></pre>
+
+<p><img src="https://yunjeongiya.github.io/assets/images/posts/077-cardinality-one-index/optimizer-path-diagram.svg" alt="Optimizer path diagram"></p>
+
+<h2>해결 과정</h2>
+
+<h3>1차 시도 — compound covering index 추가</h3>
+
+<p>쿼리의 필터와 정렬, 조회 컬럼을 맞춘 compound covering index 추가:</p>
+
+<pre><code class="language-sql">ALTER TABLE item_catalog
+  ADD INDEX idx_catalog_group_leaf_enabled
+  (group_id, leaf_flag, enabled, parent_id, order_index, id, name);</code></pre>
+
+<p>EXPLAIN 재확인 — 여전히 <code>idx_leaf_flag</code> 선택. 새 covering index 가 <code>possible_keys</code> 에 보이지만 옵티마이저가 안 골랐다.</p>
+
+<h3>2차 시도 — <code>ANALYZE TABLE</code></h3>
+
+<p>통계 갱신:</p>
+
+<pre><code class="language-sql">ANALYZE TABLE item_catalog;</code></pre>
+
+<p>다시 EXPLAIN — 그대로. 옵티마이저 비용 추정 모델 자체가 <code>idx_leaf_flag</code> 를 더 싸게 보고 있었다.</p>
+
+<h3>3차 시도 — anti-pattern 인덱스 DROP</h3>
+
+<pre><code class="language-sql">ALTER TABLE item_catalog DROP INDEX idx_leaf_flag;</code></pre>
+
+<p>EXPLAIN 즉시 변경:</p>
+
+<pre><code>type: range
+key: idx_catalog_group_leaf_enabled
+rows: ~200K (추정, 실제 sub-100K)
+Extra: Using where; Using index    ← covering, row lookup 없음</code></pre>
+
+<p>쿼리 시간: <strong>391초 → &lt;50ms</strong>.</p>
+
+<p><img src="https://yunjeongiya.github.io/assets/images/posts/077-cardinality-one-index/before-after-plan.svg" alt="Before and after index plan"></p>
+
+<h2>결과</h2>
+
+<ul><li>풀 회복 (active 20 → idle 14)</li><li>13:09 UTC 이후 leak 경고 0건, 503 0건</li><li>다음 날 같은 endpoint 트래픽 +6% 였지만 incident 없음 — 인덱스가 단일 root cause 였음을 검증</li></ul>
+
+<h2>배운 점</h2>
+
+<h3>cardinality ≤ 2 단일컬럼 인덱스는 anti-pattern</h3>
+
+<p>값이 거의 없는(boolean/flag) 단일 컬럼 인덱스는 본질적으로 존재 가치가 없다. 인덱스 seek 후 거의 전체 row 를 table lookup 하기 때문이다. 그런데도 옵티마이저가 통계를 잘못 읽고 이걸 고르는 케이스가 있다. <strong>존재 자체가 다른 좋은 인덱스를 misleading 한다.</strong></p>
+
+<p>발견 쿼리:</p>
+
+<pre><code class="language-sql">SELECT TABLE_NAME, INDEX_NAME, CARDINALITY
+FROM information_schema.STATISTICS
+WHERE TABLE_SCHEMA = ? AND CARDINALITY &lt;= 2 AND SEQ_IN_INDEX = 1
+ORDER BY TABLE_NAME;</code></pre>
+
+<p>이 쿼리로 prod 전체 audit 했더니 같은 패턴 91건이 더 발견됐다. 빙산의 일각이었다.</p>
+
+<h3><code>ANALYZE TABLE</code> 만으로는 부족</h3>
+
+<p>통계 갱신만으로 옵티마이저 선택이 바뀌지 않는 케이스가 있다. 이론상 <code>FORCE INDEX</code> 같은 우회도 가능하지만, 이번에는 실제 가치가 낮고 오판만 유발하던 단일 인덱스를 제거하는 쪽이 가장 깔끔했다.</p>
+
+<h3>검증 체크리스트 (새 <code>@Index</code> 추가 시)</h3>
+
+<ul><li>추가하려는 컬럼의 distinct value 수 추정 (cardinality 예상치)</li><li>boolean/flag 컬럼은 절대 단일 인덱스 X — compound 안의 부속 컬럼으로만 둠</li><li>DDL 후 EXPLAIN 으로 옵티마이저 선택 확인 — <code>possible_keys</code> 에 떴다고 끝이 아니다, <code>key</code> 가 새 인덱스여야 함</li><li>prod-like 데이터로 EXPLAIN — dev 의 작은 데이터로는 옵티마이저가 다른 선택을 함</li></ul>
+
+<h3>잠복 인덱스 정리는 정기 audit 영역</h3>
+
+<p>incident 후에야 비로소 다른 91건이 드러난다. 이걸 사후 발견하는 게 아니라 정기 audit (월 1회) 으로 미리 잡는 게 옳다. cron 으로 위 쿼리를 돌려서 결과 0건을 유지하는 방향.</p>
+
+<h2>다음 글</h2>
+
+<p>이 글이 root cause 를 다뤘다면, <a href="https://yunjeongiya.github.io/posts/078/">다음 글</a>은 같은 incident 가 왜 8개 leak 경고처럼 보였는지 다룬다. 분산된 stack trace 를 원인 목록으로 착각하지 않는 방법이다.</p>
+
+<h2>References</h2>
+
+<ul><li>MySQL Reference Manual: <a href="https://dev.mysql.com/doc/refman/8.0/en/cost-model.html">Optimizer Cost Constants</a></li><li>MySQL Reference Manual: <a href="https://dev.mysql.com/doc/refman/8.4/en/index-statistics.html">InnoDB and MyISAM Index Statistics Collection</a></li><li>MySQL Reference Manual: <a href="https://dev.mysql.com/doc/refman/8.0/en/analyze-table.html">ANALYZE TABLE Statement</a></li><li>HikariCP: <a href="https://github.com/brettwooldridge/HikariCP#frequently-used">leakDetectionThreshold</a></li><li><code>EXPLAIN FORMAT=JSON</code> 으로 옵티마이저 선택의 비용 추정치를 직접 들여다보기</li></ul>
+
+</body></html>

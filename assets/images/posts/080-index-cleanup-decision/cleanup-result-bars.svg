@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 420" role="img" aria-labelledby="title desc">
+  <title id="title">Cleanup classification result bars</title>
+  <desc id="desc">The 124 findings were classified into 19 immediate drops, 57 deferred, 2 keep, and 46 case-by-case.</desc>
+  <rect width="900" height="420" rx="14" fill="#0d1117"/>
+  <text x="42" y="52" fill="#8ab4f8" font-family="Segoe UI, sans-serif" font-size="25">124 findings became four different actions</text>
+  <g font-family="Segoe UI, sans-serif" font-size="18" fill="#f0f6fc">
+    <text x="88" y="122">DROP now</text>
+    <rect x="230" y="96" width="133" height="34" rx="7" fill="#f85149"/><text x="382" y="121">19</text>
+    <text x="88" y="182">DEFER</text>
+    <rect x="230" y="156" width="399" height="34" rx="7" fill="#f2cc60"/><text x="648" y="181">57</text>
+    <text x="88" y="242">KEEP</text>
+    <rect x="230" y="216" width="14" height="34" rx="7" fill="#2ea043"/><text x="264" y="241">2</text>
+    <text x="88" y="302">CASE</text>
+    <rect x="230" y="276" width="322" height="34" rx="7" fill="#58a6ff"/><text x="572" y="301">46</text>
+  </g>
+  <text x="88" y="360" fill="#8b949e" font-family="Consolas, monospace" font-size="16">audit finds candidates; cleanup classifies risk</text>
+</svg>

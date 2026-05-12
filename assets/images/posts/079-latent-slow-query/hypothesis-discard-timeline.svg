@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 420" role="img" aria-labelledby="title desc">
+  <title id="title">Hypothesis discard timeline</title>
+  <desc id="desc">Three trigger hypotheses are checked and discarded, leaving latent threshold crossing as the explanation.</desc>
+  <rect width="900" height="420" rx="14" fill="#0d1117"/>
+  <text x="42" y="52" fill="#8ab4f8" font-family="Segoe UI, sans-serif" font-size="25">Not every incident has a trigger to name</text>
+  <line x1="96" y1="210" x2="796" y2="210" stroke="#30363d" stroke-width="4"/>
+  <g font-family="Segoe UI, sans-serif" font-size="18">
+    <circle cx="180" cy="210" r="18" fill="#2a1115" stroke="#f85149" stroke-width="3"/>
+    <text x="126" y="158" fill="#f0f6fc">deploy?</text>
+    <text x="132" y="260" fill="#ffb3ad">rejected</text>
+    <circle cx="360" cy="210" r="18" fill="#2a1115" stroke="#f85149" stroke-width="3"/>
+    <text x="300" y="158" fill="#f0f6fc">traffic?</text>
+    <text x="312" y="260" fill="#ffb3ad">bad logs</text>
+    <circle cx="540" cy="210" r="18" fill="#2a1115" stroke="#f85149" stroke-width="3"/>
+    <text x="480" y="158" fill="#f0f6fc">new users?</text>
+    <text x="492" y="260" fill="#ffb3ad">normal</text>
+    <circle cx="720" cy="210" r="22" fill="#092d26" stroke="#2ea043" stroke-width="3"/>
+    <text x="656" y="158" fill="#f0f6fc">latent</text>
+    <text x="642" y="260" fill="#a7f3c4">threshold</text>
+  </g>
+  <text x="148" y="332" fill="#8b949e" font-family="Consolas, monospace" font-size="16">15m</text>
+  <text x="328" y="332" fill="#8b949e" font-family="Consolas, monospace" font-size="16">25m</text>
+  <text x="508" y="332" fill="#8b949e" font-family="Consolas, monospace" font-size="16">15m</text>
+</svg>

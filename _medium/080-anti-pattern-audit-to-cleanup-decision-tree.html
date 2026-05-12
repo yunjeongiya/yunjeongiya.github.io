@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<title>anti-pattern 124곳 발견, DROP은 19개 — 나머지를 그대로 둔 이유</title>
+<style>html{background:#fff}body{max-width:680px;margin:40px auto;font-family:Georgia,serif;font-size:18px;line-height:1.7;color:#333;background:#fff;padding:0 20px}h1{font-size:32px;line-height:1.3}h2{font-size:24px;margin-top:40px}h3{font-size:20px;margin-top:30px}img{max-width:100%;margin:20px 0;border-radius:6px}pre{background:#f6f8fa;padding:16px;overflow-x:auto;font-size:14px;line-height:1.5;border-radius:6px}code{background:#f6f8fa;padding:2px 6px;font-size:15px;border-radius:3px}pre code{background:transparent;padding:0}blockquote{border-left:3px solid #ccc;margin-left:0;padding-left:20px;color:#555}strong{font-weight:700}table{border-collapse:collapse;margin:20px 0;width:100%}th,td{border:1px solid #ddd;padding:8px 12px;text-align:left}th{background:#f6f8fa}</style>
+</head><body>
+
+<h1>anti-pattern 124곳 발견, DROP은 19개 — 나머지를 그대로 둔 이유</h1>
+
+
+<blockquote><p>5/4 DB incident 시리즈</p><p>1. <a href="https://yunjeongiya.github.io/posts/077/">cardinality=1 단일컬럼 인덱스가 새 compound index를 무력화한다</a></p><p>2. <a href="https://yunjeongiya.github.io/posts/078/">DB 풀 고갈 cascade: leak 출처 분산에 속지 말 것</a></p><p>3. <a href="https://yunjeongiya.github.io/posts/079/">잠복 슬로우 쿼리 incident: &quot;왜 하필 오늘?&quot;의 답을 짚을 수 없는 이유</a></p><p>4. <strong>anti-pattern 124곳 발견, DROP은 19개 — 나머지를 그대로 둔 이유</strong></p><p>5. <a href="https://yunjeongiya.github.io/posts/081/">JPA @Index ≠ prod DB index — Entity-DB drift 의 5가지 패턴</a></p></blockquote>
+
+<p><img src="https://yunjeongiya.github.io/assets/images/posts/080-index-cleanup-decision/thumbnail-ko.jpg" alt="발견 먼저 분류 다음 DROP은 마지막"></p>
+
+<h2>도입</h2>
+
+<p><a href="https://yunjeongiya.github.io/posts/077/">이전 글</a>에서 cardinality=1 단일컬럼 인덱스가 옵티마이저를 misleading 하여 P0 incident 를 만든 케이스와 그 fix 를 다뤘다. fix 직후 같은 DB 전체를 audit 한 결과 동일 anti-pattern 이 91건 더 발견됐고 정기 audit cron 으로 미리 잡자고 결론냈다.</p>
+
+<p>그런데 발견된 124곳을 일괄 DROP 할 수는 없었다. 실제 cleanup 을 돌려보니 즉시 DROP 19건, deferred 57건, KEEP 2건, case-by-case 46건 으로 분리됐다. <strong>발견과 정리는 별개의 의사결정</strong>이다.</p>
+
+<p>이 글은 audit 결과를 분류하고 cleanup 우선순위를 정한 4가지 결정 기준과 그 근거를 정리한다.</p>
+
+<h2>배경 / 문제</h2>
+
+<p>audit 1회 prod 실행 결과:</p>
+
+<ul><li>Cardinality ≤ 2 단일컬럼 인덱스: <strong>92건</strong></li><li>중복 prefix 인덱스 (compound 가 prefix 로 cover): <strong>32건</strong></li><li>FK 컬럼에 인덱스 없는 케이스: 0건</li></ul>
+
+<p>총 124곳 의심. 그대로 보면 &quot;anti-pattern 이 124곳, 다 DROP 하면 된다&quot; 결론에 도달하기 쉽다. 하지만 실제 분류는 더 미묘하다.</p>
+
+<h2>해결 과정 — 4가지 결정 기준</h2>
+
+<p><img src="https://yunjeongiya.github.io/assets/images/posts/080-index-cleanup-decision/cleanup-decision-tree.svg" alt="Index cleanup decision tree"></p>
+
+<h3>1. FK 제약: DROP 불가 또는 compound 교체</h3>
+
+<p>MySQL InnoDB 는 FK 제약 컬럼에 leading prefix 인덱스를 요구한다. 어떤 인덱스가 그 prefix 역할을 하면, 그 인덱스를 DROP 하려면 다른 prefix 인덱스가 있어야 한다. 없으면 DROP rejected (ERROR 1553).</p>
+
+<p>cleanup 에서 만난 케이스:</p>
+
+<pre><code class="language-sql">-- 시도
+ALTER TABLE operator_task DROP INDEX idx_template;
+-- ERROR 1553 (HY000): Cannot drop index &#x27;idx_template&#x27;:
+-- needed in a foreign key constraint</code></pre>
+
+<p><code>operator_task.template_id</code> 는 <code>task_template.id</code> 에 FK. <code>idx_template</code> 이 유일한 template_id-leading 인덱스. DROP 하려면 compound <code>(template_id, ...)</code> 인덱스를 먼저 만들어야 한다.</p>
+
+<p>비용 vs 가치:</p>
+
+<ul><li>새 compound 만들기 → 스토리지 증가 + 정당화할 쿼리 패턴이 있어야 함</li><li>그냥 KEEP → cardinality 가 낮은 단일 인덱스지만 FK 보호 인덱스로 활용</li></ul>
+
+<p><strong>결정 기준</strong>: 단독으로 anti-pattern 형태라도 FK 보호 역할이면 KEEP (또는 compound 로 교체할 정당화 가능 시에만 교체). 코딩 컨벤션에 &quot;cardinality ≤ 2 단일컬럼 인덱스 금지&quot; 룰이 있어도 <strong>FK 보호 인덱스는 예외</strong>로 등록한다.</p>
+
+<h3>2. 옵티마이저가 한 번도 안 쓰는 인덱스: 즉시 DROP</h3>
+
+<p>EXPLAIN 으로 검증할 때 <code>possible_keys</code> 에 후보로 떠도 옵티마이저가 한 번도 선택하지 않는 인덱스가 있다. 이런 건 단순히 anti-pattern 을 넘어 <strong>storage / maintenance overhead 만 발생시키는 dead weight</strong>.</p>
+
+<p>검증 절차:</p>
+
+<ol><li>해당 인덱스가 사용될 만한 모든 query 패턴을 코드베이스 grep</li><li>각 query EXPLAIN 으로 <code>key</code> 컬럼 확인</li><li>한 번도 안 뜨면 → DROP 후보</li></ol>
+
+<p>예시 EXPLAIN:</p>
+
+<pre><code class="language-text">EXPLAIN SELECT * FROM article
+        WHERE org_id = 1 AND source_type = &#x27;MANUAL&#x27; AND active = TRUE;
+
+possible_keys: idx_article_org, idx_article_source_type
+key:           idx_article_org             ← 항상 이거</code></pre>
+
+<p><code>idx_article_source_type</code> 는 후보로만 보이고 실 선택 0건. 코드의 모든 source_type 쿼리도 <code>org_id</code> 와 같이 사용 — <code>org_id</code> 의 selectivity 가 더 높아 옵티마이저가 거기서부터 좁힌다. → 즉시 DROP.</p>
+
+<p>주의: 통계가 prod-like 데이터로 갱신된 상태에서 EXPLAIN. dev 의 작은 데이터로는 옵티마이저가 다른 선택을 한다. <strong>prod 또는 prod-snapshot 으로 검증해야 함</strong>.</p>
+
+<h3>3. 중복 prefix: 검증 후 DROP</h3>
+
+<p>compound 인덱스가 동일 prefix 를 가지면 단일 인덱스는 redundant. MySQL 은 prefix lookup 을 compound 로 처리할 수 있다.</p>
+
+<pre><code class="language-text">compound: idx_user_date_status (user_id, target_date, status)
+single:   idx_user_id (user_id)
+→ idx_user_id 는 redundant. DROP 후 user_id lookup 은 compound prefix 사용</code></pre>
+
+<p>audit query 로 자동 검출 가능:</p>
+
+<pre><code class="language-sql">SELECT s1.TABLE_NAME, s1.INDEX_NAME AS redundant,
+       s2.INDEX_NAME AS covers_it
+FROM information_schema.STATISTICS s1
+JOIN information_schema.STATISTICS s2
+  ON s1.TABLE_SCHEMA = s2.TABLE_SCHEMA
+ AND s1.TABLE_NAME   = s2.TABLE_NAME
+ AND s1.COLUMN_NAME  = s2.COLUMN_NAME
+ AND s2.SEQ_IN_INDEX = 1
+ AND s1.INDEX_NAME  != s2.INDEX_NAME
+WHERE s1.TABLE_SCHEMA = ?
+  AND s1.SEQ_IN_INDEX = 1
+  AND s1.INDEX_NAME NOT IN (   -- s1 must be single-column
+    SELECT INDEX_NAME FROM information_schema.STATISTICS
+    WHERE TABLE_SCHEMA = ? AND SEQ_IN_INDEX = 2
+  )
+  AND s2.INDEX_NAME IN (        -- s2 must be compound (≥2 cols)
+    SELECT INDEX_NAME FROM information_schema.STATISTICS
+    WHERE TABLE_SCHEMA = ? AND SEQ_IN_INDEX = 2
+  )
+  AND s1.NON_UNIQUE = 1
+  AND s2.NON_UNIQUE = 1;</code></pre>
+
+<p>이 패턴이 발견되면 거의 항상 안전한 DROP. EXPLAIN before / after 로 fallback 검증만 하면 된다. compound 가 prefix lookup 을 잘 처리하는지 확인.</p>
+
+<h3>4. 빈 테이블 (cardinality=0): deferred</h3>
+
+<p>audit 에서 cardinality=0 인 인덱스 57건 — 모두 prod 가동 안 된 신규 feature 의 빈 테이블이었다. 인덱스 자체는 anti-pattern 형태지만 row 가 0 이면 통계가 잘못 잡힐 일이 없다.</p>
+
+<p>결정:</p>
+
+<ul><li>지금 DROP → feature ship 시점에 row 누적 시작하면 cardinality 자연 상승. 그 때 compound 로 교체할지 단일 KEEP 할지 데이터 기반으로 결정 가능</li><li>지금 DROP 하면 feature ship 시 다시 추가해야 함 (왕복 비용)</li></ul>
+
+<p>→ <strong>feature 가동 시점에 결정</strong>. deployment checklist 에 &quot;1주 후 EXPLAIN 으로 인덱스 선택 재확인&quot; 항목 추가.</p>
+
+<h2>결과</h2>
+
+<p>분류 결과 표:</p>
+
+<table>
+<thead><tr><th>분류</th><th>건수</th><th>액션</th></tr></thead>
+<tbody>
+<tr><td>FK 보호 KEEP</td><td>2</td><td>그대로 유지 (anti-pattern 예외)</td></tr>
+<tr><td>옵티마이저 미사용 DROP</td><td>3</td><td>즉시 정리</td></tr>
+<tr><td>중복 prefix DROP</td><td>16</td><td>EXPLAIN 검증 후 정리</td></tr>
+<tr><td>빈 테이블 deferred</td><td>57</td><td>feature ship 시점에 결정</td></tr>
+<tr><td><strong>계</strong></td><td><strong>78</strong></td><td>19 DROP, 57 deferred, 2 KEEP</td></tr>
+</tbody>
+</table>
+
+<p>남은 46건은 활성 테이블 cardinality=1 단일컬럼이지만 옵티마이저가 실제 사용 중. 비즈니스 영향 분석 후 case-by-case 결정 필요. 별도 cleanup phase 로 분리.</p>
+
+<p>지표 변화:</p>
+
+<ul><li>Cardinality ≤ 2 단일컬럼: 92 → 80 (-12)</li><li>중복 prefix: 32 → 16 (-16)</li><li>FK 누락: 0 → 0 (유지)</li></ul>
+
+<p><strong>audit 1회로 발견한 124건 중 즉시 DROP 은 19건 (15%)</strong>. audit rule 별 카운트는 서로 겹칠 수 있어서 위 지표 변화와 액션 건수는 1:1 로 더해지지 않는다. 발견-정리 비율이 100% 가 아닌 이유는 FK 제약 / 옵티마이저 사용 패턴 / 데이터 누적 시기 / 코드 변경 비용 등 여러 직교 변수가 얽혀 있기 때문.</p>
+
+<p><img src="https://yunjeongiya.github.io/assets/images/posts/080-index-cleanup-decision/cleanup-result-bars.svg" alt="Cleanup classification result"></p>
+
+<h2>배운 점</h2>
+
+<h3>결정 기준의 직교성</h3>
+
+<p>anti-pattern 발견은 자동화 가능 (위 SQL 한 줄). 결정은 자동화 어려움 — 4가지 기준이 서로 영향 안 주고 독립적으로 작용해서 매 케이스마다 따로 평가해야 한다.</p>
+
+<blockquote><p>발견은 1시간, 분류는 반나절, 정리는 1주.</p></blockquote>
+
+<h3>FK 보호 인덱스를 룰 예외로 등록</h3>
+
+<p>backend.md / 코딩 컨벤션에 &quot;cardinality ≤ 2 단일컬럼 인덱스 금지&quot; 룰이 있어도 FK 보호 인덱스는 예외다. <strong>룰을 등록할 때 예외 케이스도 같이 등록</strong>해야 한다. 그렇지 않으면 다음 audit 에서 또 false positive 로 등장한다.</p>
+
+<h3>&quot;발견 후 즉시 정리&quot; 압박은 안 좋은 시그널</h3>
+
+<p>incident 후 audit 이 발견한 124곳을 보면 &quot;큰일 났다 다 정리해야 한다&quot; 압박이 자연스러운 반응이다. 하지만 그 압박으로 무차별 DROP 하면:</p>
+
+<ul><li>FK 제약 실패 출력 누락 (parallel 실행 시 출력이 잘리면 못 본다)</li><li>옵티마이저가 실제 사용 중인 인덱스 DROP → 다른 쿼리 회귀</li><li>빈 테이블 정리 → ship 시 다시 추가하는 왕복</li></ul>
+
+<p>오히려 <strong>분류 → 우선순위 → 단계별 정리</strong>로 가는 게 즉시 정리 압박을 견디는 방법.</p>
+
+<h3>빈 테이블 정리는 deployment checklist 로 미루기</h3>
+
+<p>cardinality=0 정리는 지금 안 하는 게 옳다. 대신 deployment checklist (feature ship 시) 항목으로:</p>
+
+<ul><li>ship 1주 후 EXPLAIN 재확인</li><li>cardinality 상승 폭에 따라 compound 교체 결정</li><li>매번 인덱스 audit 자동화 트리거</li></ul>
+
+<p>이게 incident 재발 방지의 ROI 가 더 좋다. &quot;지금 발견했으니 지금 정리&quot; 보다 <strong>&quot;가동 후 데이터 기반으로 정리&quot;</strong> 가 옳은 시점.</p>
+
+<h3>parallel ALTER 실행은 실패 출력 누락 함정</h3>
+
+<p>ALTER TABLE DROP INDEX 4건을 parallel 로 돌렸을 때 1건이 FK 제약으로 실패했다. MySQL 은 명시적으로 ERROR 를 냈지만, 실행 스크립트 출력이 잘리면서 (<code>tail -3</code>) 못 봤고 최종 STATISTICS 재조회로 발견했다. <strong>prod DDL 은 1건씩 순차적으로 돌리고 각 응답 확인</strong>. parallel 은 1초 절약하려다 사고 만든다.</p>
+
+<h2>다음 글</h2>
+
+<p>인덱스를 정리하다 보면 자연스럽게 다음 질문으로 넘어간다. &quot;Entity 에 선언된 인덱스와 prod DB 의 실제 인덱스가 정말 같은가?&quot; <a href="https://yunjeongiya.github.io/posts/081/">다음 글</a>은 이 Entity-DB drift 의 패턴을 정리한다.</p>
+
+<h2>References</h2>
+
+<ul><li>MySQL Reference Manual: <a href="https://dev.mysql.com/doc/refman/8.0/en/create-table-foreign-keys.html">FOREIGN KEY Constraints — Indexing</a></li><li>MySQL Reference Manual: <a href="https://dev.mysql.com/doc/refman/8.0/en/optimizer-statistics.html">Optimizer Index Selection</a></li><li><code>information_schema.STATISTICS</code> — audit 자동화의 기반</li><li>이전 글: <a href="https://yunjeongiya.github.io/posts/077/">cardinality=1 단일컬럼 인덱스가 새 compound index 를 무력화한다</a></li></ul>
+
+</body></html>

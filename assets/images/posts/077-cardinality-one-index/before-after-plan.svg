@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 420" role="img" aria-labelledby="title desc">
+  <title id="title">Before and after index plan</title>
+  <desc id="desc">Before dropping the misleading index, MySQL chooses idx_leaf_flag and filesort. After dropping it, MySQL chooses the compound index.</desc>
+  <rect width="900" height="420" rx="14" fill="#0d1117"/>
+  <text x="42" y="52" fill="#8ab4f8" font-family="Segoe UI, sans-serif" font-size="25">Plan changed only after removing the bad signpost</text>
+  <rect x="64" y="92" width="344" height="238" rx="14" fill="#2a1115" stroke="#f85149" stroke-width="2"/>
+  <text x="96" y="132" fill="#ffb3ad" font-family="Segoe UI, sans-serif" font-size="24">Before</text>
+  <text x="96" y="176" fill="#f0f6fc" font-family="Consolas, monospace" font-size="18">key: idx_leaf_flag</text>
+  <text x="96" y="210" fill="#f0f6fc" font-family="Consolas, monospace" font-size="18">rows: 293,871</text>
+  <text x="96" y="244" fill="#f0f6fc" font-family="Consolas, monospace" font-size="18">Extra: filesort</text>
+  <text x="96" y="288" fill="#ffdad7" font-family="Segoe UI, sans-serif" font-size="20">391s</text>
+  <path d="M408 210 L492 210" stroke="#8b949e" stroke-width="4" marker-end="url(#arrow)"/>
+  <rect x="492" y="92" width="344" height="238" rx="14" fill="#092d26" stroke="#2ea043" stroke-width="2"/>
+  <text x="524" y="132" fill="#a7f3c4" font-family="Segoe UI, sans-serif" font-size="24">After</text>
+  <text x="524" y="176" fill="#f0f6fc" font-family="Consolas, monospace" font-size="18">key: idx_catalog_group...</text>
+  <text x="524" y="210" fill="#f0f6fc" font-family="Consolas, monospace" font-size="18">type: range</text>
+  <text x="524" y="244" fill="#f0f6fc" font-family="Consolas, monospace" font-size="18">Extra: Using index</text>
+  <text x="524" y="288" fill="#d2ffe4" font-family="Segoe UI, sans-serif" font-size="20">&lt;50ms</text>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#8b949e"/>
+    </marker>
+  </defs>
+</svg>

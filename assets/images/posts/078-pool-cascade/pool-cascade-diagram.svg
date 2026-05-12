@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 420" role="img" aria-labelledby="title desc">
+  <title id="title">Connection pool cascade separates one cause from many victims</title>
+  <desc id="desc">A slow path fills the pool and creates many leak warning victims.</desc>
+  <rect width="900" height="420" rx="14" fill="#0d1117"/>
+  <text x="42" y="52" fill="#8ab4f8" font-family="Segoe UI, sans-serif" font-size="24">One saturated pool can scatter many leak warnings</text>
+  <rect x="64" y="112" width="196" height="72" rx="10" fill="#2a1115" stroke="#f85149" stroke-width="2"/>
+  <text x="94" y="144" fill="#ffb3ad" font-family="Segoe UI, sans-serif" font-size="21">slow path</text>
+  <text x="94" y="169" fill="#ffdad7" font-family="Consolas, monospace" font-size="15">cause</text>
+  <line x1="260" y1="148" x2="358" y2="188" stroke="#f85149" stroke-width="4"/>
+  <rect x="360" y="104" width="180" height="168" rx="18" fill="#111827" stroke="#58a6ff" stroke-width="2"/>
+  <text x="400" y="137" fill="#dbeafe" font-family="Segoe UI, sans-serif" font-size="21">HikariPool</text>
+  <g fill="#1f6feb" stroke="#9ecbff">
+    <circle cx="398" cy="176" r="13"/><circle cx="434" cy="176" r="13"/><circle cx="470" cy="176" r="13"/><circle cx="506" cy="176" r="13"/>
+    <circle cx="398" cy="216" r="13"/><circle cx="434" cy="216" r="13"/><circle cx="470" cy="216" r="13"/><circle cx="506" cy="216" r="13"/>
+  </g>
+  <text x="398" y="254" fill="#f0f6fc" font-family="Consolas, monospace" font-size="15">active = full</text>
+  <g stroke="#f2cc60" stroke-width="3" fill="none">
+    <path d="M540 144 C610 116 650 92 724 92"/>
+    <path d="M540 176 C620 166 650 158 724 158"/>
+    <path d="M540 208 C622 226 650 238 724 238"/>
+    <path d="M540 240 C610 294 650 318 724 318"/>
+  </g>
+  <g fill="#161b22" stroke="#f2cc60">
+    <rect x="724" y="66" width="118" height="52" rx="8"/><rect x="724" y="132" width="118" height="52" rx="8"/>
+    <rect x="724" y="212" width="118" height="52" rx="8"/><rect x="724" y="292" width="118" height="52" rx="8"/>
+  </g>
+  <text x="746" y="98" fill="#f2cc60" font-family="Segoe UI, sans-serif" font-size="18">victim</text>
+  <text x="746" y="164" fill="#f2cc60" font-family="Segoe UI, sans-serif" font-size="18">victim</text>
+  <text x="746" y="244" fill="#f2cc60" font-family="Segoe UI, sans-serif" font-size="18">victim</text>
+  <text x="746" y="324" fill="#f2cc60" font-family="Segoe UI, sans-serif" font-size="18">victim</text>
+  <text x="112" y="346" fill="#f0f6fc" font-family="Segoe UI, sans-serif" font-size="21">Do not turn every stack trace into a separate root cause.</text>
+</svg>

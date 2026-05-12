@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<title>JPA @Index is not prod DB index — 5 Entity-DB drift patterns</title>
+<style>html{background:#fff}body{max-width:680px;margin:40px auto;font-family:Georgia,serif;font-size:18px;line-height:1.7;color:#333;background:#fff;padding:0 20px}h1{font-size:32px;line-height:1.3}h2{font-size:24px;margin-top:40px}h3{font-size:20px;margin-top:30px}img{max-width:100%;margin:20px 0;border-radius:6px}pre{background:#f6f8fa;padding:16px;overflow-x:auto;font-size:14px;line-height:1.5;border-radius:6px}code{background:#f6f8fa;padding:2px 6px;font-size:15px;border-radius:3px}pre code{background:transparent;padding:0}blockquote{border-left:3px solid #ccc;margin-left:0;padding-left:20px;color:#555}strong{font-weight:700}table{border-collapse:collapse;margin:20px 0;width:100%}th,td{border:1px solid #ddd;padding:8px 12px;text-align:left}th{background:#f6f8fa}</style>
+</head><body>
+
+<h1>JPA @Index is not prod DB index — 5 Entity-DB drift patterns</h1>
+
+
+<blockquote><p>5/4 DB incident series</p><p>1. <a href="https://yunjeongiya.github.io/posts/077-en/">When a cardinality=1 single-column index beats the compound index</a></p><p>2. <a href="https://yunjeongiya.github.io/posts/078-en/">DB pool exhaustion cascade: do not mistake victim traces for causes</a></p><p>3. <a href="https://yunjeongiya.github.io/posts/079-en/">Latent slow query incident: why &quot;why today?&quot; may have no clean answer</a></p><p>4. <a href="https://yunjeongiya.github.io/posts/080-en/">124 index anti-patterns found, 19 dropped — why the rest stayed</a></p><p>5. <strong>JPA @Index is not prod DB index — 5 Entity-DB drift patterns</strong></p></blockquote>
+
+<p><img src="https://yunjeongiya.github.io/assets/images/posts/081-entity-db-drift/thumbnail-en.jpg" alt="blueprint and prod DB drift apart"></p>
+
+<h2>Introduction</h2>
+
+<p>In a JPA project, it is easy to treat <code>@Index</code> as the schema source of truth. Entities define indexes, Hibernate can update schema, and production often runs validation.</p>
+
+<p>But after years of production changes, direct hotfixes, renames, and manual cleanup, the entity model and the real database can drift apart.</p>
+
+<h2>Cross-check</h2>
+
+<p>We compared entity-declared indexes with actual production indexes from <code>information_schema.STATISTICS</code>.</p>
+
+<pre><code class="language-sql">SELECT TABLE_NAME, INDEX_NAME,
+       GROUP_CONCAT(COLUMN_NAME ORDER BY SEQ_IN_INDEX) AS cols
+FROM information_schema.STATISTICS
+WHERE TABLE_SCHEMA = ? AND INDEX_NAME != &#x27;PRIMARY&#x27;
+GROUP BY TABLE_NAME, INDEX_NAME;</code></pre>
+
+<pre><code class="language-bash">grep -rE &#x27;@Index\(name = &quot;([^&quot;]+)&quot;&#x27; src/main/java \
+  | sed -E &#x27;s/.*name = &quot;([^&quot;]+)&quot;.*/\1/&#x27; | sort -u</code></pre>
+
+<p><img src="https://yunjeongiya.github.io/assets/images/posts/081-entity-db-drift/entity-db-drift-diagram.svg" alt="Entity-DB drift diagram"></p>
+
+<h2>Five Drift Patterns</h2>
+
+<h3>1. Rename orphan</h3>
+
+<p>An index was renamed in the entity, but the old database index remained. Hibernate update behavior can add the new object without removing the old one.</p>
+
+<h3>2. Double UNIQUE</h3>
+
+<p>The same column was declared unique through two mechanisms:</p>
+
+<pre><code class="language-java">@Column(name = &quot;dedup_key&quot;, nullable = false, unique = true, length = 200)
+private String dedupKey;
+
+@Table(indexes = {
+    @Index(name = &quot;idx_qn_dedup_key&quot;, columnList = &quot;dedup_key&quot;, unique = true)
+})</code></pre>
+
+<p>In our environment, production ended up with two unique indexes representing the same constraint.</p>
+
+<h3>3. Hotfix unsynced</h3>
+
+<p>During an incident, an index was added directly in prod, but the entity annotation was not updated.</p>
+
+<p>Impact:</p>
+
+<ul><li>prod worked</li><li>dev regenerated the old index</li><li>prod and dev <code>EXPLAIN</code> diverged</li></ul>
+
+<h3>4. Name-column mismatch</h3>
+
+<p>The index name suggested one access pattern, but the columns represented another:</p>
+
+<pre><code class="language-text">INDEX_NAME: idx_user_event_status
+COLUMNS:    occurred_at, status</code></pre>
+
+<p>The optimizer does not care about the name, but humans do. Misleading names mislead reviews.</p>
+
+<h3>5. FK protection orphan</h3>
+
+<p>The DB had an FK-protection index that was not declared in the entity. Dropping it failed with an FK constraint error. The fix was not to delete it, but to document it in the entity as an intentional index.</p>
+
+<h2>Result</h2>
+
+<table>
+<thead><tr><th>Pattern</th><th>Count</th><th>Action</th></tr></thead>
+<tbody>
+<tr><td>Rename orphan</td><td>4</td><td>drop after confirming zero usage</td></tr>
+<tr><td>Double UNIQUE</td><td>1</td><td>drop one duplicate</td></tr>
+<tr><td>Hotfix unsynced</td><td>2</td><td>entity sync commit</td></tr>
+<tr><td>Name mismatch</td><td>2</td><td>drop or rename</td></tr>
+<tr><td>FK orphan</td><td>2</td><td>add entity <code>@Index</code></td></tr>
+</tbody>
+</table>
+
+<p><img src="https://yunjeongiya.github.io/assets/images/posts/081-entity-db-drift/drift-pattern-matrix.svg" alt="Five Entity-DB drift patterns"></p>
+
+<h2>Lessons</h2>
+
+<h3>Entity as source of truth has limits</h3>
+
+<p>Hibernate documentation itself recommends incremental migration scripts for production flexibility. If manual ALTER and entity annotations do not move together, drift accumulates.</p>
+
+<h3>Sync immediately after hotfixes</h3>
+
+<p>The best time to create the entity sync commit is within 30 minutes of the production ALTER. After that, the schema change becomes tribal memory.</p>
+
+<h3>Run cross-check audits quarterly</h3>
+
+<p>This audit is simple and catches the patterns that code review cannot see.</p>
+
+<h3>Index names carry meaning</h3>
+
+<p>An index name is a human contract. Rename it when the leading columns change.</p>
+
+<h2>Series close</h2>
+
+<p>The incident started as one bad index choice, but real prevention required a broader cleanup: execution plans, cascade interpretation, postmortem framing, audit classification, and finally schema source-of-truth hygiene.</p>
+
+<h2>References</h2>
+
+<ul><li>Hibernate User Guide: <a href="https://docs.jboss.org/hibernate/orm/6.6/userguide/html_single/Hibernate_User_Guide.html#configurations-hbm2ddl">hbm2ddl.auto</a></li><li>Jakarta Persistence API: <a href="https://jakarta.ee/specifications/persistence/4.0/apidocs/jakarta.persistence/jakarta/persistence/table">@@0@@</a></li><li>Jakarta Persistence API: <a href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/index">@@0@@</a></li><li>MySQL Reference Manual: <a href="https://dev.mysql.com/doc/refman/8.0/en/information-schema-statistics-table.html">information_schema.STATISTICS</a></li><li>MySQL Reference Manual: <a href="https://dev.mysql.com/doc/refman/8.0/en/create-table-foreign-keys.html">FOREIGN KEY Constraints — Indexing</a></li></ul>
+
+</body></html>
