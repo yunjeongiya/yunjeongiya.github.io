@@ -11,7 +11,7 @@ thumbnail: /assets/images/posts/038-claude-vscode-3-windows/thumbnail-ko.png
 
 Here we go again. Another Claude Code bug post.
 
-If my [last one](https://yunjeongiya.github.io/claude/devtools/2025/09/27/claude-file-modified-bug-workaround.html) was about the "File has been unexpectedly modified" error, this time it's **VSCode windows multiplying like rabbits**.
+If my [last one](/posts/001-en/) was about the "File has been unexpectedly modified" error, this time it's **VSCode windows multiplying like rabbits**.
 
 ---
 
@@ -95,11 +95,11 @@ Remove the workaround once Anthropic ships a proper fix.
 
 Another cycle of "Claude Code updates → something breaks." At least the community finds workarounds fast.
 
-As I said in my [previous post](https://yunjeongiya.github.io/claude/devtools/2025/09/27/claude-file-modified-bug-workaround.html), the most reliable source of truth is always [GitHub Issues](https://github.com/anthropics/claude-code/issues).
+As I said in my [previous post](/posts/001-en/), the most reliable source of truth is always [GitHub Issues](https://github.com/anthropics/claude-code/issues).
 
 ---
 
 **Related links**:
 - [GitHub Issue #30848](https://github.com/anthropics/claude-code/issues/30848)
 - [GitHub Issue #31136](https://github.com/anthropics/claude-code/issues/31136)
-- [Previous post: The Elusive Claude "File Has Been Unexpectedly Modified" Bug](https://yunjeongiya.github.io/claude/devtools/2025/09/27/claude-file-modified-bug-workaround.html)
+- [Previous post: The Elusive Claude "File Has Been Unexpectedly Modified" Bug](/posts/001-en/)

@@ -10,7 +10,7 @@ thumbnail: /assets/images/posts/027-notion-cache-limit/thumbnail-ko.png
 published: false
 ---
 
-> 이전 글: [Notion API 없이 2만 페이지 읽기 - 로컬 캐시 + 오픈소스 기여기](/posts/026-notion-mcp-windows-opensource-contribution/)
+> 이전 글: [Notion API 없이 2만 페이지 읽기 - 로컬 캐시 + 오픈소스 기여기](/posts/026/)
 
 ## TL;DR
 
@@ -23,7 +23,7 @@ published: false
 
 ## 배경: 상담일지 3094개가 필요했다
 
-AI 상담 시스템을 만들려면 과거 상담 데이터가 필요했다. 몇 년간 쌓인 상담일지가 Notion 데이터베이스에 3094개. [지난번에 만든 notion-mcp-fast](/posts/026-notion-mcp-windows-opensource-contribution/)를 쓰면 되겠지?
+AI 상담 시스템을 만들려면 과거 상담 데이터가 필요했다. 몇 년간 쌓인 상담일지가 Notion 데이터베이스에 3094개. [지난번에 만든 notion-mcp-fast](/posts/026/)를 쓰면 되겠지?
 
 ```
 Claude: notion_get_database_records로 상담일지를 가져올게요.

@@ -11,7 +11,7 @@ thumbnail: /assets/images/posts/038-claude-vscode-3-windows/thumbnail-ko.png
 
 또 왔습니다. Claude Code 버그 포스트.
 
-[저번 포스트](https://yunjeongiya.github.io/claude/devtools/2025/09/27/claude-file-modified-bug-workaround.html)가 "파일이 예기치 않게 수정되었습니다" 버그였다면, 이번엔 **VSCode 창이 무한증식하는 버그**입니다.
+[저번 포스트](/posts/001/)가 "파일이 예기치 않게 수정되었습니다" 버그였다면, 이번엔 **VSCode 창이 무한증식하는 버그**입니다.
 
 ---
 
@@ -95,11 +95,11 @@ TERM_PROGRAM= VSCODE_INJECTION= claude
 
 또 하나의 "Claude Code 업데이트 → 뭔가 깨짐" 사이클입니다. 그래도 커뮤니티가 빠르게 우회법을 찾아내니까 다행이죠.
 
-[저번 포스트](https://yunjeongiya.github.io/claude/devtools/2025/09/27/claude-file-modified-bug-workaround.html)에서도 말했지만, 가장 신뢰할 수 있는 정보의 출처는 항상 [GitHub Issues](https://github.com/anthropics/claude-code/issues)입니다.
+[저번 포스트](/posts/001/)에서도 말했지만, 가장 신뢰할 수 있는 정보의 출처는 항상 [GitHub Issues](https://github.com/anthropics/claude-code/issues)입니다.
 
 ---
 
 **관련 링크**:
 - [GitHub Issue #30848](https://github.com/anthropics/claude-code/issues/30848)
 - [GitHub Issue #31136](https://github.com/anthropics/claude-code/issues/31136)
-- [이전 포스트: Claude '파일이 예기치 않게 수정되었습니다' 버그 해결법](https://yunjeongiya.github.io/claude/devtools/2025/09/27/claude-file-modified-bug-workaround.html)
+- [이전 포스트: Claude '파일이 예기치 않게 수정되었습니다' 버그 해결법](/posts/001/)

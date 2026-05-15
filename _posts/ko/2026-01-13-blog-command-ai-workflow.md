@@ -5,7 +5,7 @@ date: 2026-01-13 12:00:00 +0900
 categories: [Productivity, AI]
 tags: [ai, automation, blogging, claude, workflow, slash-command]
 lang: ko
-slug: "026"
+slug: "016"
 ---
 
 ## TL;DR

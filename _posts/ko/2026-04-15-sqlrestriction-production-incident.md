@@ -11,7 +11,7 @@ published: false
 
 ## 도입
 
-> 이 글은 [이전 글 — "Hibernate @SoftDelete 마이그레이션 삽질기"](/posts/054)의 후속편이다. 이전 글에서 `@SoftDelete`의 한계를 겪고 `@SQLDelete` + `@SQLRestriction` 조합으로 마무리했는데, **그 @SQLRestriction이 프로덕션을 멈추는 데는 하룻밤이면 충분했다.**
+> 이 글은 [이전 글 — "Hibernate @SoftDelete 마이그레이션 삽질기"](/posts/054/)의 후속편이다. 이전 글에서 `@SoftDelete`의 한계를 겪고 `@SQLDelete` + `@SQLRestriction` 조합으로 마무리했는데, **그 @SQLRestriction이 프로덕션을 멈추는 데는 하룻밤이면 충분했다.**
 
 어제 밤 배포한 Soft Delete 리팩토링이 오늘 아침 프로덕션을 멈췄다. `@SQLRestriction("deleted_at IS NULL")` 한 줄을 `User` 엔티티에 추가했을 뿐인데, 12시간 동안 577건의 에러가 발생했고, 하루에 5번의 핫픽스를 배포했다.
 

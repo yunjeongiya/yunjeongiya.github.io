@@ -205,7 +205,7 @@ public class Room {
 
 이 글의 결론은 "`@SQLDelete` + `@SQLRestriction` 조합으로 안착했다"였다. 하지만 이 결론에는 후일담이 있다 — 다음 날 이 `@SQLRestriction`이 프로덕션 전면 장애를 일으켰다. 52개 테이블의 FK resolve를 차단해서 하루에 핫픽스 5회를 배포하게 된 이야기는 후속 글에서.
 
-> **후속 글**: [@SQLRestriction 하나가 프로덕션을 멈추다](/posts/055)
+> **후속 글**: [@SQLRestriction 하나가 프로덕션을 멈추다](/posts/055/)
 
 ## References
 

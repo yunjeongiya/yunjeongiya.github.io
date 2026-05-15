@@ -202,7 +202,7 @@ The core of vibe coding isn't AI writing code quickly. It's **leaving documentat
 3. **Feature complete**: Auto-commit + doc update with `/finish` command
 4. **On pause**: Record current state with `/pause` command
 
-If you're curious about this pattern, check out the [/blog command post](/posts/024-en/).
+If you're curious about this pattern, check out the [/blog command post](/posts/016/).
 
 ---
 

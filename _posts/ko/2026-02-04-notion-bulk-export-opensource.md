@@ -10,7 +10,7 @@ thumbnail: /assets/images/posts/029-notion-bulk-export/thumbnail-ko.png
 published: false
 ---
 
-> 이전 글: [로컬 캐시의 함정 - Notion 3000개 페이지 본문 추출 삽질기](/posts/027-notion-local-cache-limit/)
+> 이전 글: [로컬 캐시의 함정 - Notion 3000개 페이지 본문 추출 삽질기](/posts/027/)
 
 ## TL;DR
 
@@ -29,7 +29,7 @@ Notion에 수천 개 페이지가 쌓인 데이터베이스가 있다고 하자.
 - **공식 API**: Rate limit (429 Too Many Requests)에 금방 걸린다
 - **기존 도구들**: 대부분 Markdown 출력만 지원. 데이터 분석이나 AI 파이프라인에 쓰려면 구조화된 JSON이 필요하다
 
-[지난번에 이 문제를 겪고](/posts/027-notion-local-cache-limit/) asyncio 병렬 처리로 3094개 페이지를 40분 만에 추출하는 스크립트를 만들었는데, 이걸 누구나 쓸 수 있는 도구로 발행했다.
+[지난번에 이 문제를 겪고](/posts/027/) asyncio 병렬 처리로 3094개 페이지를 40분 만에 추출하는 스크립트를 만들었는데, 이걸 누구나 쓸 수 있는 도구로 발행했다.
 
 ---
 
@@ -165,7 +165,7 @@ notion-bulk-export/
 
 ### "나만 쓸 스크립트"의 가치
 
-[첫 번째 오픈소스 기여는 notion-mcp-fast에 Windows 지원을 추가한 21줄짜리 PR](/posts/026-notion-mcp-windows-opensource-contribution/)이었다. 이번에는 처음부터 내 프로젝트를 만들어서 발행했다. 21줄 수정 PR → 독립 도구 발행으로 성장한 셈이다.
+[첫 번째 오픈소스 기여는 notion-mcp-fast에 Windows 지원을 추가한 21줄짜리 PR](/posts/026/)이었다. 이번에는 처음부터 내 프로젝트를 만들어서 발행했다. 21줄 수정 PR → 독립 도구 발행으로 성장한 셈이다.
 
 급하게 만든 스크립트도 핵심 로직이 범용적이면 오픈소스가 될 수 있다. "나만 쓸 코드"에서 시작해도, 같은 문제를 겪는 사람이 있다면 공유할 가치가 있다.
 

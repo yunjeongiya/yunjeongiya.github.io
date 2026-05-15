@@ -10,7 +10,7 @@ slug: "028"
 thumbnail: /assets/images/posts/028-ai-data-pipeline/thumbnail-ko.png
 ---
 
-> 이전 글: [로컬 캐시의 함정 - Notion 3000개 페이지 본문 추출 삽질기](/posts/027-notion-local-cache-limit/)
+> 이전 글: [로컬 캐시의 함정 - Notion 3000개 페이지 본문 추출 삽질기](/posts/027/)
 
 ## TL;DR
 
@@ -23,7 +23,7 @@ thumbnail: /assets/images/posts/028-ai-data-pipeline/thumbnail-ko.png
 
 ## 배경: 상담 데이터의 보물
 
-[지난번에 Notion에서 3,094개 상담일지를 추출했다](/posts/027-notion-local-cache-limit/). 수년간 쌓인 학생 상담 기록. 그 안에는 수학 공부법, 영단어 암기법, 오답 분석 방법 등 **검증된 학습 노하우**가 묻혀있었다.
+[지난번에 Notion에서 3,094개 상담일지를 추출했다](/posts/027/). 수년간 쌓인 학생 상담 기록. 그 안에는 수학 공부법, 영단어 암기법, 오답 분석 방법 등 **검증된 학습 노하우**가 묻혀있었다.
 
 문제는 양이다. 3,094개 상담을 사람이 읽고 정리하려면 몇 주가 걸린다.
 
