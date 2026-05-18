@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="540" viewBox="0 0 1120 540" role="img" aria-labelledby="title desc">
+  <title id="title">From exception capture to pool exhaustion</title>
+  <desc id="desc">A flow diagram showing DEVICE_PROFILE_NOT_FOUND exceptions flowing through Sentry capture, heap pressure, Full GC pause, JVM latency, and HikariCP timeout.</desc>
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#6b7280"/></marker></defs>
+  <rect width="1120" height="540" rx="14" fill="#1e1e1e"/>
+  <text x="44" y="58" fill="#d4d4d4" font-family="Consolas, Arial, sans-serif" font-size="28" font-weight="700">Failure chain: observability code inside a hot path</text>
+  <g font-family="Consolas, Arial, sans-serif">
+    <g transform="translate(54 122)"><rect width="188" height="112" rx="10" fill="#252526" stroke="#3c3c3c"/><text x="22" y="42" fill="#ce9178" font-size="18">High-volume</text><text x="22" y="76" fill="#dcdcaa" font-size="18">DEVICE_PROFILE</text><text x="22" y="100" fill="#dcdcaa" font-size="18">_NOT_FOUND</text></g>
+    <g transform="translate(292 122)"><rect width="188" height="112" rx="10" fill="#252526" stroke="#3c3c3c"/><text x="22" y="45" fill="#4fc1ff" font-size="19">Sentry capture</text><text x="22" y="82" fill="#cccccc" font-size="16">serialize, queue</text></g>
+    <g transform="translate(530 122)"><rect width="188" height="112" rx="10" fill="#252526" stroke="#3c3c3c"/><text x="22" y="45" fill="#dcdcaa" font-size="19">Heap pressure</text><text x="22" y="82" fill="#cccccc" font-size="16">more allocation</text></g>
+    <g transform="translate(768 122)"><rect width="188" height="112" rx="10" fill="#3a2716" stroke="#f59e0b"/><text x="22" y="45" fill="#fbbf24" font-size="19">Full GC pause</text><text x="22" y="82" fill="#f5f5f5" font-size="16">stop-the-world</text></g>
+    <g transform="translate(410 328)"><rect width="188" height="112" rx="10" fill="#252526" stroke="#3c3c3c"/><text x="22" y="45" fill="#c586c0" font-size="19">JVM latency</text><text x="22" y="82" fill="#cccccc" font-size="16">requests stall</text></g>
+    <g transform="translate(650 328)"><rect width="220" height="112" rx="10" fill="#3b1d21" stroke="#ef4444"/><text x="22" y="45" fill="#f87171" font-size="19">HikariCP timeout</text><text x="22" y="82" fill="#f5f5f5" font-size="16">pool exhaustion</text></g>
+  </g>
+  <g fill="none" stroke="#6b7280" stroke-width="3" marker-end="url(#arrow)"><path d="M242 178h46"/><path d="M480 178h46"/><path d="M718 178h46"/><path d="M862 234 C840 300 600 285 520 324"/><path d="M598 384h46"/></g>
+  <text x="58" y="495" fill="#858585" font-family="Consolas, Arial, sans-serif" font-size="18">Lesson: code added for visibility can still become an outage trigger when the path is hot enough.</text>
+</svg>

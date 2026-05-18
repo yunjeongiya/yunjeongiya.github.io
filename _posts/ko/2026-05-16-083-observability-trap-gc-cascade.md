@@ -6,8 +6,12 @@ categories: [Backend, Incident]
 tags: [java, spring-boot, sentry, jvm, gc, hikaricp, incident, postmortem]
 lang: ko
 slug: "083"
-published: false
+thumbnail: /assets/images/posts/083-observability-trap-gc-cascade/thumbnail.png
+image: /assets/images/posts/083-observability-trap-gc-cascade/thumbnail.png
+published: true
 ---
+
+![CCTV 모니터링이 너무 많은 알림을 뿜어 전력 차단기를 내려버리는 서버룸](/assets/images/posts/083-observability-trap-gc-cascade/thumbnail.png){: width="700"}
 
 모니터링을 붙이다가 서버가 죽었다. 정확히는, 에러를 더 잘 잡으려고 추가한 코드가 GC를 폭발시키고, JVM을 멈추게 하고, DB 커넥션 풀을 고갈시켰다.
 
@@ -51,6 +55,8 @@ public ResponseEntity<ErrorResponse> handleBusinessException(
 1. 커넥션을 오래 점유하는 쿼리가 생긴다
 2. 대기 스레드가 쌓인다
 3. 결국 모든 커넥션이 대기 상태로 잠기고 새 요청이 전부 타임아웃
+
+![고빈도 예외 캡처에서 HikariCP 타임아웃까지 이어지는 장애 흐름](/assets/images/posts/083-observability-trap-gc-cascade/cascade-flow.svg){: width="700"}
 
 ---
 
@@ -102,9 +108,9 @@ Sentry.withScope(scope -> {
 });
 ```
 
-Sentry SDK는 각 예외를 직렬화하고 내부 큐에 쌓는다. 큐는 백그라운드 스레드가 비운다. 580회/5시간은 초당 0.03회로 낮아 보이지만, 각 캡처마다 힙에 적지 않은 객체가 생성된다.
+Sentry SDK는 각 예외를 직렬화하고 내부 큐에 쌓는다. 큐는 백그라운드 스레드가 비운다. 580회/5시간은 초당 0.03회로 낮아 보이지만, 각 캡처마다 힙에 적지 않은 객체가 생성된다. 이 시점의 지표와 로그를 맞춰 보면, 가장 그럴듯한 연결고리는 Sentry 캡처로 늘어난 힙 할당과 그에 따른 GC 압력이었다.
 
-결과:
+관측된 흐름:
 - **힙 압력 증가** → Young Gen GC 빈도 증가
 - **Old Gen 영역 누적** → Full GC(stop-the-world) 발생
 - **Full GC 동안 JVM 스레드 전체 정지** → housekeeper 지연 delta 1분 30초 관측
@@ -116,7 +122,7 @@ Sentry에 다음과 같은 이슈가 보고된 사례가 있다:
 - [sentry-java #3182: Significant memory usage](https://github.com/getsentry/sentry-java/issues/3182)
 - [sentry-java #2225: throwableToSpan keeps growing](https://github.com/getsentry/sentry-java/issues/2225)
 
-고빈도 예외를 Sentry로 보내는 건 SDK 설계 의도 밖이다.
+정상 흐름의 고빈도 예외를 전부 Sentry로 보내는 건 비용 대비 이득이 작았다.
 
 ---
 
@@ -150,8 +156,10 @@ public ResponseEntity<ErrorResponse> handleBusinessException(
 
 원래 intent(에러 추적 강화)는 유지하면서, 정상 흐름인 고빈도 에러 코드는 Sentry 캡처에서 제외했다.
 
+![모든 예외를 Sentry로 보내던 이전 상태와 노이즈 코드를 제외한 이후 상태 비교](/assets/images/posts/083-observability-trap-gc-cascade/sentry-filter-before-after.svg){: width="700"}
+
 방어 심층 조치도 함께 적용했다:
-- HikariCP 풀 크기 20 → 30 (cascade 내성)
+- HikariCP 풀 크기 20 → 30 (근본 해결이 아니라 cascade 전파를 늦추는 임시 완충)
 - GC 로그 활성화 (`-Xlog:gc*:file=/app/data/gc.log`) — 다음 incident에서 즉시 진단 가능하도록
 
 ---

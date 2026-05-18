@@ -1,0 +1,122 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>When observability code killed prod — Sentry SDK heap pressure and a GC cascade</title>
+<style>
+  body { font-family: Georgia, serif; max-width: 680px; margin: 0 auto; padding: 20px; line-height: 1.8; color: #292929; }
+  h1 { font-size: 2em; margin-bottom: 0.3em; }
+  h2 { font-size: 1.4em; margin-top: 2em; border-bottom: 1px solid #eee; padding-bottom: 0.3em; }
+  h3 { font-size: 1.15em; margin-top: 1.5em; }
+  pre { background: #f6f6f6; padding: 16px; border-radius: 4px; overflow-x: auto; font-size: 0.88em; }
+  code { font-family: Menlo, Courier New, monospace; background: #f0f0f0; padding: 2px 5px; border-radius: 3px; font-size: 0.9em; }
+  pre code { background: none; padding: 0; }
+  blockquote { border-left: 3px solid #ccc; margin: 0; padding-left: 20px; color: #666; }
+  img { max-width: 100%; height: auto; display: block; margin: 28px auto; border-radius: 6px; }
+  ul, ol { padding-left: 1.5em; }
+  hr { border: none; border-top: 1px solid #eee; margin: 2em 0; }
+</style>
+</head>
+<body>
+<h1>When observability code killed prod — Sentry SDK heap pressure and a GC cascade</h1>
+<p><em>This post is also available on <a href="https://yunjeongiya.github.io/posts/083-en/">my blog</a>. (<a href="https://yunjeongiya.github.io/posts/083/">한국어 버전은 여기</a>)</em></p>
+<p><img src="https://yunjeongiya.github.io/assets/images/posts/083-observability-trap-gc-cascade/thumbnail-en.png" alt="CCTV-like monitoring code tripping the breaker in a server room"></p>
+
+<p>We added monitoring and the server died. More precisely, code added to capture errors more clearly increased GC pressure, stalled the JVM, and cascaded into HikariCP pool exhaustion.</p>
+<p>This is a short incident note about that chain, and about the three wrong theories we chased before finding the actual trigger.</p>
+<hr>
+
+<h2>Background: Better Error Tracking</h2>
+<p>We decided to send <code>BusinessException</code> events to Sentry. Until then, those domain exceptions were only logged. We wanted to see how often specific error codes happened in production.</p>
+<p>The change looked harmless. We added Sentry capture to <code>GlobalExceptionHandler.handleBusinessException</code>:</p>
+<pre><code class="language-java">@ExceptionHandler(BusinessException.class)
+public ResponseEntity&lt;ErrorResponse&gt; handleBusinessException(
+        BusinessException ex, HttpServletRequest request) {
+    log.warn("BusinessException: code={}, message={}", ex.getCode(), ex.getMessage());
+
+    Sentry.withScope(scope -&gt; {
+        scope.setFingerprint(List.of("business-exception", ex.getCode()));
+        scope.setTag("error.code", ex.getCode());
+        Sentry.captureException(ex);
+    });
+
+    return ResponseEntity.status(ex.getStatus())
+            .body(ErrorResponse.of(ex));
+}</code></pre>
+<p>It was not complicated code. Nothing happened for two days after deployment.</p>
+<hr>
+
+<h2>The Outage</h2>
+<p>At around 10 p.m., Grafana alerted that the HikariCP connection pool wait queue was climbing fast. Service latency rose, and connection timeout errors followed.</p>
+<ol>
+  <li>Some request holds a connection too long</li>
+  <li>Waiting threads pile up</li>
+  <li>Eventually every new request times out</li>
+</ol>
+<p><img src="https://yunjeongiya.github.io/assets/images/posts/083-observability-trap-gc-cascade/cascade-flow-en.svg" alt="Failure flow from high-volume exception capture to HikariCP timeout"></p>
+<hr>
+
+<h2>Three Wrong Theories</h2>
+<h3>Theory 1: Slow Query</h3>
+<p>The first suspect was the database. We checked MySQL processlist and ran <code>EXPLAIN</code>. A few queries had suspicious plans.</p>
+<p><strong>Result</strong>: the service stabilized briefly after restart, then failed the same way again. The bad-looking queries were victims of the cascade, not the cause.</p>
+<h3>Theory 2: Infrastructure Limit</h3>
+<p>CloudWatch showed CPU rising to 65-98%, but traffic was not unusually high. CPU looked more like a result than a cause.</p>
+<h3>Theory 3: Recent Deployment</h3>
+<p>We checked the last 24 hours of prod deploy commits. One of them added Sentry capture to <code>GlobalExceptionHandler</code>. That connected the dots.</p>
+<hr>
+
+<h2>Actual Trigger: High-Volume Error Code + Sentry SDK Allocation</h2>
+<p>One device screen was polling indefinitely. When the device was not registered on the server, every poll raised <code>DEVICE_PROFILE_NOT_FOUND</code>.</p>
+<p>That error code appeared <strong>580+ times in 5 hours</strong>. It was 99% of all <code>BusinessException</code> events.</p>
+<pre><code class="language-java">Sentry.withScope(scope -&gt; {
+    // create Scope
+    // create Hint
+    // serialize Exception including stack trace
+    // enqueue event
+    Sentry.captureException(ex);
+});</code></pre>
+<p>The Sentry SDK serializes each exception and queues events for a background worker. Looking at the metrics and logs together, the most plausible chain was extra heap allocation from Sentry capture leading to GC pressure.</p>
+<ul>
+  <li><strong>Heap pressure increased</strong> -> more Young Gen GC</li>
+  <li><strong>Old Gen accumulated</strong> -> Full GC stop-the-world pauses</li>
+  <li><strong>JVM threads stalled</strong> -> Hikari housekeeper delay around 1m 30s</li>
+  <li><strong>EC2 CPU spiked</strong> -> up to 98%</li>
+  <li><strong>JVM latency increased</strong> -> pool exhaustion cascade</li>
+</ul>
+<p>Sending every normal-flow high-volume exception to Sentry had poor signal-to-cost tradeoff.</p>
+<hr>
+
+<h2>Fix</h2>
+<p>We added a noise-code exclusion list to <code>GlobalExceptionHandler</code>:</p>
+<pre><code class="language-java">private static final Set&lt;String&gt; SENTRY_NOISE_CODES = Set.of(
+    "DEVICE_PROFILE_NOT_FOUND",
+    "AUTH_REFRESH_TOKEN_MISSING"
+);
+
+if (!SENTRY_NOISE_CODES.contains(ex.getCode())) {
+    Sentry.captureException(ex);
+}</code></pre>
+<p><img src="https://yunjeongiya.github.io/assets/images/posts/083-observability-trap-gc-cascade/sentry-filter-before-after-en.svg" alt="Before and after filtering noisy Sentry exception capture"></p>
+<p>We also raised HikariCP pool size from 20 to 30 as a buffer, not the root fix, and enabled GC logging for faster diagnosis next time.</p>
+<hr>
+
+<h2>Lessons</h2>
+<h3>1. Check frequency before changing exception hot paths</h3>
+<pre><code class="language-bash">docker logs &lt;container&gt; --since 1h 2&gt;&amp;1 | grep -c 'DEVICE_PROFILE_NOT_FOUND'</code></pre>
+<h3>2. "Capture every exception" is not a good default</h3>
+<p>Sentry is best for real bugs. Normal-flow exceptions can become noise and, in worse cases, performance cost.</p>
+<h3>3. Put "what changed recently?" in Phase 1</h3>
+<pre><code class="language-bash">git log --since='24 hours ago' --pretty=format:'%h %ci %s' origin/main | head -10</code></pre>
+<hr>
+
+<h2>References</h2>
+<ul>
+  <li><a href="https://docs.sentry.io/product/performance/performance-overhead/">Sentry Performance Overhead</a></li>
+  <li><a href="https://github.com/getsentry/sentry-java/issues/1851">sentry-java #1851: Memory issues with breadcrumbs</a></li>
+  <li><a href="https://github.com/getsentry/sentry-java/issues/3182">sentry-java #3182: Significant memory usage</a></li>
+  <li><a href="https://medium.com/javarevisited/stop-increasing-pool-size-how-to-actually-fix-hikaricp-timeouts-in-spring-boot-prod-477a39d359d3">Stop Increasing Pool Size: How to Actually Fix HikariCP Timeouts</a></li>
+</ul>
+</body>
+</html>
+

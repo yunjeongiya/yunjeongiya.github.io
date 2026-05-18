@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Two AI sessions as a tiny incident war room</title>
+  <desc id="desc">A dark VSCode-inspired thumbnail showing an alert split into two AI terminal sessions: rescue and incident investigation.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1e1e1e"/>
+      <stop offset="0.62" stop-color="#252526"/>
+      <stop offset="1" stop-color="#101827"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="7" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <text x="72" y="88" fill="#d4d4d4" font-family="D2Coding, Consolas, monospace" font-size="34" font-weight="700">혼자 운영하는 작은 war room</text>
+  <g transform="translate(80 146)">
+    <rect width="440" height="402" rx="16" fill="#1b1b1c" stroke="#3c3c3c"/>
+    <rect width="440" height="44" rx="16" fill="#2d2d30"/>
+    <circle cx="30" cy="22" r="7" fill="#f87171"/>
+    <circle cx="54" cy="22" r="7" fill="#fbbf24"/>
+    <circle cx="78" cy="22" r="7" fill="#34d399"/>
+    <text x="104" y="29" fill="#4fc1ff" font-family="Consolas, D2Coding, monospace" font-size="22">/rescue</text>
+    <text x="32" y="94" fill="#dcdcaa" font-family="Consolas, D2Coding, monospace" font-size="25">서비스 복구 전담</text>
+    <text x="32" y="146" fill="#cccccc" font-family="Consolas, D2Coding, monospace" font-size="21">health check</text>
+    <text x="32" y="188" fill="#cccccc" font-family="Consolas, D2Coding, monospace" font-size="21">restart / swap</text>
+    <text x="32" y="230" fill="#cccccc" font-family="Consolas, D2Coding, monospace" font-size="21">UP 확인</text>
+    <rect x="32" y="284" width="342" height="62" rx="10" fill="#15351f" stroke="#22c55e"/>
+    <text x="56" y="323" fill="#86efac" font-family="Consolas, D2Coding, monospace" font-size="24">code change: no</text>
+  </g>
+  <g transform="translate(680 146)">
+    <rect width="440" height="402" rx="16" fill="#1b1b1c" stroke="#3c3c3c"/>
+    <rect width="440" height="44" rx="16" fill="#2d2d30"/>
+    <circle cx="30" cy="22" r="7" fill="#f87171"/>
+    <circle cx="54" cy="22" r="7" fill="#fbbf24"/>
+    <circle cx="78" cy="22" r="7" fill="#34d399"/>
+    <text x="104" y="29" fill="#c586c0" font-family="Consolas, D2Coding, monospace" font-size="22">/incident</text>
+    <text x="32" y="94" fill="#dcdcaa" font-family="Consolas, D2Coding, monospace" font-size="25">원인 조사 전담</text>
+    <text x="32" y="146" fill="#cccccc" font-family="Consolas, D2Coding, monospace" font-size="21">deploy diff</text>
+    <text x="32" y="188" fill="#cccccc" font-family="Consolas, D2Coding, monospace" font-size="21">logs + metrics</text>
+    <text x="32" y="230" fill="#cccccc" font-family="Consolas, D2Coding, monospace" font-size="21">root cause</text>
+    <rect x="32" y="284" width="342" height="62" rx="10" fill="#2b2135" stroke="#c586c0"/>
+    <text x="56" y="323" fill="#e9d5ff" font-family="Consolas, D2Coding, monospace" font-size="24">fix after UP</text>
+  </g>
+  <g transform="translate(548 258)" filter="url(#glow)">
+    <path d="M52 0 L104 92 H74 L118 180 L0 64 H42 Z" fill="#f59e0b"/>
+    <text x="-34" y="230" fill="#fbbf24" font-family="Consolas, D2Coding, monospace" font-size="26">ALERT</text>
+  </g>
+  <path d="M590 350 C540 330 540 310 522 300" fill="none" stroke="#4fc1ff" stroke-width="5"/>
+  <path d="M620 350 C670 330 670 310 680 300" fill="none" stroke="#c586c0" stroke-width="5"/>
+</svg>

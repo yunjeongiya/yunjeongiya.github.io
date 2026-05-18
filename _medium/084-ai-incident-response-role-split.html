@@ -17,13 +17,16 @@
   table { border-collapse: collapse; width: 100%; margin: 1em 0; }
   th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
   th { background: #f6f6f6; }
+  img { max-width: 100%; height: auto; display: block; margin: 28px auto; border-radius: 6px; }
 </style>
 </head>
 <body>
 
 <h1>혼자 서버 운영하다 장애 났을 때 — AI 세션 역할 분리로 war room 흉내내기</h1>
 
-<p><em>이 글은 <a href="https://yunjeongiya.github.io/posts/084">블로그</a>에서도 읽을 수 있습니다.</em></p>
+<p><em>이 글은 블로그에도 공개할 예정입니다.</em></p>
+
+<p><img src="../assets/images/posts/084-ai-incident-response-role-split/thumbnail.png" alt="체스판 위에서 한 손이 방패 말과 돋보기 말을 나누어 움직이는 장면"></p>
 
 <hr>
 
@@ -35,11 +38,9 @@
 
 <h2>장애 대응의 두 가지 모드</h2>
 
-<p>Google SRE 책에는 incident 대응의 핵심 원칙이 있다: <strong>서비스 복구와 원인 조사는 분리하라.</strong></p>
+<p>Google SRE 책에는 incident 대응의 핵심 원칙이 있다. 요지는 <strong>먼저 출혈을 멈추고, 서비스를 복구하고, root cause 분석을 위한 증거를 보존하라</strong>는 것이다.</p>
 
-<blockquote>
-  <p>"Stop the bleeding first. Investigate root cause after service restoration."</p>
-</blockquote>
+<p>이 원칙을 혼자 운영하는 상황에 맞게 바꾸면, 서비스 복구와 원인 조사를 분리하는 쪽이 안전하다.</p>
 
 <p>복구와 조사를 같은 사람이 동시에 하면:</p>
 <ul>
@@ -49,6 +50,8 @@
 </ul>
 
 <p>war room은 이 두 모드를 사람으로 분리한다. AI 세션으로도 같은 분리가 가능하다.</p>
+
+<p><img src="../assets/images/posts/084-ai-incident-response-role-split/role-split-diagram.svg" alt="AI 세션 두 개를 복구와 조사 역할로 나누는 구조도"></p>
 
 <hr>
 
@@ -107,6 +110,8 @@
 사용자 → 세션 2에 전달 ("세션1 복구 완료. 재시작 전 에러: [...]")
      ↓
 세션 2: 가설 확정 → 수정 구현</code></pre>
+
+<p><img src="../assets/images/posts/084-ai-incident-response-role-split/incident-flow.svg" alt="장애 알림 이후 복구와 조사가 병렬로 진행되는 타임라인"></p>
 
 <p>두 세션이 <strong>같은 코드를 동시에 수정하지 않도록</strong> 명시적으로 역할을 알려주는 게 중요하다. 안 그러면 두 세션이 같은 파일을 덮어쓰는 사고가 난다.</p>
 

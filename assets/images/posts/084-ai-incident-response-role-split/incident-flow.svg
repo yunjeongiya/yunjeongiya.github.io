@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="470" viewBox="0 0 1120 470" role="img" aria-labelledby="title desc">
+  <title id="title">복구와 조사 병렬 플로우</title>
+  <desc id="desc">장애 알림 이후 rescue 세션과 incident 세션이 동시에 시작되고, 복구 완료 후 조사 세션이 수정과 문서화로 이어지는 타임라인.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#6b7280"/>
+    </marker>
+  </defs>
+  <rect width="1120" height="470" rx="14" fill="#1e1e1e"/>
+  <text x="44" y="58" fill="#d4d4d4" font-family="D2Coding, Consolas, monospace" font-size="28" font-weight="700">실제 플로우: 먼저 살리고, 동시에 단서를 모은다</text>
+  <g font-family="D2Coding, Consolas, monospace" font-size="18">
+    <text x="74" y="142" fill="#fbbf24">T+0 알림</text>
+    <text x="74" y="248" fill="#4fc1ff">/rescue</text>
+    <text x="74" y="354" fill="#c586c0">/incident</text>
+  </g>
+  <g fill="none" stroke="#3c3c3c" stroke-width="3">
+    <path d="M170 136h860"/>
+    <path d="M170 242h860"/>
+    <path d="M170 348h860"/>
+  </g>
+  <g font-family="D2Coding, Consolas, monospace">
+    <g transform="translate(190 104)">
+      <circle cx="32" cy="32" r="30" fill="#3a2716" stroke="#f59e0b"/>
+      <text x="20" y="39" fill="#fbbf24" font-size="24">!</text>
+    </g>
+    <g transform="translate(292 204)">
+      <rect width="150" height="76" rx="10" fill="#252526" stroke="#4fc1ff"/>
+      <text x="22" y="32" fill="#d4d4d4" font-size="17">상태 확인</text>
+      <text x="22" y="57" fill="#858585" font-size="15">health/logs</text>
+    </g>
+    <g transform="translate(482 204)">
+      <rect width="150" height="76" rx="10" fill="#252526" stroke="#4fc1ff"/>
+      <text x="22" y="32" fill="#d4d4d4" font-size="17">복구 실행</text>
+      <text x="22" y="57" fill="#858585" font-size="15">restart/swap</text>
+    </g>
+    <g transform="translate(672 204)">
+      <rect width="150" height="76" rx="10" fill="#15351f" stroke="#22c55e"/>
+      <text x="22" y="32" fill="#86efac" font-size="17">UP 확인</text>
+      <text x="22" y="57" fill="#86efac" font-size="15">handoff note</text>
+    </g>
+    <g transform="translate(292 310)">
+      <rect width="150" height="76" rx="10" fill="#252526" stroke="#c586c0"/>
+      <text x="22" y="32" fill="#d4d4d4" font-size="17">배포 커밋</text>
+      <text x="22" y="57" fill="#858585" font-size="15">last 24h</text>
+    </g>
+    <g transform="translate(482 310)">
+      <rect width="150" height="76" rx="10" fill="#252526" stroke="#c586c0"/>
+      <text x="22" y="32" fill="#d4d4d4" font-size="17">로그/메트릭</text>
+      <text x="22" y="57" fill="#858585" font-size="15">parallel</text>
+    </g>
+    <g transform="translate(672 310)">
+      <rect width="150" height="76" rx="10" fill="#252526" stroke="#c586c0"/>
+      <text x="22" y="32" fill="#d4d4d4" font-size="17">가설 검증</text>
+      <text x="22" y="57" fill="#858585" font-size="15">root cause</text>
+    </g>
+    <g transform="translate(862 310)">
+      <rect width="150" height="76" rx="10" fill="#2b2135" stroke="#c586c0"/>
+      <text x="22" y="32" fill="#e9d5ff" font-size="17">수정/문서화</text>
+      <text x="22" y="57" fill="#e9d5ff" font-size="15">after UP</text>
+    </g>
+  </g>
+  <g fill="none" stroke="#6b7280" stroke-width="3" marker-end="url(#arrow)">
+    <path d="M252 136 C275 170 292 196 314 206"/>
+    <path d="M252 136 C275 255 292 302 314 312"/>
+    <path d="M442 242h36"/>
+    <path d="M632 242h36"/>
+    <path d="M442 348h36"/>
+    <path d="M632 348h36"/>
+    <path d="M822 348h36"/>
+    <path d="M747 280 C760 300 768 304 774 310"/>
+  </g>
+</svg>

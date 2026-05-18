@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="500" viewBox="0 0 1120 500" role="img" aria-labelledby="title desc">
+  <title id="title">Sentry 캡처 전후 비교</title>
+  <desc id="desc">모든 BusinessException을 Sentry로 보내던 이전 상태와 노이즈 코드를 제외하는 수정 후 상태를 비교한다.</desc>
+  <rect width="1120" height="500" rx="14" fill="#1e1e1e"/>
+  <text x="44" y="58" fill="#d4d4d4" font-family="D2Coding, Consolas, monospace" font-size="28" font-weight="700">수정 방향: 모든 예외가 아니라 “볼 가치가 있는 예외”만</text>
+  <g font-family="D2Coding, Consolas, monospace">
+    <g transform="translate(54 108)">
+      <rect width="478" height="300" rx="12" fill="#252526" stroke="#3c3c3c"/>
+      <text x="28" y="45" fill="#f87171" font-size="24">Before</text>
+      <text x="28" y="85" fill="#cccccc" font-size="18">BusinessException 전체 캡처</text>
+      <g transform="translate(30 125)" font-size="17">
+        <rect width="390" height="34" rx="6" fill="#3b1d21"/>
+        <text x="16" y="23" fill="#fca5a5">DEVICE_PROFILE_NOT_FOUND</text>
+        <rect y="48" width="320" height="34" rx="6" fill="#3b1d21"/>
+        <text x="16" y="71" fill="#fca5a5">AUTH_REFRESH_TOKEN_MISSING</text>
+        <rect y="96" width="260" height="34" rx="6" fill="#1f2937"/>
+        <text x="16" y="119" fill="#d4d4d4">실제 버그성 예외</text>
+      </g>
+      <path d="M386 182h52" stroke="#ef4444" stroke-width="4" marker-end="url(#arrow-red)"/>
+      <text x="316" y="260" fill="#fca5a5" font-size="18">노이즈와 비용 증가</text>
+    </g>
+    <g transform="translate(588 108)">
+      <rect width="478" height="300" rx="12" fill="#252526" stroke="#3c3c3c"/>
+      <text x="28" y="45" fill="#4ade80" font-size="24">After</text>
+      <text x="28" y="85" fill="#cccccc" font-size="18">SENTRY_NOISE_CODES 제외</text>
+      <g transform="translate(30 125)" font-size="17">
+        <rect width="390" height="34" rx="6" fill="#15351f" stroke="#22c55e"/>
+        <text x="16" y="23" fill="#86efac">정상 흐름 예외는 로그만</text>
+        <rect y="56" width="300" height="34" rx="6" fill="#1f2937" stroke="#4fc1ff"/>
+        <text x="16" y="79" fill="#d4d4d4">실제 버그성 예외만 캡처</text>
+        <rect y="112" width="230" height="34" rx="6" fill="#1f2937" stroke="#4fc1ff"/>
+        <text x="16" y="135" fill="#d4d4d4">대시보드 신호 유지</text>
+      </g>
+      <text x="282" y="260" fill="#86efac" font-size="18">비용과 노이즈 감소</text>
+    </g>
+  </g>
+  <defs>
+    <marker id="arrow-red" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#ef4444"/>
+    </marker>
+  </defs>
+</svg>

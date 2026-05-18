@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Solo incident response with AI sessions — split rescue from root-cause analysis</title>
+<style>
+  body { font-family: Georgia, serif; max-width: 680px; margin: 0 auto; padding: 20px; line-height: 1.8; color: #292929; }
+  h1 { font-size: 2em; margin-bottom: 0.3em; }
+  h2 { font-size: 1.4em; margin-top: 2em; border-bottom: 1px solid #eee; padding-bottom: 0.3em; }
+  h3 { font-size: 1.15em; margin-top: 1.5em; }
+  pre { background: #f6f6f6; padding: 16px; border-radius: 4px; overflow-x: auto; font-size: 0.88em; }
+  code { font-family: Menlo, Courier New, monospace; background: #f0f0f0; padding: 2px 5px; border-radius: 3px; font-size: 0.9em; }
+  pre code { background: none; padding: 0; }
+  img { max-width: 100%; height: auto; display: block; margin: 28px auto; border-radius: 6px; }
+  ul, ol { padding-left: 1.5em; }
+  table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+  th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+  th { background: #f6f6f6; }
+  hr { border: none; border-top: 1px solid #eee; margin: 2em 0; }
+</style>
+</head>
+<body>
+<h1>Solo incident response with AI sessions — split rescue from root-cause analysis</h1>
+<p><em>This post is also available on <a href="https://yunjeongiya.github.io/posts/084-en/">my blog</a>. (<a href="https://yunjeongiya.github.io/posts/084/">한국어 버전은 여기</a>)</em></p>
+<p><img src="../assets/images/posts/084-ai-incident-response-role-split/thumbnail-en.png" alt="A chessboard where one hand moves a shield piece and a magnifying-glass piece separately"></p>
+
+<p>The server is down. You are alone. You need to restore it now, but you also need to understand why it died.</p>
+<p>Trying to do both at the same time slows both down. Teams with SRE practices open a war room and split roles. When operating alone, I found a smaller version of that structure: two AI sessions.</p>
+<hr>
+
+<h2>Two Modes of Incident Response</h2>
+<p>The Google SRE incident guidance is roughly: stop the bleeding, restore service, and preserve evidence for root cause analysis.</p>
+<p>For a solo operator, that means service restoration and root-cause investigation should be separated.</p>
+<ul>
+  <li>The service stays down while investigation continues</li>
+  <li>Restoration urgency can destroy clues</li>
+  <li>The two tracks interrupt each other</li>
+</ul>
+<p><img src="../assets/images/posts/084-ai-incident-response-role-split/role-split-diagram-en.svg" alt="Two AI sessions split into rescue and investigation roles"></p>
+<hr>
+
+<h2>Session Split: /rescue and /incident</h2>
+<h3>Session 1: /rescue</h3>
+<p>This session does only one thing: <strong>restore service</strong>.</p>
+<pre><code>"The server is down. /rescue"</code></pre>
+<ol>
+  <li>Checks current state: containers, health checks, logs</li>
+  <li>Executes restoration: blue-green swap or container restart</li>
+  <li>Confirms recovery: repeated health checks and normal response</li>
+  <li>Summarizes the result for handoff</li>
+</ol>
+<p>This session does <strong>not</strong> edit code. It does not claim root cause.</p>
+
+<h3>Session 2: /incident</h3>
+<p>This session does only one thing: <strong>find why it died</strong>.</p>
+<pre><code>"Session 1 is restoring service. You investigate root cause only. Do not edit code."</code></pre>
+<ol>
+  <li>Checks deploy commits from the last 24 hours first</li>
+  <li>Looks for error-log patterns</li>
+  <li>Checks DB state: slow queries, locks, processlist</li>
+  <li>Checks metrics: CPU, heap, GC pause, connection pool</li>
+  <li>Forms theories, validates them, then implements the fix after recovery</li>
+</ol>
+<hr>
+
+<h2>Actual Flow</h2>
+<pre><code>[Alert]
+     ↓
+Open session 1 → "/rescue restore the server"
+     ↓ (at the same time)
+Open session 2 → "Session 1 is restoring. You investigate only.
+                  Do not touch code. Start with last 24h deploy commits."
+     ↓
+Session 1: blue-green swap or restart
+Session 2: logs, deploy commits, metrics in parallel
+     ↓
+Session 1 → recovery summary with last error logs
+User → pass that summary to session 2
+     ↓
+Session 2: confirm theory → implement fix</code></pre>
+<p><img src="../assets/images/posts/084-ai-incident-response-role-split/incident-flow-en.svg" alt="Parallel timeline for rescue and investigation sessions"></p>
+<p>The important instruction is that the two sessions must not edit the same code at the same time.</p>
+<hr>
+
+<h2>Why the Rescue Session Should Not Own RCA</h2>
+<p>If the rescue session quickly guesses a root cause and edits code:</p>
+<ul>
+  <li>Restarting can erase clues such as logs and metrics</li>
+  <li>A wrong theory leaves no stable baseline to return to</li>
+  <li>A rushed fix can enter prod based on a bad guess</li>
+</ul>
+<p>Separating rescue and investigation lets the investigation session collect evidence without panic.</p>
+<hr>
+
+<h2>Are More Sessions Better?</h2>
+<p>Multiple investigation sessions sound useful, but they add coordination load. During an incident, the user now has to merge competing theories and decide which session is right.</p>
+<p>Best setup: <strong>one rescue session + one investigation session.</strong></p>
+<hr>
+
+<h2>The Reality of AI SRE</h2>
+<p>Anthropic's Claude Cookbook has an <a href="https://platform.claude.com/cookbook/managed-agents-sre-incident-responder">SRE incident response agent</a>: PagerDuty webhook -> Lambda -> Claude API -> automated analysis -> Slack report.</p>
+<p>The practical setup today is: alert fires -> human opens chat -> run <code>/rescue</code> and <code>/incident</code>. It is not fully automated, but it is structured.</p>
+<hr>
+
+<h2>Summary</h2>
+<table>
+  <thead><tr><th></th><th>/rescue session</th><th>/incident session</th></tr></thead>
+  <tbody>
+    <tr><td>Goal</td><td>Restore service</td><td>Find root cause</td></tr>
+    <tr><td>Code changes</td><td>No</td><td>Yes, after recovery</td></tr>
+    <tr><td>Timeline</td><td>Within 10 minutes</td><td>After service is back</td></tr>
+    <tr><td>Output</td><td>"Service is UP"</td><td>Fix PR + prevention</td></tr>
+  </tbody>
+</table>
+<hr>
+
+<h2>References</h2>
+<ul>
+  <li><a href="https://sre.google/sre-book/managing-incidents/">Google SRE Book: Managing Incidents</a></li>
+  <li><a href="https://upstat.io/blog/war-room-protocols">War Room Protocols: Coordinating Critical Incident Response</a></li>
+  <li><a href="https://incident.io/blog/how-it-feels-to-run-an-incident-with-ai-sre">How it feels to run an incident with AI SRE — incident.io</a></li>
+  <li><a href="https://www.arcade.dev/blog/claude-code-ai-sre-oncall-workflows/">AI SRE with Claude Code: 5 On-Call Reliability Workflows — Arcade</a></li>
+  <li><a href="https://platform.claude.com/cookbook/managed-agents-sre-incident-responder">Build an SRE incident response agent with Claude Managed Agents</a></li>
+</ul>
+</body>
+</html>

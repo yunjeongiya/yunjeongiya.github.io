@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="540" viewBox="0 0 1120 540" role="img" aria-labelledby="title desc">
+  <title id="title">예외 캡처에서 풀 고갈까지 이어지는 장애 흐름</title>
+  <desc id="desc">DEVICE_PROFILE_NOT_FOUND 예외가 Sentry 캡처, 힙 할당, GC pause, JVM 응답 지연, DB 커넥션 풀 고갈로 이어지는 흐름도.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#6b7280"/>
+    </marker>
+  </defs>
+  <rect width="1120" height="540" rx="14" fill="#1e1e1e"/>
+  <text x="44" y="58" fill="#d4d4d4" font-family="D2Coding, Consolas, monospace" font-size="28" font-weight="700">장애 연쇄: 관찰성 코드가 hot path에 들어갔을 때</text>
+  <g font-family="D2Coding, Consolas, monospace">
+    <g transform="translate(54 122)">
+      <rect width="188" height="112" rx="10" fill="#252526" stroke="#3c3c3c"/>
+      <text x="22" y="42" fill="#ce9178" font-size="18">고빈도 예외</text>
+      <text x="22" y="76" fill="#dcdcaa" font-size="18">DEVICE_PROFILE</text>
+      <text x="22" y="100" fill="#dcdcaa" font-size="18">_NOT_FOUND</text>
+    </g>
+    <g transform="translate(292 122)">
+      <rect width="188" height="112" rx="10" fill="#252526" stroke="#3c3c3c"/>
+      <text x="22" y="45" fill="#4fc1ff" font-size="19">Sentry capture</text>
+      <text x="22" y="82" fill="#cccccc" font-size="16">serialize, queue</text>
+    </g>
+    <g transform="translate(530 122)">
+      <rect width="188" height="112" rx="10" fill="#252526" stroke="#3c3c3c"/>
+      <text x="22" y="45" fill="#dcdcaa" font-size="19">Heap pressure</text>
+      <text x="22" y="82" fill="#cccccc" font-size="16">객체 할당 증가</text>
+    </g>
+    <g transform="translate(768 122)">
+      <rect width="188" height="112" rx="10" fill="#3a2716" stroke="#f59e0b"/>
+      <text x="22" y="45" fill="#fbbf24" font-size="19">Full GC pause</text>
+      <text x="22" y="82" fill="#f5f5f5" font-size="16">stop-the-world</text>
+    </g>
+    <g transform="translate(410 328)">
+      <rect width="188" height="112" rx="10" fill="#252526" stroke="#3c3c3c"/>
+      <text x="22" y="45" fill="#c586c0" font-size="19">JVM 응답 지연</text>
+      <text x="22" y="82" fill="#cccccc" font-size="16">요청 처리 정체</text>
+    </g>
+    <g transform="translate(650 328)">
+      <rect width="220" height="112" rx="10" fill="#3b1d21" stroke="#ef4444"/>
+      <text x="22" y="45" fill="#f87171" font-size="19">HikariCP timeout</text>
+      <text x="22" y="82" fill="#f5f5f5" font-size="16">커넥션 풀 고갈</text>
+    </g>
+  </g>
+  <g fill="none" stroke="#6b7280" stroke-width="3" marker-end="url(#arrow)">
+    <path d="M242 178h46"/>
+    <path d="M480 178h46"/>
+    <path d="M718 178h46"/>
+    <path d="M862 234 C840 300 600 285 520 324"/>
+    <path d="M598 384h46"/>
+  </g>
+  <text x="58" y="495" fill="#858585" font-family="D2Coding, Consolas, monospace" font-size="18">핵심: “에러를 더 잘 보려는 코드”도 빈도가 높으면 장애 트리거가 될 수 있다.</text>
+</svg>
