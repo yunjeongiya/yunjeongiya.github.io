@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ERD 문서를 삭제했다 — AI는 다이어그램을 읽지 않는다</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #1a1a2e; color: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; font-size: 18px; line-height: 1.8; }
+.container { max-width: 720px; margin: 0 auto; padding: 40px 20px; }
+h1 { font-size: 36px; font-weight: bold; color: #fff; margin-bottom: 24px; line-height: 1.3; }
+h2 { font-size: 28px; font-weight: bold; color: #fff; margin-top: 48px; margin-bottom: 16px; }
+h3 { font-size: 22px; font-weight: bold; color: #fff; margin-top: 36px; margin-bottom: 12px; }
+p { margin-bottom: 16px; }
+strong { color: #f0f6fc; }
+em { font-style: italic; }
+a { color: #58a6ff; text-decoration: none; }
+a:hover { text-decoration: underline; }
+img { max-width: 100%; border-radius: 8px; margin: 32px auto; display: block; }
+blockquote { border-left: 3px solid #58a6ff; padding-left: 16px; color: #8b949e; font-style: italic; margin: 16px 0; }
+ul, ol { margin-left: 24px; margin-bottom: 16px; }
+li { margin-bottom: 8px; }
+code { background: #2d333b; padding: 2px 6px; border-radius: 4px; color: #e6edf3; font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 15px; }
+pre { position: relative; background: #0d1117; border-radius: 8px; padding: 20px; overflow-x: auto; margin: 16px 0; }
+pre code { background: none; padding: 0; font-size: 14px; }
+hr { border: none; border-top: 1px solid #30363d; margin: 32px 0; }
+table { border-collapse: collapse; margin: 24px 0; width: 100%; }
+th, td { border: 1px solid #30363d; padding: 10px 16px; text-align: left; }
+th { background: #21262d; color: #f0f6fc; }
+.tags { margin-bottom: 32px; }
+.tag { display: inline-block; padding: 4px 12px; border-radius: 16px; font-size: 13px; font-weight: 500; margin-right: 8px; margin-bottom: 8px; }
+.tag-ai { background: #1B3A4B; color: #81D4FA; }
+.tag-docs { background: #1B4332; color: #95D5B2; }
+.tag-db { background: #1A3A5C; color: #90CAF9; }
+.tag-claude { background: #3A2A1B; color: #FFCC80; }
+.tag-solo { background: #21262D; color: #C9D1D9; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>ERD 문서를 삭제했다 — AI는 다이어그램을 읽지 않는다</h1>
+
+<div class="tags">
+<span class="tag tag-db">ERD</span>
+<span class="tag tag-docs">Documentation</span>
+<span class="tag tag-ai">AI Coding</span>
+<span class="tag tag-claude">Claude Code</span>
+<span class="tag tag-solo">1인개발</span>
+</div>
+
+<h2>TL;DR</h2>
+
+<p>96KB짜리 ERD 문서를 리포에서 지웠다. 감으로 내린 결정이 아니다. 최근 한 달치 AI 코딩 세션 로그 396개를 전수 분석해보니, ERD를 실제로 읽은 세션은 3개였고 같은 폴더의 <code>schema.sql</code>을 읽은 세션은 22개였다. 코드를 AI가 짜는 환경에서 손으로 유지하는 다이어그램은 독자가 없는 문서다. 관계 정보의 원본(DDL)만 남기고, 시각화는 필요한 순간에 생성하면 된다. CLI 도구들이 다시 흥하는 것과 정확히 같은 힘이 문서에도 작용하고 있다.</p>
+
+<hr>
+
+<h2>발단: 동기화하다가 포기한 문서</h2>
+
+<p>운영 DB에서 안 쓰는 테이블 하나를 DROP했다. 프로젝트 룰상 스키마 문서를 같이 동기화해야 해서 <code>schema.sql</code>, <code>prod_schema.sql</code>, 그리고 <code>erd.md</code>를 고치기 시작했는데, SQL 덤프 두 개는 금방 끝났지만 ERD에서 막혔다.</p>
+
+<p>이 ERD는 ASCII 박스 문자로 그린 다이어그램 + 번호 매긴 테이블 인벤토리(105개 테이블, 28개 도메인)로 된 1,963줄짜리 마크다운이다. 테이블 하나를 지우면 박스 다이어그램을 다시 그려야 하고, 52번 테이블을 빼면 53번부터 끝까지 전부 번호를 다시 매겨야 한다. 부분 수정이 연쇄로 번지는 구조다. 게다가 들여다보니 이미 stale했다. 몇 달 전 추가된 컬럼들이 빠져 있었다. "전면 재생성은 별도 작업으로 빼자"하고 SQL 덤프만 동기화하고 덮었다.</p>
+
+<p>그날 저녁에 다시 생각했다. 전면 재생성? 그 전에 — 이 문서, 누가 읽긴 하나?</p>
+
+<h2>일단 데이터부터 깠다</h2>
+
+<p>나는 1인 개발자고, 코드는 거의 AI(Claude Code)가 짠다. 그 말은 "문서의 독자"도 대부분 AI 세션이라는 뜻이다. 그리고 Claude Code는 모든 세션을 JSONL로 남긴다. 즉, 문서별 실제 참조 횟수를 셀 수 있다.</p>
+
+<p>보존된 세션 로그 396개(약 한 달치)를 긁어서 erd.md와 schema.sql이 실제로 Read/Grep된 횟수를 셌다.</p>
+
+<table>
+<tr><th>문서</th><th>실제로 읽은 세션 수</th></tr>
+<tr><td><code>schema.sql</code> / <code>prod_schema.sql</code></td><td><strong>22개</strong></td></tr>
+<tr><td><code>erd.md</code></td><td><strong>3개</strong></td></tr>
+</table>
+
+<p>erd.md의 3회도 내역을 보면 약하다. 두 번은 DB 인시던트 디버깅 중 테이블명 grep, 한 번은 위에서 말한 동기화 시도 그 자체. 다이어그램을 "보러" 온 세션은 사실상 0이었다. 문자열 "erd.md"가 등장한 세션은 19개였는데, 대부분 파일 목록에 스쳐 지나간 것이었다.</p>
+
+<p>AI는 스키마가 궁금하면 <code>schema.sql</code>을 grep한다. 테이블 정의, 컬럼 타입, 그리고 FK 제약 194개 — 관계 정보까지 전부 거기 있다. 거기서 안 나오면 엔티티 코드를 읽는다. 사람인 나? 나도 ERD 안 본 지 오래됐다. 궁금한 게 있으면 AI한테 물어보니까.</p>
+
+<h2>텍스트인데 이미지처럼 행동하는 문서</h2>
+
+<p>여기서 재밌는 지점. erd.md는 형식상 텍스트 파일이다. 그런데 왜 AI가 안 읽고, 편집은 왜 그렇게 고통스러웠을까.</p>
+
+<p>ASCII 아트 다이어그램은 <strong>텍스트의 탈을 쓴 이미지</strong>라서 그렇다. 정보가 문자가 아니라 2차원 배치에 들어 있다. 사람 눈에는 공간 배치가 의미를 갖지만, 토큰 스트림으로 읽는 입장에선 박스 문자와 공백의 나열일 뿐이고, 같은 정보를 DDL 한 줄(<code>FOREIGN KEY (student_id) REFERENCES students(id)</code>)이 훨씬 싸고 정확하게 전달한다. 편집도 마찬가지다. 텍스트처럼 diff는 떠지지만, 수정은 이미지처럼 "전체를 다시 그려야" 한다. 사람에게도 AI에게도 최악인 중간 형태다.</p>
+
+<p>정리하면 이 문서의 문제는 두 겹이었다.</p>
+
+<ol>
+<li><strong>파생물이다</strong> — 원본(schema.sql)에서 생성된 2차 자료인데 손으로 유지했다. 파생물은 원본이 바뀔 때마다 빚이 쌓인다.</li>
+<li><strong>기계가 소비할 수 없는 인코딩이다</strong> — 주 독자가 AI가 된 환경에서, 사람 눈 전용 포맷으로 적혀 있었다.</li>
+</ol>
+
+<h2>CLI 르네상스와 같은 힘</h2>
+
+<p>이게 우리 리포만의 사정이 아니라는 게 이 글을 쓰는 이유다.</p>
+
+<p>2025년부터 터미널 도구들이 갑자기 다시 흥하고 있다. Claude Code가 터미널 도구로 나와서 1년이 안 돼 <a href="https://jrpospos.blog/posts/2025/12/the-terminal-renaissance-in-the-age-of-ai-coding-agents/">공개 GitHub 커밋의 4%를 작성</a>하는 지경이 됐고, Google(Gemini CLI), Microsoft(Copilot CLI), AWS까지 전부 독립 CLI 에이전트를 제품으로 내놨다. 수십 년 된 GUI 시대에 왜 거꾸로 가나 싶지만, 이유는 단순하다. <strong>에이전트가 일꾼이 되자, 일꾼이 쓰기 좋은 인터페이스가 이겼다.</strong> GUI는 사람의 눈과 손에 최적화된 인터페이스고, CLI는 조합 가능한 텍스트 스트림이다. AI는 텍스트를 먹고 텍스트를 뱉는다. <a href="https://galtea.ai/blog/why-ai-coding-agents-are-bringing-the-cli-back">MCP 기반 에이전트와 CLI 기반 에이전트로 같은 작업을 75회 비교한 테스트</a>에서 CLI 쪽이 토큰 비용 10~32배 우위, 안정성 ~100% vs 72%로 전 지표를 이겼다는 보고도 있다.</p>
+
+<p>문서 쪽에서도 같은 선택압이 이미 보인다.</p>
+
+<ul>
+<li><a href="https://llmstxt.org/">llms.txt</a> — HTML 사이트 대신 LLM이 읽을 마크다운 인덱스를 제공하자는 표준. Anthropic, Stripe, Cloudflare 등 600개 넘는 사이트가 채택했다 (<a href="https://daleseo.com/llms-txt/">한국어 소개</a>).</li>
+<li><a href="https://www.aihero.dev/a-complete-guide-to-agents-md">AGENTS.md</a> — 리포 루트에 에이전트용 컨텍스트를 마크다운으로 두는 관례. Vercel이 <a href="https://the-decoder.com/a-simple-text-file-beats-complex-skill-systems-for-ai-coding-agents/">스킬 시스템 vs 압축된 AGENTS.md 한 장을 비교</a>했더니 단순 텍스트 파일 쪽이 100% vs 79%로 이겼다.</li>
+<li>AI ERD 생성기들 — ChartDB 같은 도구가 DDL에서 다이어그램을 즉석 생성한다. 다이어그램이 "유지하는 자산"에서 "필요할 때 뽑는 출력물"로 옮겨가고 있다는 신호다.</li>
+</ul>
+
+<p>도구 시장에서 일어난 일이 문서에도 그대로 일어나고 있는 거다. 독자의 다수가 AI가 되면, 형식은 기계 친화적 텍스트로 수렴한다. 내 ERD 삭제는 그 흐름의 아주 작은 로컬 버전이고.</p>
+
+<h2>그럼 다이어그램은 끝인가</h2>
+
+<p>아니다. 핵심은 "시각 자료를 버려라"가 아니라 <strong>"파생물을 손으로 유지하지 마라"</strong>다.</p>
+
+<p>다이어그램이 필요한 순간은 여전히 있다. 신규 도메인 설계 논의, 외부인에게 구조 설명할 때. 그런데 그 순간이 오면 AI한테 "schema.sql에서 결제 도메인만 Mermaid로 그려줘"라고 하면 끝난다. Mermaid도 결국 텍스트 DSL이라 AI가 잘 만들고, 그 시점의 원본에서 뽑으니까 <strong>항상 최신</strong>이다. 유지보수된 stale 다이어그램보다 생성된 다이어그램이 언제나 정확하다.</p>
+
+<p>오히려 stale한 ERD는 무해하지 않다. 위에서 erd.md를 읽은 3개 세션 중 2개가 DB 인시던트 디버깅 중이었다는 걸 떠올려보자. 장애 대응 중인 에이전트가 낡은 관계도를 자신 있게 참조하는 상황 — 없는 게 낫다.</p>
+
+<h2>실행</h2>
+
+<p>결정하고 나니 작업 자체는 시시했다.</p>
+
+<ul>
+<li><code>docs/database/erd.md</code> 삭제 (1,963줄)</li>
+<li><code>docs/database/README.md</code>에 두 줄: "schema.sql이 source of truth다. FK가 관계를 담는다. 다이어그램이 필요하면 schema.sql에서 생성하라."</li>
+<li>과거 작업 문서들이 erd.md를 링크한 ~20곳은 그대로 뒀다. 시점 기록이니까.</li>
+</ul>
+
+<p>git 히스토리에 erd.md는 남아 있다. 혹시 그리워지면 <code>git show</code>로 꺼내 보면 된다. 아직 그럴 일은 없었다.</p>
+
+<h2>남는 생각</h2>
+
+<p>"문서화 잘 해야지"라는 말은 이제 반쪽짜리다. 질문이 하나 더 붙어야 한다 — <strong>누가 읽는데?</strong> 독자가 사람이면 사람의 포맷으로, AI면 AI의 포맷으로. 그리고 요즘 내 리포의 독자는 396 대 3으로 AI다.</p>
+
+<p>원본은 텍스트로 한 벌만. 파생물은 유지하지 말고 생성할 것. 도구는 이미 그렇게 갔고, 문서가 따라가는 중이다.</p>
+
+<hr>
+
+<h2>참고 자료</h2>
+
+<ul>
+<li><a href="https://jrpospos.blog/posts/2025/12/the-terminal-renaissance-in-the-age-of-ai-coding-agents/">The Terminal Renaissance in the Age of AI Coding Agents</a></li>
+<li><a href="https://galtea.ai/blog/why-ai-coding-agents-are-bringing-the-cli-back">Why AI coding agents are bringing the CLI back — Galtea</a></li>
+<li><a href="https://the-decoder.com/a-simple-text-file-beats-complex-skill-systems-for-ai-coding-agents/">A simple text file beats complex skill systems for AI coding agents — The Decoder</a></li>
+<li><a href="https://llmstxt.org/">The /llms.txt file</a> · <a href="https://daleseo.com/llms-txt/">llms.txt: LLM을 위한 웹사이트 안내서 — Dale Seo</a></li>
+<li><a href="https://www.aihero.dev/a-complete-guide-to-agents-md">A Complete Guide To AGENTS.md</a></li>
+<li><a href="https://brunch.co.kr/@230kimi/49">AI 시대, 왜 마크다운을 알아야 하는가 — brunch</a></li>
+</ul>
+
+</div>
+</body>
+</html>
