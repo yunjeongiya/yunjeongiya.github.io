@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "When a Feature Keeps Breaking: Build the Full Case Matrix Before You Let AI Write Code"
+title: "Use AI as a Design Partner, Not Just a Coder: Start Complex Features with a Case Table"
 date: 2026-06-19 16:30:00 +0900
 categories: [AI, Engineering]
 tags: [ai-pair-programming, spec-first, code-review, e2e, workflow]

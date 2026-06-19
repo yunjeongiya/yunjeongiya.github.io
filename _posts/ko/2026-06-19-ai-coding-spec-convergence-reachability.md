@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "복잡한 기능이 자꾸 꼬일 때: AI와 코드 전에 '전 경우의 수 매트릭스'부터 짠다"
+title: "AI를 코더가 아니라 설계 파트너로: 복잡한 기능을 만들 땐 경우의 수 테이블을 짜달라고 하자!"
 date: 2026-06-19 16:30:00 +0900
 categories: [AI, Engineering]
 tags: [ai-pair-programming, spec-first, code-review, e2e, workflow]
