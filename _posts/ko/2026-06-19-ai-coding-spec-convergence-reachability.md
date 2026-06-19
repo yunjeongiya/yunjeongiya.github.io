@@ -6,11 +6,11 @@ categories: [AI, Engineering]
 tags: [ai-pair-programming, spec-first, code-review, e2e, workflow]
 lang: ko
 slug: "100"
-thumbnail: /assets/images/posts/100-exhaustive-spec-matrix/thumbnail.png
+thumbnail: /assets/images/posts/100-exhaustive-spec-matrix/thumbnail-prompt-vs-design-ko-v1.png
 published: true
 ---
 
-![코드 전에 전 경우의 수 매트릭스부터 짠다](/assets/images/posts/100-exhaustive-spec-matrix/thumbnail.png)
+![프롬프트만 더 쓰는 방식과 AI와 설계부터 함께하는 방식을 대비한 썸네일](/assets/images/posts/100-exhaustive-spec-matrix/thumbnail-prompt-vs-design-ko-v1.png)
 
 ## 도입
 

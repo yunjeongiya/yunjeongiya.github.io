@@ -6,11 +6,11 @@ categories: [AI, Engineering]
 tags: [ai-pair-programming, spec-first, code-review, e2e, workflow]
 lang: en
 slug: "100-en"
-thumbnail: /assets/images/posts/100-exhaustive-spec-matrix/thumbnail-en.png
+thumbnail: /assets/images/posts/100-exhaustive-spec-matrix/thumbnail-prompt-vs-design-en-v1.png
 published: true
 ---
 
-![Build the full case matrix before you let AI write code](/assets/images/posts/100-exhaustive-spec-matrix/thumbnail-en.png)
+![Prompt harder versus design together with AI before coding](/assets/images/posts/100-exhaustive-spec-matrix/thumbnail-prompt-vs-design-en-v1.png)
 
 ## Intro
 
