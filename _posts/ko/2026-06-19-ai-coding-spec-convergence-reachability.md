@@ -6,6 +6,7 @@ categories: [AI, Engineering]
 tags: [ai-pair-programming, spec-first, code-review, e2e, workflow]
 lang: ko
 slug: "100"
+thumbnail: /assets/images/posts/100-exhaustive-spec-matrix/thumbnail.png
 published: true
 ---
 
