@@ -39,6 +39,8 @@ The matrix that came out looked like this (domain-generalized):
 
 *The full set of branches for a feature where "changing a type drives a state transition." Forward (general → transition) splits into Link/Move/Start/Repair/Block by `current state × existing record × feasibility`; reverse (transition → general) splits into Release/Guide by in-progress vs. completed; transition↔transition is a composition of the two.*
 
+The figure above is actually a **simplified slice.** The spec we really froze was far bigger — changes split into **three families (forward, reverse, and transition↔transition composite)**, filling **~20 cases with no empty cell**, each cell further resolved by `current state × existing record × feasibility`. So one "change the type" action resolved into **13 distinct outcomes** — link, start, move, repair, block, release, plus **5 composite** ones for when a reverse-release overlaps a forward action. `execute` **re-judges** the branch `preview` chose and rejects it if the state shifted in between (a race guard), and this judgment logic alone is pinned by **44 tests.**
+
 That matrix became the **contract.** AI implements against the frozen table; the human reviews against the same table. You don't ask "how should this case behave?" during code review — it's already written in the cell.
 
 This makes the human/AI division clear. **Enumerating the cases and writing the code is AI's job; deciding each cell's domain meaning is the human's.** AI is strong at "list every combination you can think of," the human at "this cell like so, block that one." The human fills the cells — but AI is what surfaces *where* the cells are.
