@@ -10,6 +10,8 @@ thumbnail: /assets/images/posts/100-exhaustive-spec-matrix/thumbnail.png
 published: true
 ---
 
+![코드 전에 전 경우의 수 매트릭스부터 짠다](/assets/images/posts/100-exhaustive-spec-matrix/thumbnail.png)
+
 ## 도입
 
 AI가 코드를 꽤 잘 짠다. 그런데도 **경우의 수가 많은 기능**은 자꾸 꼬인다. "이거 만들어줘" 하면 첫 구현은 그럴듯한데, 엣지에서 깨지고, 패치하면 다른 분기가 깨지고, 그러다 처음 의도가 흐려진다.

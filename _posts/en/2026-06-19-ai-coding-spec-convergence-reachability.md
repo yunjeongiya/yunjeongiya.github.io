@@ -10,6 +10,8 @@ thumbnail: /assets/images/posts/100-exhaustive-spec-matrix/thumbnail-en.png
 published: true
 ---
 
+![Build the full case matrix before you let AI write code](/assets/images/posts/100-exhaustive-spec-matrix/thumbnail-en.png)
+
 ## Intro
 
 AI writes pretty good code. And yet **features with many branches keep getting tangled.** You say "build this," the first cut looks plausible, it breaks at an edge, you patch it, the patch breaks another branch, and somewhere along the way the original intent blurs.
