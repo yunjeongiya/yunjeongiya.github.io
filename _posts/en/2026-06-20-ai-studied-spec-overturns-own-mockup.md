@@ -13,6 +13,10 @@ published: false
 
 There was a scheduling modal. You pick one person and **assign** them to a time slot. The task was to refine "how to show the selected person and where to put the assign button." I drew the first mockup in 30 minutes. It looked plausible. But it was **eyeballed.**
 
+## 0. The starting point — the code as it was
+
+Before any refinement, the screen looked like this. The selected person showed up as **plain text in a dropdown**, and "View details" was a **detached button** below it. On top of that, picking a person **flipped** the bottom [Save] button into [Assign], overwriting the slot-save position — the exact "an action invades another's spot" problem from [#102](/posts/102-en/). Three things were off from the very start. And the first thing I did here was eyeball it.
+
 ## 1. The first mockup — eyeballed
 
 All I did in the first cut was move "the parts that looked off" around by instinct. I made the selected person a small chip, attached "View details" as an inline link beside it, and tucked the assign button into the person's area. Not bad. But **I couldn't give one line of reason for why it was right.** "It looks cleaner this way" was the whole of it. I'd just moved things around out of nowhere.
@@ -43,9 +47,9 @@ So in the third mockup I **promoted the chip to a row.** The person takes a whol
 
 Chip → row wasn't for looks. It was a **structural change the spec forced.** Without studying, I'd have spent forever cramming three ✕'s into a tiny chip and calling it "clean."
 
-![Evolution of the selected-person element: v1 eyeballed chip → v2 grounded input chip → v2.3 accessible row. Each step, theory intervenes more deeply.](/assets/images/posts/103-ai-studied-mockup/mockup-evolution-ux-en.png)
+![Evolution of the selected-person element: the code as it was (dropdown + detached button) → v1 eyeballed chip → v2 grounded input chip → v2.3 accessible row.](/assets/images/posts/103-ai-studied-mockup/mockup-evolution-ux-en.png)
 
-*Above is the "selected person" portion of the three mockups we actually built. Eyeballed → grounded → a structure that theory forced.*
+*Leftmost is the code as it was (the starting point); the three on the right are the mockups we built. As-is → eyeballed → grounded → a structure that theory forced.*
 
 ## What I learned
 

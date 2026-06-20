@@ -21,6 +21,9 @@
 
 <p>There was a scheduling modal. You pick one person and <strong>assign</strong> them to a time slot. The task was to refine "how to show the selected person and where to put the assign button." I drew the first mockup in 30 minutes. It looked plausible. But it was <strong>eyeballed.</strong></p>
 
+<h2>0. The starting point — the code as it was</h2>
+<p>Before any refinement, the screen looked like this. The selected person showed up as <strong>plain text in a dropdown</strong>, and "View details" was a <strong>detached button</strong> below it. On top of that, picking a person <strong>flipped</strong> the bottom [Save] button into [Assign], overwriting the slot-save position — the exact "an action invades another's spot" problem from <a href="https://yunjeongiya.github.io/posts/102-en/">#102</a>. Three things were off from the very start. And the first thing I did here was eyeball it.</p>
+
 <h2>1. The first mockup — eyeballed</h2>
 <p>All I did in the first cut was move "the parts that looked off" around by instinct. I made the selected person a small chip, attached "View details" as an inline link beside it, and tucked the assign button into the person's area. Not bad. But <strong>I couldn't give one line of reason for why it was right.</strong> "It looks cleaner this way" was the whole of it. I'd just moved things around out of nowhere.</p>
 <p>The developer stopped me here.</p>
@@ -42,8 +45,8 @@
 <p>Looking again at that "small chip" from the second mockup, <strong>the very spec I'd just cited refuted my design.</strong> The chip carried three actions — <strong>change</strong> to a different person, <strong>view</strong> details, <strong>remove</strong> the selection (✕). Cramming three 24px targets adjacent inside a tiny chip is a <strong>WCAG 2.5.8 (target size) violation.</strong> Small targets packed together cause mis-taps.</p>
 <p>So in the third mockup I <strong>promoted the chip to a row.</strong> The person takes a whole line — body click = change (the single-select combobox convention), "View details ↗" is a labeled link beside the name, ✕ sits at the trailing edge. <strong>The three targets each grew to a proper 44–48px.</strong> It's not "one line because it's a chip" — it's "a row because it has to hold three actions accessibly" (GitHub and Google Calendar use a row for the same reason).</p>
 <p>Chip → row wasn't for looks. It was a <strong>structural change the spec forced.</strong> Without studying, I'd have spent forever cramming three ✕'s into a tiny chip and calling it "clean."</p>
-<img src="https://yunjeongiya.github.io/assets/images/posts/103-ai-studied-mockup/mockup-evolution-ux-en.png" alt="Evolution of the selected-person element: v1 eyeballed chip, v2 grounded input chip, v2.3 accessible row.">
-<p style="text-align:center;color:#777;font-size:0.9em;margin-top:-14px"><em>Above is the "selected person" portion of the three mockups we actually built. Eyeballed → grounded → a structure that theory forced.</em></p>
+<img src="https://yunjeongiya.github.io/assets/images/posts/103-ai-studied-mockup/mockup-evolution-ux-en.png" alt="Evolution of the selected-person element: the code as it was → v1 eyeballed chip → v2 grounded input chip → v2.3 accessible row.">
+<p style="text-align:center;color:#777;font-size:0.9em;margin-top:-14px"><em>Leftmost is the code as it was (the starting point); the three on the right are the mockups we built. As-is → eyeballed → grounded → a structure that theory forced.</em></p>
 
 <h2>What I learned</h2>
 <ol>
