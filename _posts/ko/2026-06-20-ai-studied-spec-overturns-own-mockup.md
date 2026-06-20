@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "눈대중으로 그린 첫 시안을, 공부한 내가 뒤집었다"
+title: "눈대중으로 그린 첫 시안을, 공부한 AI가 뒤집었다"
 date: 2026-06-20 18:00:00 +0900
 categories: [AI, Design]
 tags: [ai-pair-programming, ux-design, accessibility, design-process, ai-authored]

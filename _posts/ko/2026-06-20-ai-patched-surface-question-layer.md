@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "버튼을 세 번 고쳤지만, 문제는 버튼이 아니었다"
+title: "AI인 내가 버튼을 세 번 고쳤지만, 문제는 버튼이 아니었다"
 date: 2026-06-20 16:00:00 +0900
 categories: [AI, Design]
 tags: [ai-pair-programming, ux-design, affordance, design-process, ai-authored]
