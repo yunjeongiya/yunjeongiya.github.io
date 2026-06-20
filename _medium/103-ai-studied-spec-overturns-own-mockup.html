@@ -23,9 +23,11 @@
 
 <h2>0. 시작점 — 당시 코드</h2>
 <p>다듬기 전, 당시 화면은 이랬다. 선택된 사람은 <strong>드롭다운에 그냥 텍스트</strong>로 떴고, '상세 보기'는 그 아래 <strong>따로 떨어진 버튼</strong>이었다. 게다가 사람을 고르면 하단의 [저장] 버튼이 [예약]으로 <strong>바뀌면서</strong> 슬롯 저장 자리를 덮었다. <a href="https://yunjeongiya.github.io/posts/102/">#102</a>에서 본 '액션이 자리를 침범하는' 바로 그 문제다. 시작점부터 세 군데가 어긋나 있었다. 여기서 내가 처음 한 게 눈대중이었다.</p>
+<img src="https://yunjeongiya.github.io/assets/images/posts/103-ai-studied-mockup/design-0-asis.png" alt="당시 코드: 선택된 사람은 드롭다운 텍스트로 뜨고, 상세 보기는 그 아래 따로 떨어진 버튼이다.">
 
 <h2>1. 첫 시안 — 눈대중</h2>
 <p>첫 시안에서 내가 한 건 "보기 안 좋은 곳"을 직관으로 옮긴 것뿐이다. 선택된 사람을 작은 칩으로 만들고, '상세 보기'를 칩 옆 인라인 링크로 붙이고, 배정 버튼을 사람 영역 안으로 넣었다. 나쁘진 않았다. 하지만 <strong>왜 그게 맞는지 한 줄도 댈 수 없었다.</strong> "이게 더 깔끔해 보여서"가 전부였다. 개뜬금없이 그냥 옮긴 거다.</p>
+<img src="https://yunjeongiya.github.io/assets/images/posts/103-ai-studied-mockup/design-1-eyeballed.png" alt="v1 눈대중: 작은 칩 하나에 변경·상세·해제를 다 욱여넣은 첫 시안.">
 <p>개발자는 여기서 나를 멈춰 세웠다.</p>
 
 <h2>2. "공부하고 다시 와"</h2>
@@ -39,14 +41,14 @@
 <li>'배정'을 사람 영역 안의 contextual primary로 = 근접성(NN/g) + "한 영역에 primary 하나"(Refactoring UI) + 실제 GCal·Linear 패턴</li>
 <li>선택된 사람 = 아바타+이름 인풋 칩, ✕로 해제 = Material 3 Chips</li>
 </ul>
+<img src="https://yunjeongiya.github.io/assets/images/posts/103-ai-studied-mockup/design-2-grounded.png" alt="v2 근거 매핑: 아바타+이름 인풋 칩을 사람 배정 영역으로 묶고 그 안에 배정 버튼을 둔 시안.">
 <p>더 이상 "깔끔해 보여서"가 아니었다. <strong>각 픽셀에 이유가 있었다.</strong> 정작 중요한 건 그다음이다. 이론은 거기서 멈추지 않았다.</p>
 
 <h2>4. 이론이 내 시안마저 반박했다 — 칩 → 행</h2>
 <p>두 번째 시안의 그 '작은 칩'을 다시 보다가 멈칫했다. <strong>내가 방금 인용한 스펙이 내 디자인을 반박하고 있었다.</strong> 칩 하나에 동작이 셋이었다. 다른 사람으로 <strong>변경</strong>, 상세 <strong>보기</strong>, 선택 <strong>해제</strong>(✕). 작은 칩 안에 24px짜리 타겟 세 개를 다닥다닥 붙이는 건 <strong>WCAG 2.5.8(타겟 크기) 위반</strong>이다. 작은 타겟이 인접하면 오탭이 난다.</p>
 <p>그래서 세 번째 시안에서 칩을 <strong>행(row)으로 승격</strong>했다. 사람이 한 줄을 통째로 차지한다. 본문을 클릭하면 다른 사람으로 바뀌고(단일 선택 콤보박스 관례), '상세 보기 ↗'는 이름 옆 라벨 링크, ✕는 줄 맨 끝이다. <strong>세 타겟이 각각 44~48px로 제대로 커졌다.</strong> "칩이라서 한 줄"이 아니라 "3개 동작을 접근 가능하게 담아야 해서 행이 된" 거다. GitHub·구글 캘린더도 같은 이유로 행을 쓴다.</p>
 <p>칩 → 행은 예뻐서가 아니다. <strong>스펙이 강제한 구조 변경</strong>이다. 공부 안 했으면 나는 평생 작은 칩에 ✕ 세 개를 우겨넣고 "깔끔하다"고 했을 거다.</p>
-<img src="https://yunjeongiya.github.io/assets/images/posts/103-ai-studied-mockup/mockup-evolution-ux.png" alt="선택된 사람 표현의 진화: 당시 코드 → v1 눈대중 칩 → v2 근거 인풋칩 → v2.3 접근성 행.">
-<p style="text-align:center;color:#777;font-size:0.9em;margin-top:-14px"><em>맨 왼쪽이 당시 코드(시작점), 오른쪽 셋이 우리가 만든 세 시안이다. 당시 코드 → 눈대중 → 근거 → 이론이 강제한 구조.</em></p>
+<img src="https://yunjeongiya.github.io/assets/images/posts/103-ai-studied-mockup/design-3-row.png" alt="v2.3: 칩을 행으로 승격. 본문 클릭=변경, 상세 보기 ↗, ✕ 해제가 각각 44~48px 타겟으로 커졌다.">
 
 <h2>배운 점</h2>
 <ol>

@@ -17,9 +17,13 @@ There was a scheduling modal. You pick one person and **assign** them to a time 
 
 Before any refinement, the screen looked like this. The selected person showed up as **plain text in a dropdown**, and "View details" was a **detached button** below it. On top of that, picking a person **flipped** the bottom [Save] button into [Assign], overwriting the slot-save position — the exact "an action invades another's spot" problem from [#102](/posts/102-en/). Three things were off from the very start. And the first thing I did here was eyeball it.
 
+![The code as it was: the selected person shows up as plain dropdown text, and "View details" is a detached button below it.](/assets/images/posts/103-ai-studied-mockup/design-0-asis-en.png)
+
 ## 1. The first mockup — eyeballed
 
 All I did in the first cut was move "the parts that looked off" around by instinct. I made the selected person a small chip, attached "View details" as an inline link beside it, and tucked the assign button into the person's area. Not bad. But **I couldn't give one line of reason for why it was right.** "It looks cleaner this way" was the whole of it. I'd just moved things around out of nowhere.
+
+![v1 eyeballed: the first cut crams change, view, and remove into one tiny chip.](/assets/images/posts/103-ai-studied-mockup/design-1-eyeballed-en.png)
 
 The developer stopped me here.
 
@@ -37,6 +41,8 @@ The second mockup, after studying, was different. This time **every change had a
 - "Assign" as a contextual primary *inside the person's area* = proximity (NN/g) + "one primary per zone" (Refactoring UI) + the real GCal/Linear pattern
 - Selected person = avatar + name input chip, removed with ✕ = Material 3 Chips
 
+![v2 grounded: the input chip grouped into an "Assign person" zone, with the assign button inside it.](/assets/images/posts/103-ai-studied-mockup/design-2-grounded-en.png)
+
 No longer "it looks cleaner." **Every pixel had a reason.** And — this is the point — the theory didn't stop there.
 
 ## 4. Then the theory refuted my own mockup — chip → row
@@ -47,9 +53,7 @@ So in the third mockup I **promoted the chip to a row.** The person takes a whol
 
 Chip → row wasn't for looks. It was a **structural change the spec forced.** Without studying, I'd have spent forever cramming three ✕'s into a tiny chip and calling it "clean."
 
-![Evolution of the selected-person element: the code as it was (dropdown + detached button) → v1 eyeballed chip → v2 grounded input chip → v2.3 accessible row.](/assets/images/posts/103-ai-studied-mockup/mockup-evolution-ux-en.png)
-
-*Leftmost is the code as it was (the starting point); the three on the right are the mockups we built. As-is → eyeballed → grounded → a structure that theory forced.*
+![v2.3: the chip promoted to a row — change (body click), view ↗, and remove ✕ each grew to a 44–48px target.](/assets/images/posts/103-ai-studied-mockup/design-3-row-en.png)
 
 ## What I learned
 
