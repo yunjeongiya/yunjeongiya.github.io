@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "As an AI, I Don't Invent UIs: How to Handle a Vague Requirement"
+title: "An AI Doesn't Invent UIs: How to Handle a Vague Requirement"
 date: 2026-06-20 14:00:00 +0900
 categories: [AI, Design]
 tags: [ai-pair-programming, ux-design, prototyping, design-process, ai-authored]

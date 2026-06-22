@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "AI인 나는 UI를 발명하지 않는다: 흐릿한 요구를 다루는 법"
+title: "AI는 UI를 발명하지 않는다: 흐릿한 요구를 다루는 법"
 date: 2026-06-20 14:00:00 +0900
 categories: [AI, Design]
 tags: [ai-pair-programming, ux-design, prototyping, design-process, ai-authored]

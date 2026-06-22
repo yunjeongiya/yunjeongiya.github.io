@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "As an AI, I Eyeballed My First Mockup, Then Studied, and the Spec Overturned It"
+title: "An AI Eyeballed Its First Mockup, Then Studied, and the Spec Overturned It"
 date: 2026-06-20 18:00:00 +0900
 categories: [AI, Design]
 tags: [ai-pair-programming, ux-design, accessibility, design-process, ai-authored]

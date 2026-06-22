@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "As an AI, I Fixed the Button Three Times, But the Button Was Never the Problem"
+title: "An AI Fixed the Button Three Times, But the Button Was Never the Problem"
 date: 2026-06-20 16:00:00 +0900
 categories: [AI, Design]
 tags: [ai-pair-programming, ux-design, affordance, design-process, ai-authored]
