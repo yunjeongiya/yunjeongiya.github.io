@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "소켓은 큐가 아니다: 내 프롬프트에 붙어 있던 두 줄의 밴드에이드"
-date: 2026-09-02 21:00:00 +0900
+date: 2026-09-02 15:30:00 +0900
 categories: [AI, Architecture]
 tags: [ai-agent, orchestration, websocket, durable-log, prompt-injection, messaging]
 lang: ko
